@@ -1,0 +1,16 @@
+# Add build support that should go in sdist, but not go in bdist/be installed
+# Note that sub-directories that don't have __init__ are apparently not
+# included by 'recursive-include', so list those separately
+recursive-include include *
+recursive-include src *
+recursive-include wlplan *
+
+# Add documentation and benchmarks: we don't use add_data_dir since we do not
+# want to include this at installation, only for sdist-generated tarballs
+# Docs:
+recursive-include doc *
+prune doc/build
+
+# Exclude generated files
+prune */__pycache__
+global-exclude *.pyc *.pyo *.pyd *.swp *.bak *~
