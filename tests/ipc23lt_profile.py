@@ -1,17 +1,19 @@
 import logging
 import time
 
-from ipc23lt import get_dataset
+import pytest
+from ipc23lt import DOMAINS, get_dataset
 from util import print_mat
 
 from wlplan.feature_generation import WLFeatures
 
 LOGGER = logging.getLogger(__name__)
 
-REPEATS = 100
+REPEATS = 10
 
 
-def helper(domain_name):
+@pytest.mark.parametrize("domain_name", sorted(DOMAINS))
+def test_profile(domain_name):
     data = {}
 
     configs = {
@@ -43,43 +45,3 @@ def helper(domain_name):
     for desc in configs:
         mat.append([desc] + list(data[desc].values()))
     print_mat(mat)
-
-
-def test_blocksworld():
-    helper("blocksworld")
-
-
-def test_childsnack():
-    helper("childsnack")
-
-
-def test_ferry():
-    helper("ferry")
-
-
-def test_floortile():
-    helper("floortile")
-
-
-def test_miconic():
-    helper("miconic")
-
-
-def test_rovers():
-    helper("rovers")
-
-
-def test_satellite():
-    helper("satellite")
-
-
-def test_sokoban():
-    helper("sokoban")
-
-
-def test_spanner():
-    helper("spanner")
-
-
-def test_transport():
-    helper("transport")

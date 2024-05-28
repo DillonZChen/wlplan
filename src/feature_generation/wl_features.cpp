@@ -15,6 +15,7 @@ namespace feature_generation {
         multiset_hash(multiset_hash) {
     collected = false;
     neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
+    seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
   }
 
   int WLFeatures::get_colour_hash(const std::string &colour) {
@@ -31,11 +32,12 @@ namespace feature_generation {
   void WLFeatures::refine(const graph::Graph &graph,
                           std::vector<int> &colours,
                           std::vector<int> &colours_tmp) {
-
+    // memory for storing string and hashed int representation of colours
     std::string new_colour;
     int new_colour_compressed;
 
     for (size_t u = 0; u < graph.nodes.size(); u++) {
+      // skip unseen colours
       if (colours[u] == -1) {
         new_colour_compressed = -1;
         goto end_of_iteration;
@@ -43,10 +45,13 @@ namespace feature_generation {
       neighbour_container->clear();
 
       for (const auto &edge : graph.edges[u]) {
+        // skip unseen colours
         if (colours[edge.second] == -1) {
           new_colour_compressed = -1;
           goto end_of_iteration;
         }
+
+        // add sorted neighbour (colour, edge_label) pair
         neighbour_container->insert(colours[edge.second], edge.first);
       }
 
@@ -81,15 +86,17 @@ namespace feature_generation {
   }
 
   void WLFeatures::collect(const data::Dataset dataset) {
+
+    /* 0. throw error if not using an implemented graph generator */
     if (graph_generator == nullptr) {
       std::string err_msg = "No graph generator is set. Use graph input instead of dataset.";
       throw std::runtime_error(err_msg);
     }
 
-    /* Stage 1: convert dataset to graphs */
+    /* 1. convert dataset to graphs */
     std::vector<graph::Graph> graphs = convert_to_graphs(dataset);
 
-    /* Stage 2: collect colours */
+    /* 2. collect colours */
     collect(graphs);
   }
 
@@ -235,27 +242,33 @@ namespace feature_generation {
       throw std::runtime_error("WLFeatures::collect() must be called before embedding");
     }
 
+    /* 1. Initialise embedding before pruning */
     Embedding x0(colour_hash.size(), 0);
 
+    /* 2. Set up memory for WL updates */
     int n_nodes = graph.nodes.size();
     std::vector<int> colours(n_nodes);
     std::vector<int> colours_tmp(n_nodes);
 
+    /* 3. Compute initial colours */
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       int col = get_colour_hash(std::to_string(graph.nodes[node_i]));
       colours[node_i] = col;
       x0[col]++;
     }
 
+    /* 4. Main WL loop */
+    int is_seen_colour;
     for (int itr = 0; itr < iterations; itr++) {
       refine(graph, colours, colours_tmp);
       for (const int col : colours) {
-        if (col != -1) {
-          x0[col]++;
-        }
+        is_seen_colour = (col != -1);  // prevent branch prediction
+        x0[col] += is_seen_colour;
+        seen_colour_statistics[is_seen_colour][itr]++;
       }
     }
 
+    /* 5. Prune features with colours_to_keep */
     if (prune_features == "none") {
       return x0;
     }

@@ -1,5 +1,6 @@
 import logging
 
+import pytest
 from ipc23lt import get_dataset
 from util import print_mat
 
@@ -12,17 +13,19 @@ FD_COLOURS = {
     "blocksworld": 10444,
     "childsnack": 251,
     "ferry": 3228,
-    "floortile": 7616,
-    "miconic": 108,
-    "rovers": 23202,
-    "satellite": 22155,
-    "sokoban": 110,
-    "spanner": 350,
-    "transport": 3787,
+    ### performing all the tests takes too long
+    # "floortile": 7616,
+    # "miconic": 108,
+    # "rovers": 23202,
+    # "satellite": 22155,
+    # "sokoban": 110,
+    # "spanner": 350,
+    # "transport": 3787,
 }
 
 
-def helper(domain_name):
+@pytest.mark.parametrize("domain_name", sorted(FD_COLOURS.keys()))
+def test_domain(domain_name):
     n_features = {}
 
     configs = {
@@ -60,44 +63,3 @@ def helper(domain_name):
     ## removing statics by schema analysis should always give fewer features
     assert n_features["schema-non-static-set"] <= n_features["static-set"]
     assert n_features["schema-non-static-mset"] <= n_features["static-mset"]
-
-
-def test_blocksworld():
-    helper("blocksworld")
-
-
-def test_childsnack():
-    helper("childsnack")
-
-
-def test_ferry():
-    helper("ferry")
-
-
-## testing all domains takes too long
-# def test_floortile():
-#     helper("floortile")
-
-
-# def test_miconic():
-#     helper("miconic")
-
-
-# def test_rovers():
-#     helper("rovers")
-
-
-# def test_satellite():
-#     helper("satellite")
-
-
-# def test_sokoban():
-#     helper("sokoban")
-
-
-# def test_spanner():
-#     helper("spanner")
-
-
-# def test_transport():
-#     helper("transport")
