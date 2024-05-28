@@ -7,14 +7,15 @@ import pymimir
 from ipc23lt import get_dataset, get_domain_benchmark_dir, get_mimir_problem, get_predicates
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct
+from util import print_mat
 
 import wlplan
 from wlplan.feature_generation import WLFeatures
 
 LOGGER = logging.getLogger(__name__)
 
-PROBLEM = "p1_01"
-EXPANSION_LIMIT = 300
+PROBLEM = "p1_01"  # 149 expansions
+EXPANSION_LIMIT = 149
 
 
 class Node(object):
@@ -108,6 +109,9 @@ def test_train_eval_blocks():
 
     state = mimir_problem.create_state(mimir_problem.initial)
     node = Node(state)
+    if is_goal(state):
+        LOGGER.info(f"Initial state is a goal state")
+        return
     h = get_h(state)
     best_h = h
     LOGGER.info(f"Initial {h=}")
@@ -120,21 +124,28 @@ def test_train_eval_blocks():
     while len(q):
         node = heappop(q)[1]
         state = node.state
-        if is_goal(state):
-            t = time.time() - start_time
-            LOGGER.info(f"Found goal state! {expansions=}, {t=}")
-            break
         expansions += 1
         for action in succ_generator.get_applicable_actions(state):
             succ = action.apply(state)
             if hash(succ) in seen:
                 continue
+            if is_goal(succ):
+                t = time.time() - start_time
+                LOGGER.info(f"Found goal state! {expansions=}, {t=}")
+                return
             seen.add(hash(succ))
             h = get_h(succ)
             if h < best_h:
                 best_h = h
                 t = time.time() - start_time
                 LOGGER.info(f"New best {h=}, {expansions=}, {t=}")
+                if h % 10 == 0:
+                    seen_counts = feature_generator.get_seen_counts()
+                    unseen_counts = feature_generator.get_unseen_counts()
+                    mat = [["itr"] + list(range(0, len(seen_counts)))]
+                    mat.append(["seen"] + seen_counts)
+                    mat.append(["unseen"] + unseen_counts)
+                    print_mat(mat)
             heappush(q, (h, Node(succ)))
         if expansions >= EXPANSION_LIMIT:
             LOGGER.info(f"Expansions limit reached")

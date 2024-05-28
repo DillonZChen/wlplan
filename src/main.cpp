@@ -150,9 +150,7 @@ Parameters
         List of node names, where `node_names[i]` is the name of node `i` indexed from 0.
 
     edges : List[Tuple[int, int]]
-        List of labelled edges, where `edges[u] = [(r_1, v_1), ..., (r_k, v_k)]` represents 
-        edges from node `u` to nodes `v_1, ..., v_k` with labels `r_1, ..., r_k`, respectively.
-        WLPlan graphs are directed so users must ensure that edges are undirected.
+        List of labelled edges, where `edges[u] = [(r_1, v_1), ..., (r_k, v_k)]` represents edges from node `u` to nodes `v_1, ..., v_k` with labels `r_1, ..., r_k`, respectively. WLPlan graphs are directed so users must ensure that edges are undirected.
 
 Attributes
 ----------
@@ -202,6 +200,8 @@ wl_features
         "graphs"_a)
   .def("embed", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::embed_np),
         "state"_a)
-  .def("get_n_features", &feature_generation::WLFeatures::get_n_features);
+  .def("get_n_features", &feature_generation::WLFeatures::get_n_features)
+  .def("get_seen_counts", &feature_generation::WLFeatures::get_seen_counts)
+  .def("get_unseen_counts", &feature_generation::WLFeatures::get_unseen_counts);
 }
 // clang-format on

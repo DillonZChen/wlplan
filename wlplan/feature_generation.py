@@ -18,8 +18,7 @@ class WLFeatures(_WLFeatures):
         domain : Domain
 
         graph_representation : "ilg" or None, default="ilg"
-            The graph encoding of planning states used. If None, the user can
-            only call class method of classes and not datasets and states.
+            The graph encoding of planning states used. If None, the user can only call class method of classes and not datasets and states.
 
         iterations : int, default=2
             The number of WL iterations to perform.
@@ -47,8 +46,17 @@ class WLFeatures(_WLFeatures):
         embed(graphs: List[Graph]) -> np.ndarray[np.int32]
             Converts a list of graphs into a numpy feature matrix. Throws an error if training colours have not been collected by calling `collect`.
 
-        embed(state: List[Atom]) -> np.ndarray[np.int32]
+        embed(state: State) -> np.ndarray[np.int32]
             Converts a state into a numpy feature vector. Throws an error if training colours have not been collected by calling `collect`. An error may also occur if the state does not belong to the problem set by `set_problem`, or if `set_problem` is not called beforehand.
+
+        get_n_features() -> int
+            Returns number of collected features after pruning.
+
+        get_seen_counts() -> List[int]
+            Returns a list of length `iterations` with the count of seen features at each iteration. Counts are from seen colours collected from `collect` calls. The values are collected over all `embed` calls from the initialisation of this class.
+
+        get_unseen_counts() -> List[int]
+            Returns a list of length `iterations` with the count of unseen colours at each iteration. Counts are from colours not seen from `collect` calls. The values are collected over all `embed` calls from the initialisation of this class.
     """
 
     def __init__(

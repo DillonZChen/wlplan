@@ -46,7 +46,12 @@ namespace feature_generation {
 
     Embedding embed(const planning::State &state);
 
+    /* statistics functions */
     int get_n_features() const { return colours_to_keep.size(); }
+
+    std::vector<long> get_seen_counts() const { return seen_colour_statistics[1]; };
+
+    std::vector<long> get_unseen_counts() const { return seen_colour_statistics[0]; };
 
    private:
     std::shared_ptr<graph::GraphGenerator> graph_generator;
@@ -67,6 +72,11 @@ namespace feature_generation {
     std::vector<int> colour_to_layer;
     std::vector<int> colours_to_keep;
 
+    // runtime statistics; int is faster than long but could cause overflow
+    // [i][j] denotes seen count if i=1, and unseen count if i=0
+    // for iteration j = 0, ..., iterations - 1
+    std::vector<std::vector<long>> seen_colour_statistics;
+
     // convert to ILG
     std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);
 
@@ -74,9 +84,8 @@ namespace feature_generation {
     int get_colour_hash(const std::string &colour);
 
     // main WL iteration, updates colours and uses colours_tmp as extra memory for refining
-    void refine(const graph::Graph &graph,
-                std::vector<int> &colours,
-                std::vector<int> &colours_tmp);
+    void
+    refine(const graph::Graph &graph, std::vector<int> &colours, std::vector<int> &colours_tmp);
   };
 
 }  // namespace feature_generation
