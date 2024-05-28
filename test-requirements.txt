@@ -1,3 +1,4 @@
-pymimir @ git+https://github.com/DillonZChen/mimir.git
+--extra-index-url https://test.pypi.org/simple/  # for my pymimir fork
 pytest==8.2.1
 scikit-learn==1.5.0
+pymimir-dzc-fork==0.1.3

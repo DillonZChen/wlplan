@@ -8,6 +8,8 @@ The Python interface for WLPlan can be installed simply by
 
     pip install wlplan
 
+The PyPI release only supports `python>=3.10`.
+
 ### Installing from source
 
 To install from source, clone the repository and then run
