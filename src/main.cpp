@@ -20,8 +20,8 @@ m.doc() = "WLPlan: WL Features for PDDL Planning";
 
 /* Planning */
 auto planning_m = m.def_submodule("planning");
-auto atom = py::class_<planning::Atom>(planning_m, "Atom", R"(
-Parameters
+auto atom = py::class_<planning::Atom>(planning_m, "Atom", 
+R"(Parameters
 ----------
     predicate : Predicate
         Predicate object.
@@ -29,8 +29,8 @@ Parameters
     objects : List[Object]
         List of object names.
 )");
-auto domain = py::class_<planning::Domain>(planning_m, "Domain", R"(
-Parameters
+auto domain = py::class_<planning::Domain>(planning_m, "Domain", 
+R"(Parameters
 ----------
     name : str
         Domain name.
@@ -41,11 +41,11 @@ Parameters
     constant_objects : List[Object], optional
         List of constant objects.
 )");
-auto object = py::class_<planning::Object>(planning_m, "Object", R"(
-Object is a type alias for a str.
+auto object = py::class_<planning::Object>(planning_m, "Object", 
+R"(Object is a type alias for a str.
 )");
-auto predicate = py::class_<planning::Predicate>(planning_m, "Predicate", R"(
-Parameters
+auto predicate = py::class_<planning::Predicate>(planning_m, "Predicate", 
+R"(Parameters
 ----------
     name : str
         Predicate name.
@@ -53,8 +53,8 @@ Parameters
     arity : int
         Predicate arity.
 )");
-auto problem = py::class_<planning::Problem>(planning_m, "Problem", R"(
-Parameters
+auto problem = py::class_<planning::Problem>(planning_m, "Problem", 
+R"(Parameters
 ----------
     domain : Domain
         Domain object.
@@ -68,8 +68,8 @@ Parameters
     negative_goals : List[Atom]
         List of negative goal atoms.
 )");
-auto state = py::class_<planning::State>(planning_m, "State", R"(
-State is a type alias for a list of Atoms.
+auto state = py::class_<planning::State>(planning_m, "State", 
+R"(State is a type alias for a list of Atoms.
 )");
 
 predicate
@@ -98,8 +98,8 @@ problem
 
 /* Data */
 auto data_m = m.def_submodule("data");
-auto dataset = py::class_<data::Dataset>(data_m, "Dataset", R"(
-WLPlan dataset object.
+auto dataset = py::class_<data::Dataset>(data_m, "Dataset", 
+R"(WLPlan dataset object.
 
 Datasets contain a domain and a list of problem states.
 
@@ -111,8 +111,8 @@ Parameters
     data : List[ProblemStates]
         List of problem states.
 )");
-auto problem_states = py::class_<data::ProblemStates>(data_m, "ProblemStates", R"(
-Stores a problem and training states for the problem.
+auto problem_states = py::class_<data::ProblemStates>(data_m, "ProblemStates", 
+R"(Stores a problem and training states for the problem.
 
 Upon initialisation, the problem and states are checked for consistency.
 
@@ -136,8 +136,8 @@ dataset
 
 /* Graph */
 auto graph_m = m.def_submodule("graph");
-auto graph = py::class_<graph::Graph>(graph_m, "Graph", R"(
-WLPlan graph object.
+auto graph = py::class_<graph::Graph>(graph_m, "Graph", 
+R"(WLPlan graph object.
 
 Graphs have integer node colours and edge labels.
 

@@ -1,6 +1,9 @@
 WLPlan
 ======
 
+[![PyPI version](https://badge.fury.io/py/wlplan.svg)](https://badge.fury.io/py/wlplan)
+[![License](https://img.shields.io/pypi/l/wlplan)](https://badge.fury.io/py/wlplan)
+
 WLPlan is a package for generating embeddings of PDDL planning problems for machine learning tasks.
 
 ## Installation
