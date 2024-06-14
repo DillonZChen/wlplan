@@ -35,7 +35,7 @@ jobs:
           python -m pip install -v .
 
       - name: Install test dependencies
-        run: python -m pip install -r test-requirements.txt
+        run: python -m pip install -r tests/test-requirements.txt
 
       - name: Profile
         run: pytest **/*profile*
