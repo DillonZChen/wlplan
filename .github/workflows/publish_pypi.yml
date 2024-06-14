@@ -42,9 +42,13 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
+          mkdir _wlplan
+          pip install .
+          pybind11-stubgen _wlplan -o .
+          touch _wlplan/py.typed
           pip wheel .
           export whl_file=$(find -name "wlplan-*.whl" -type f)
           auditwheel repair $whl_file --plat manylinux_2_34_x86_64 -w wheelhouse/
           export whl_file_new=$(find wheelhouse/ -name "*.whl" -type f)
           echo $whl_file_new
-          twine upload $whl_file_new
+          twine upload --repository testpypi $whl_file_new

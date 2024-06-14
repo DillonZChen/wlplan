@@ -30,7 +30,9 @@ jobs:
         run: python -m pip install --upgrade pip setuptools wheel
 
       - name: Build and install
-        run: python -m pip install -v .
+        run: |
+          mkdir _wlplan
+          python -m pip install -v .
 
       - name: Install test dependencies
         run: python -m pip install -r test-requirements.txt
