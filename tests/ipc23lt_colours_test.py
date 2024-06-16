@@ -1,9 +1,10 @@
 import logging
 
+import numpy as np
 import pytest
 from ipc23lt import get_dataset
-from util import print_mat
 
+from util import print_mat
 from wlplan.feature_generation import WLFeatures
 
 LOGGER = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ def test_domain(domain_name):
             multiset_hash=config["multiset_hash"],
         )
         feature_generator.collect(dataset)
-        X = feature_generator.embed(dataset).astype(float)
+        X = np.array(feature_generator.embed(dataset)).astype(float)
         n_features[desc] = feature_generator.get_n_features()
         assert X.shape[1] == n_features[desc]
 

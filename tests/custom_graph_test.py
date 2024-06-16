@@ -2,6 +2,7 @@ import logging
 import random
 
 import networkx as nx
+import numpy as np
 from ipc23lt import get_raw_dataset
 
 from wlplan.feature_generation import WLFeatures
@@ -31,7 +32,7 @@ def test_blocksworld_random_path():
             graphs.append(G)
             G.dump()
     feature_generator.collect(graphs)
-    X = feature_generator.embed(graphs).astype(float)
+    X = np.array(feature_generator.embed(graphs)).astype(float)
     n_features = feature_generator.get_n_features()
     assert X.shape[1] == n_features
     LOGGER.info(f"{n_features} features collected from random path graphs")

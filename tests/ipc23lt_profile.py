@@ -1,6 +1,7 @@
 import logging
 import time
 
+import numpy as np
 import pytest
 from ipc23lt import DOMAINS, get_dataset
 from util import print_mat
@@ -32,8 +33,9 @@ def test_profile(domain_name):
         feature_generator.collect(dataset)
         t = time.time()
         for _ in range(REPEATS):
-            X = feature_generator.embed(dataset).astype(float)
+            X = feature_generator.embed(dataset)
         t = (time.time() - t) / REPEATS
+        X = np.array(X)
         data[desc] = {
             "n_data": X.shape[0],
             "n_feat": X.shape[1],

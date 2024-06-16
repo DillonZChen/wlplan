@@ -1,5 +1,4 @@
 import networkx as nx
-
 from _wlplan.graph import Graph
 
 
@@ -37,8 +36,7 @@ def to_networkx(graph: Graph):
     G = nx.Graph()
     for u, colour in enumerate(graph.node_colours):
         node_name = graph.get_node_name(u)
-        ## pyvis uses group to automatically assign different visual colours
-        G.add_node(node_name, group=colour)
+        G.add_node(node_name, colour=colour)
     for u in range(len(graph.edges)):
         for r, v in graph.edges[u]:
             G.add_edge(graph.get_node_name(u), graph.get_node_name(v), relation=r)

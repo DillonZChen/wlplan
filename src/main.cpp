@@ -199,11 +199,11 @@ wl_features
         "graphs"_a)
   .def("set_problem", &feature_generation::WLFeatures::set_problem,
         "problem"_a)
-  .def("embed", py::overload_cast<const data::Dataset>(&feature_generation::WLFeatures::embed_np), 
+  .def("embed", py::overload_cast<const data::Dataset &>(&feature_generation::WLFeatures::embed), 
         "dataset"_a)
-  .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::WLFeatures::embed_np),
+  .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::WLFeatures::embed),
         "graphs"_a)
-  .def("embed", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::embed_np),
+  .def("embed", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::embed),
         "state"_a)
   .def("get_n_features", &feature_generation::WLFeatures::get_n_features)
   .def("get_seen_counts", &feature_generation::WLFeatures::get_seen_counts)
@@ -218,8 +218,8 @@ wl_features
   .def("save", &feature_generation::WLFeatures::save);
 
 /* Version */
-#ifdef VERSION_INFO
-  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#ifdef WLPLAN_VERSION
+  m.attr("__version__") = MACRO_STRINGIFY(WLPLAN_VERSION);
 #else
   m.attr("__version__") = "dev";
 #endif

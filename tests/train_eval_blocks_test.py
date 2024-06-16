@@ -9,9 +9,9 @@ import pymimir
 from ipc23lt import get_dataset, get_domain_benchmark_dir, get_mimir_problem, get_predicates
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct
-from util import print_mat
 
 import wlplan
+from util import print_mat
 from wlplan.feature_generation import WLFeatures
 
 LOGGER = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def test_train_eval_blocks():
         multiset_hash=False,
     )
     feature_generator.collect(dataset)
-    X = feature_generator.embed(dataset).astype(float)
+    X = np.array(feature_generator.embed(dataset)).astype(float)
     y = np.array(y)
     LOGGER.info(f"{X.shape=}")
     LOGGER.info(f"{y.shape=}")
@@ -59,7 +59,7 @@ def test_train_eval_blocks():
     mse_loss_fast = np.mean((y - y_pred_fast) ** 2)
     LOGGER.info(f"{mse_loss_fast=}")
     assert np.isclose(mse_loss, mse_loss_fast)
-    feature_generator.set_weights(w_raw)
+    feature_generator.set_weights(w_raw.tolist())
 
     ## save
     LOGGER.info(f"Saving feature generator...")
@@ -69,7 +69,7 @@ def test_train_eval_blocks():
     ## load
     LOGGER.info(f"Loading feature generator...")
     feature_generator = WLFeatures.load(save_file)
-    w_loaded = feature_generator.get_weights()
+    w_loaded = np.array(feature_generator.get_weights())
     logging.info(type(w_loaded))
 
     ## initialise testing problem
@@ -115,7 +115,7 @@ def test_train_eval_blocks():
         for atom in state.get_atoms():
             wlplan_atom = mimir_to_wlplan_atom(atom)
             wlplan_atoms.append(wlplan_atom)
-        x = feature_generator.embed(wlplan_atoms)
+        x = np.array(feature_generator.embed(wlplan_atoms))
         h_raw = x @ w_raw.T
         h_api = feature_generator.predict(wlplan_atoms)
         h_loaded = x @ w_loaded.T

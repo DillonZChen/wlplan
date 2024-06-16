@@ -16,7 +16,7 @@ ext_modules = [
         "_wlplan",
         sorted([f for file_group in files for f in file_group]),
         # Example: passing in the version to the compiled code
-        define_macros=[("VERSION_INFO", __version__)],
+        define_macros=[("WLPLAN_VERSION", __version__)],
     ),
 ]
 
@@ -37,6 +37,5 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "networkx>=3.0",
-        "numpy>=1.26",
     ],
 )

@@ -1,8 +1,6 @@
 import os
 from typing import Optional, Union
 
-import numpy as np
-
 from _wlplan.feature_generation import _WLFeatures
 from _wlplan.planning import Atom, Domain
 
@@ -39,14 +37,14 @@ class WLFeatures(_WLFeatures):
         set_problem(self, problem: Problem) -> None
             Set problem for graph generator if it exists. This should be called before calling `embed` on a state.
 
-        embed(self, dataset: Dataset) -> np.ndarray[np.int32]
-            Converts a dataset into a numpy feature matrix. Throws an error if training colours have not been collected by calling `collect`.
+        embed(self, dataset: Dataset) -> list[int]
+            Converts a dataset into a 2D matrix in the form of a list of lists. Throws an error if training colours have not been collected by calling `collect`.
 
-        embed(self, graphs: List[Graph]) -> np.ndarray[np.int32]
-            Converts a list of graphs into a numpy feature matrix. Throws an error if training colours have not been collected by calling `collect`.
+        embed(self, graphs: List[Graph]) -> list[int]
+            Converts a list of graphs into a 2D matrix in the form of a list of lists. Throws an error if training colours have not been collected by calling `collect`.
 
-        embed(self, state: State) -> np.ndarray[np.int32]
-            Converts a state into a numpy feature vector. Throws an error if training colours have not been collected by calling `collect`. An error may also occur if the state does not belong to the problem set by `set_problem`, or if `set_problem` is not called beforehand.
+        embed(self, state: State) -> list[int]
+            Converts a state into a list. Throws an error if training colours have not been collected by calling `collect`. An error may also occur if the state does not belong to the problem set by `set_problem`, or if `set_problem` is not called beforehand.
 
         get_n_features(self) -> int
             Returns number of collected features after pruning.
@@ -57,7 +55,7 @@ class WLFeatures(_WLFeatures):
         get_unseen_counts(self) -> List[int]
             Returns a list of length `iterations` with the count of unseen colours at each iteration. Counts are from colours not seen from `collect` calls. The values are collected over all `embed` calls from the initialisation of this class.
 
-        set_weights(self, weights: Union[list[float], list[int], np.ndarray]) -> None
+        set_weights(self, weights: Union[list[float], list[int]]) -> None
             Set the weights to predict heuristics directly with this class. The weights must be a list of floats, integers or a numpy array of floats. The length of the weights must be the same as the number of features collected.
 
         get_weights(self) -> np.ndarray
@@ -107,14 +105,13 @@ class WLFeatures(_WLFeatures):
             multiset_hash=multiset_hash,
         )
 
-    def set_weights(self, weights: Union[list[float], list[int], np.ndarray]) -> None:
-        if isinstance(weights, np.ndarray):
-            weights = weights.tolist()
+    def set_weights(self, weights: Union[list[float], list[int]]) -> None:
+        if not isinstance(weights, list):
+            raise ValueError("Input weights must be a Python list.")
         super().set_weights(weights)
 
-    def get_weights(self) -> np.ndarray:
+    def get_weights(self) -> list[float]:
         weights = super().get_weights()
-        weights = np.array(weights)
         return weights
     
     def predict(self, state: list[Atom]) -> float:

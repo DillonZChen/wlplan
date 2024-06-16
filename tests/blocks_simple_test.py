@@ -146,7 +146,7 @@ def test_prune_features():
             multiset_hash=False,
         )
         feature_generator.collect(dataset)
-        X = feature_generator.embed(dataset)
+        X = np.array(feature_generator.embed(dataset))
         X_unique = np.unique(X, axis=1)
         feature_generators[prune_features] = feature_generator
         Xs[prune_features] = X
@@ -158,7 +158,7 @@ def test_prune_features():
         if PROFILE:
             t = time.time()
             for _ in range(PROFILE_REPEATS):
-                X = feature_generator.embed(dataset)
+                X = np.array(feature_generator.embed(dataset))
             t = time.time() - t
             print(f"{t=:.3f}s")
 
@@ -194,7 +194,7 @@ def test_repeated_dataset():
             [dataset, dataset_repeated],
             [feature_generator, feature_generator_repeated],
         ):
-            X = fg.embed(d)
+            X = np.array(fg.embed(d))
             column_sizes.add(X.shape[1])
             print(f"{X.shape=}")
 
@@ -214,7 +214,7 @@ def test_multiset():
             multiset_hash=True,
         )
         feature_generator.collect(dataset)
-        X = feature_generator.embed(dataset)
+        X = np.array(feature_generator.embed(dataset))
         X_unique = np.unique(X, axis=1)
         feature_generators[prune_features] = feature_generator
         Xs[prune_features] = X
@@ -226,7 +226,7 @@ def test_multiset():
         if PROFILE:
             t = time.time()
             for _ in range(PROFILE_REPEATS):
-                X = feature_generator.embed(dataset)
+                X = np.array(feature_generator.embed(dataset))
             t = time.time() - t
             print(f"{t=:.3f}s")
 

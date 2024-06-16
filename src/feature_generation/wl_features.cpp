@@ -1,7 +1,6 @@
 #include "../../include/feature_generation/wl_features.hpp"
 
 #include "../../include/graph/graph_generator_factory.hpp"
-#include "../../include/utils/arrays.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>
@@ -17,7 +16,7 @@ namespace feature_generation {
                          int iterations,
                          std::string prune_features,
                          bool multiset_hash)
-      : package_version(MACRO_STRINGIFY(VERSION_INFO)),
+      : package_version(MACRO_STRINGIFY(WLPLAN_VERSION)),
         graph_representation(graph_representation),
         iterations(iterations),
         prune_features(prune_features),
@@ -37,7 +36,7 @@ namespace feature_generation {
     std::ifstream i(filename);
     json j;
     i >> j;
-    std::string current_package_version = MACRO_STRINGIFY(VERSION_INFO);
+    std::string current_package_version = MACRO_STRINGIFY(WLPLAN_VERSION);
 
     // load configurations
     package_version = j["package_version"];
@@ -285,26 +284,12 @@ namespace feature_generation {
     }
   }
 
-  py::array_t<int> WLFeatures::embed_np(const data::Dataset dataset) {
+  std::vector<Embedding> WLFeatures::embed(const data::Dataset &dataset) {
     std::vector<graph::Graph> graphs = convert_to_graphs(dataset);
     if (graphs.size() == 0) {
       throw std::runtime_error("No graphs to embed");
     }
-    return embed_np(graphs);
-  }
-
-  py::array_t<int> WLFeatures::embed_np(const std::vector<graph::Graph> &graphs) {
-    if (graphs.size() == 0) {
-      throw std::runtime_error("No graphs to embed");
-    }
-    std::vector<Embedding> X = embed(graphs);
-    return utils::to_np_2d(X);
-  }
-
-  py::array_t<int> WLFeatures::embed_np(const planning::State &state) {
-    graph::Graph graph = *(graph_generator->to_graph(state));
-    Embedding x = embed(graph);
-    return utils::to_np_1d(x);
+    return embed(graphs);
   }
 
   std::vector<Embedding> WLFeatures::embed(const std::vector<graph::Graph> &graphs) {

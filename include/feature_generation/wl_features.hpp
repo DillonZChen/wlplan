@@ -9,8 +9,6 @@
 #include "neighbour_container.hpp"
 
 #include <memory>
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
 #include <string>
 #include <vector>
 
@@ -67,12 +65,8 @@ namespace feature_generation {
     // set problem for graph generator if it exists
     void set_problem(const planning::Problem &problem);
 
-    // assumes training is done, and returns a numpy feature matrix X
-    py::array_t<int> embed_np(const data::Dataset dataset);
-
-    py::array_t<int> embed_np(const std::vector<graph::Graph> &graphs);
-
-    py::array_t<int> embed_np(const planning::State &state);
+    // assumes training is done, and returns a feature matrix X
+    std::vector<Embedding> embed(const data::Dataset &dataset);
 
     std::vector<Embedding> embed(const std::vector<graph::Graph> &graphs);
 

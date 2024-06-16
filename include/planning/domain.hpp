@@ -5,13 +5,10 @@
 #include "predicate.hpp"
 #include "state.hpp"
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-namespace py = pybind11;
 using json = nlohmann::json;
 
 namespace planning {

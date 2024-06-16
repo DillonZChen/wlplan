@@ -3,6 +3,7 @@
 import itertools
 import logging
 
+import numpy as np
 import pytest
 from ipc23lt import get_dataset
 
@@ -33,7 +34,7 @@ def test_save_load(domain_name, desc):
         multiset_hash=config["multiset_hash"],
     )
     feature_generator.collect(dataset)
-    X = feature_generator.embed(dataset).astype(float)
+    X = np.array(feature_generator.embed(dataset)).astype(float)
     n_features = feature_generator.get_n_features()
     assert X.shape[1] == n_features
 
@@ -43,7 +44,7 @@ def test_save_load(domain_name, desc):
     ## load
     feature_generator = WLFeatures.load(save_file)
 
-    loaded_X = feature_generator.embed(dataset).astype(float)
+    loaded_X = np.array(feature_generator.embed(dataset)).astype(float)
     assert loaded_X.shape == X.shape
     assert (loaded_X == X).all()
 
