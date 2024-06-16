@@ -1,6 +1,7 @@
 #ifndef PLANNING_DOMAIN_HPP
 #define PLANNING_DOMAIN_HPP
 
+#include "../../include/utils/nlohmann/json.hpp"
 #include "predicate.hpp"
 #include "state.hpp"
 
@@ -11,13 +12,14 @@
 #include <vector>
 
 namespace py = pybind11;
+using json = nlohmann::json;
 
 namespace planning {
   class Domain {
    public:
-    const std::string name;
-    const std::vector<Predicate> predicates;
-    const std::vector<Object> constant_objects;
+    std::string name;
+    std::vector<Predicate> predicates;
+    std::vector<Object> constant_objects;
     std::unordered_map<std::string, int> predicate_to_colour;
 
     Domain(const std::string &name,
@@ -27,6 +29,8 @@ namespace planning {
     Domain(const std::string &name, const std::vector<Predicate> &predicates);
 
     int max_arity() const;
+
+    json to_json() const;
 
     std::string to_string() const;
 

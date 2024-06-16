@@ -1,9 +1,8 @@
 # Available at setup time due to pyproject.toml
-import os
 from glob import glob
 
 from pybind11.setup_helpers import Pybind11Extension, build_ext
-from setuptools import find_packages, setup
+from setuptools import setup
 
 # Read version from wlplan/__version__.py file
 exec(open("wlplan/__version__.py").read())

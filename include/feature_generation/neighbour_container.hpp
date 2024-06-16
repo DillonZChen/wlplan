@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-
 namespace feature_generation {
   class NeighbourContainer {
    public:
@@ -20,7 +19,8 @@ namespace feature_generation {
 
    private:
     const bool multiset_hash;
-    // profiling showed that using pairs is faster than vector of maps or sets
+    // profiling showed that using pairs is faster than vector of maps/sets, and that ordered
+    // containers are faster than unordered containers given that pair does not have a hash
     std::set<std::pair<int, int>> neighbours_set;
     std::map<std::pair<int, int>, int> neighbours_mset;
   };

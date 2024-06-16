@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import logging
 import time
 from heapq import heappop, heappush
@@ -52,11 +54,23 @@ def test_train_eval_blocks():
     y_pred = model.predict(X)
     mse_loss = np.mean((y - y_pred) ** 2)
     LOGGER.info(f"{mse_loss=}")
-    w = model.alpha_ @ model.X_train_  # linear weights from GP
-    y_pred_fast = X @ w.T
+    w_raw = model.alpha_ @ model.X_train_  # linear weights from GP
+    y_pred_fast = X @ w_raw.T
     mse_loss_fast = np.mean((y - y_pred_fast) ** 2)
     LOGGER.info(f"{mse_loss_fast=}")
     assert np.isclose(mse_loss, mse_loss_fast)
+    feature_generator.set_weights(w_raw)
+
+    ## save
+    LOGGER.info(f"Saving feature generator...")
+    save_file = f"tests/models/train_eval_blocks/{PROBLEM}.json"
+    feature_generator.save(save_file)
+
+    ## load
+    LOGGER.info(f"Loading feature generator...")
+    feature_generator = WLFeatures.load(save_file)
+    w_loaded = feature_generator.get_weights()
+    logging.info(type(w_loaded))
 
     ## initialise testing problem
     LOGGER.info(f"Constructing mimir problem...")
@@ -66,7 +80,6 @@ def test_train_eval_blocks():
     mimir_domain, mimir_problem = get_mimir_problem(domain_pddl, problem_pddl)
     LOGGER.info("Constructing mimir succ generator...")
     succ_generator = pymimir.LiftedSuccessorGenerator(mimir_problem)
-    # succ_generator = pymimir.GroundedSuccessorGenerator(mimir_problem)
     name_to_predicate = get_predicates(mimir_domain, keep_statics=False)
     goal_atoms = set(goal.atom for goal in mimir_problem.goal)
 
@@ -103,9 +116,13 @@ def test_train_eval_blocks():
             wlplan_atom = mimir_to_wlplan_atom(atom)
             wlplan_atoms.append(wlplan_atom)
         x = feature_generator.embed(wlplan_atoms)
-        h = x @ w.T
-        h = round(h)
-        return h
+        h_raw = x @ w_raw.T
+        h_api = feature_generator.predict(wlplan_atoms)
+        h_loaded = x @ w_loaded.T
+        assert np.isclose(h_raw, h_api)
+        assert np.isclose(h_raw, h_loaded)
+        h_raw = round(h_raw)
+        return h_raw
 
     state = mimir_problem.create_state(mimir_problem.initial)
     node = Node(state)
@@ -150,3 +167,7 @@ def test_train_eval_blocks():
         if expansions >= EXPANSION_LIMIT:
             LOGGER.info(f"Expansions limit reached")
             assert False
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    test_train_eval_blocks()

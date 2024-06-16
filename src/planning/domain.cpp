@@ -7,6 +7,9 @@ namespace planning {
                  const std::vector<Predicate> &predicates,
                  const std::vector<Object> &constant_objects)
       : name(name), predicates(predicates), constant_objects(constant_objects) {
+    // sort items to ensure consistency when saving and loading models
+    std::sort(this->constant_objects.begin(), this->constant_objects.end());
+    std::sort(this->predicates.begin(), this->predicates.end());
     predicate_to_colour = std::unordered_map<std::string, int>();
     for (size_t i = 0; i < this->predicates.size(); i++) {
       predicate_to_colour[predicates[i].name] = i;
@@ -22,6 +25,18 @@ namespace planning {
       max_arity = std::max(max_arity, predicates[i].arity);
     }
     return max_arity;
+  }
+
+  json Domain::to_json() const {
+    json j;
+    j["name"] = name;
+    std::vector<std::pair<std::string, int>> predicates_raw;
+    for (size_t i = 0; i < predicates.size(); i++) {
+      predicates_raw.push_back(std::make_pair(predicates[i].name, predicates[i].arity));
+    }
+    j["predicates"] = predicates_raw;
+    j["constant_objects"] = constant_objects;
+    return j;
   }
 
   std::string Domain::to_string() const {

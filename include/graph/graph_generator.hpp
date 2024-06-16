@@ -17,7 +17,6 @@
 namespace graph {
   class GraphGenerator {
    public:
-
     // Change the base graph based on the input problem
     virtual void set_problem(const planning::Problem &problem) = 0;
 

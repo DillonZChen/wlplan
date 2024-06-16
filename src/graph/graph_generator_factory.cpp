@@ -7,7 +7,7 @@ namespace graph {
                                                          const planning::Domain &domain) {
     if (name == "ilg") {
       return std::make_shared<ILGGenerator>(domain);
-    } else if (name == "none") {
+    } else if (name == "custom") {
       return NULL;
     } else {
       throw std::runtime_error("Unknown graph generator: " + name);

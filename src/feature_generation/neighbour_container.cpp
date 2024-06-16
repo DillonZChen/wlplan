@@ -1,8 +1,7 @@
 #include "../../include/feature_generation/neighbour_container.hpp"
 
 namespace feature_generation {
-  NeighbourContainer::NeighbourContainer(bool multiset_hash)
-      : multiset_hash(multiset_hash) {}
+  NeighbourContainer::NeighbourContainer(bool multiset_hash) : multiset_hash(multiset_hash) {}
 
   void NeighbourContainer::clear() {
     if (multiset_hash) {

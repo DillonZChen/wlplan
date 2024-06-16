@@ -1,7 +1,15 @@
 #include "../../include/feature_generation/wl_features.hpp"
 
 #include "../../include/graph/graph_generator_factory.hpp"
-#include "../../include/utils.hpp"
+#include "../../include/utils/arrays.hpp"
+#include "../../include/utils/nlohmann/json.hpp"
+
+#include <fstream>
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
+using json = nlohmann::json;
 
 namespace feature_generation {
   WLFeatures::WLFeatures(const planning::Domain &domain,
@@ -9,14 +17,85 @@ namespace feature_generation {
                          int iterations,
                          std::string prune_features,
                          bool multiset_hash)
-      : graph_generator(graph::create_graph_generator(graph_representation, domain)),
+      : package_version(MACRO_STRINGIFY(VERSION_INFO)),
+        graph_representation(graph_representation),
         iterations(iterations),
         prune_features(prune_features),
         multiset_hash(multiset_hash) {
+    this->domain = std::make_shared<planning::Domain>(domain);
+    graph_generator = graph::create_graph_generator(graph_representation, domain);
     collected = false;
+    collecting = false;
     neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
     seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
+    store_weights = false;
   }
+
+  WLFeatures::WLFeatures(const std::string &filename) {
+    // let Python handle file exceptions
+    std::cout << "Loading feature generator from " << filename << " ..." << std::endl;
+    std::ifstream i(filename);
+    json j;
+    i >> j;
+    std::string current_package_version = MACRO_STRINGIFY(VERSION_INFO);
+
+    // load configurations
+    package_version = j["package_version"];
+    if (package_version != current_package_version) {
+      std::cout << "WARNING: loaded generator was created with version " << package_version
+                << " but current version is " << current_package_version;
+      std::cout << "This may lead to unexpected behaviour." << std::endl;
+    }
+    graph_representation = j.at("graph_representation").get<std::string>();
+    iterations = j.at("iterations").get<int>();
+    prune_features = j.at("prune_features").get<std::string>();
+    multiset_hash = j.at("multiset_hash").get<bool>();
+
+    std::cout << "package_version=" << package_version << std::endl;
+    std::cout << "graph_representation=" << graph_representation << std::endl;
+    std::cout << "iterations=" << iterations << std::endl;
+    std::cout << "prune_features=" << prune_features << std::endl;
+    std::cout << "multiset_hash=" << multiset_hash << std::endl;
+
+    // load colours
+    colour_hash = j.at("colour_hash").get<std::unordered_map<std::string, int>>();
+    colour_to_layer = j.at("colour_to_layer").get<std::vector<int>>();
+    colours_to_keep = j.at("colours_to_keep").get<std::vector<int>>();
+
+    // initialise domain object
+    std::string domain_name = j.at("domain").at("name").get<std::string>();
+    std::vector<std::pair<std::string, int>> raw_predicates =
+        j.at("domain").at("predicates").get<std::vector<std::pair<std::string, int>>>();
+    std::vector<planning::Predicate> domain_predicates = std::vector<planning::Predicate>();
+    for (size_t i = 0; i < raw_predicates.size(); i++) {
+      domain_predicates.push_back(
+          planning::Predicate(raw_predicates[i].first, raw_predicates[i].second));
+    }
+    std::vector<planning::Object> constant_objects =
+        j.at("domain").at("constant_objects").get<std::vector<planning::Object>>();
+
+    // load weights if they exist
+    std::vector<double> weights_tmp = j.at("weights").get<std::vector<double>>();
+    std::cout << "weights_size=" << weights_tmp.size() << std::endl;
+    if (weights_tmp.size() > 0) {
+      store_weights = true;
+      weights = weights_tmp;
+    } else {
+      store_weights = false;
+    }
+
+    // initialise other variables
+    domain = std::make_shared<planning::Domain>(domain_name, domain_predicates, constant_objects);
+    graph_generator = graph::create_graph_generator(graph_representation, *domain);
+    collected = true;  // assume generator already collected colours
+    collecting = false;
+    neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
+    seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
+
+    std::cout << "Feature generator loaded!" << std::endl;
+  }
+
+  /* feature functions */
 
   int WLFeatures::get_colour_hash(const std::string &colour) {
     if (!collecting && colour_hash.count(colour) == 0) {
@@ -154,7 +233,7 @@ namespace feature_generation {
     collecting = false;
 
     // 2.3 post processing to detect equivalent features based on final X
-    if (prune_features == "none") {
+    if (prune_features == "no_prune") {
       // do not detect equivalent features
       colours_to_keep = std::vector<int>(colour_hash.size());
       std::iota(colours_to_keep.begin(), colours_to_keep.end(), 0);
@@ -163,7 +242,7 @@ namespace feature_generation {
 
     // want to call embed without invoking collapse features
     std::string prune_features_tmp = prune_features;
-    prune_features = "none";
+    prune_features = "no_prune";
     colours_to_keep = std::vector<int>();
     std::vector<Embedding> X = embed(graphs);
     if (prune_features_tmp == "collapse") {
@@ -269,7 +348,7 @@ namespace feature_generation {
     }
 
     /* 5. Prune features with colours_to_keep */
-    if (prune_features == "none") {
+    if (prune_features == "no_prune") {
       return x0;
     }
 
@@ -283,5 +362,60 @@ namespace feature_generation {
   Embedding WLFeatures::embed(const planning::State &state) {
     graph::Graph graph = *(graph_generator->to_graph(state));
     return embed(graph);
+  }
+
+  /* prediction functions */
+
+  void WLFeatures::set_weights(const std::vector<double> &weights) {
+    if (((int)weights.size()) != get_n_features()) {
+      throw std::runtime_error("Number of weights must match number of features.");
+    }
+    store_weights = true;
+    this->weights = weights;
+  }
+
+  std::vector<double> WLFeatures::get_weights() const {
+    if (!store_weights) {
+      throw std::runtime_error("Cannot get weights as they are not stored.");
+    }
+    return weights;
+  }
+
+  double WLFeatures::predict(const graph::Graph &graph) {
+    if (!store_weights) {
+      throw std::runtime_error("Weights have not been set for prediction.");
+    }
+
+    Embedding x = embed(graph);
+    double h = std::inner_product(x.begin(), x.end(), weights.begin(), 0.0);
+    return h;
+  }
+
+  double WLFeatures::predict(const planning::State &state) {
+    graph::Graph graph = *(graph_generator->to_graph(state));
+    return predict(graph);
+  }
+
+  /* I/O functions */
+
+  void WLFeatures::save(const std::string &filename) {
+    // let Python handle file exceptions
+    json j;
+    j["package_version"] = package_version;
+    j["graph_representation"] = graph_representation;
+    j["iterations"] = iterations;
+    j["prune_features"] = prune_features;
+    j["multiset_hash"] = multiset_hash;
+
+    j["domain"] = domain->to_json();
+
+    j["colour_hash"] = colour_hash;
+    j["colour_to_layer"] = colour_to_layer;
+    j["colours_to_keep"] = colours_to_keep;
+
+    j["weights"] = weights;
+
+    std::ofstream o(filename);
+    o << std::setw(4) << j << std::endl;
   }
 }  // namespace feature_generation

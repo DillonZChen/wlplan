@@ -11,6 +11,9 @@
 #include <pybind11/stl.h>
 #include <pybind11/typing.h>
 
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
 namespace py = pybind11;
 using namespace py::literals;
 
@@ -186,6 +189,8 @@ auto feature_generation_m = m.def_submodule("feature_generation");
 auto wl_features = py::class_<feature_generation::WLFeatures>(feature_generation_m, "_WLFeatures");
 
 wl_features
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
   .def("collect", py::overload_cast<const data::Dataset>(&feature_generation::WLFeatures::collect),
@@ -202,6 +207,21 @@ wl_features
         "state"_a)
   .def("get_n_features", &feature_generation::WLFeatures::get_n_features)
   .def("get_seen_counts", &feature_generation::WLFeatures::get_seen_counts)
-  .def("get_unseen_counts", &feature_generation::WLFeatures::get_unseen_counts);
+  .def("get_unseen_counts", &feature_generation::WLFeatures::get_unseen_counts)
+  .def("set_weights", &feature_generation::WLFeatures::set_weights,
+        "weights"_a)
+  .def("get_weights", &feature_generation::WLFeatures::get_weights)
+  .def("predict", py::overload_cast<const graph::Graph &>(&feature_generation::WLFeatures::predict),
+        "graph"_a)
+  .def("predict", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::predict),
+        "state"_a)
+  .def("save", &feature_generation::WLFeatures::save);
+
+/* Version */
+#ifdef VERSION_INFO
+  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+  m.attr("__version__") = "dev";
+#endif
 }
 // clang-format on

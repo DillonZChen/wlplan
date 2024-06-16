@@ -6,16 +6,16 @@
 namespace planning {
   class Predicate {
    public:
-    const std::string name;
-    const int arity;
+    std::string name;
+    int arity;
 
-    Predicate(const std::string &name, int arity);
+    Predicate(const std::string &name, const int arity);
 
     std::string to_string() const;
 
-    bool operator==(const Predicate &other) const {
-      return name == other.name && arity == other.arity;
-    }
+    bool operator==(const Predicate &other) const { return to_string() == other.to_string(); }
+
+    bool operator<(const Predicate &other) const { return to_string() < other.to_string(); }
   };
 
 }  // namespace planning

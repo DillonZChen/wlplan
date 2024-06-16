@@ -1,4 +1,4 @@
 --extra-index-url https://test.pypi.org/simple/  # for my pymimir fork
+pymimir-dzc-fork==0.1.3
 pytest==8.2.1
 scikit-learn==1.5.0
-pymimir-dzc-fork==0.1.3
