@@ -23,6 +23,8 @@ and adding the following to the root CMakeLists.txt file of your project
 
     list(APPEND CMAKE_PREFIX_PATH "<path/to/installation>")
     find_package(wlplan)
+    ...
+    target_link_libraries(<your_project> PRIVATE wlplan)
 
 ## References
 For information about the technical details of the underlying algorithm, read the paper [here](https://arxiv.org/abs/2403.16508). The corresponding bib entry is
