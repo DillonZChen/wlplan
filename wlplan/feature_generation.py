@@ -123,6 +123,6 @@ class WLFeatures(_WLFeatures):
 
     def save(self, filename: str) -> None:
         filename_dir = os.path.dirname(filename)
-        if not os.path.exists(filename_dir):
+        if len(filename_dir) > 0 and not os.path.exists(filename_dir):
             os.makedirs(filename_dir)
         super().save(filename)

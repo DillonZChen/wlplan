@@ -19,8 +19,8 @@ add_library(wlplan ${SRC_FILES})
 
 # Specify include directories for the target
 target_include_directories(wlplan PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 # Export the targets to a file
@@ -31,6 +31,9 @@ install(TARGETS wlplan
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+# Install header files
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Create and install the package configuration file
 include(CMakePackageConfigHelpers)

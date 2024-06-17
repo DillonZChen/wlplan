@@ -55,7 +55,7 @@ namespace feature_generation {
 
     WLFeatures(const std::string &filename);
 
-    /* feature functions */
+    /* Feature generation functions */
 
     // collect training colours
     void collect(const data::Dataset dataset);
@@ -74,7 +74,7 @@ namespace feature_generation {
 
     Embedding embed(const planning::State &state);
 
-    /* prediction functions */
+    /* Prediction functions */
 
     void set_weights(const std::vector<double> &weights);
 
@@ -84,7 +84,7 @@ namespace feature_generation {
 
     double predict(const planning::State &state);
 
-    /* statistics functions */
+    /* Statistics functions */
 
     int get_n_features() const { return colours_to_keep.size(); }
 
@@ -92,8 +92,11 @@ namespace feature_generation {
 
     std::vector<long> get_unseen_counts() const { return seen_colour_statistics[0]; };
 
-    /* I/O functions */
+    /* Other useful functions */
+
     void save(const std::string &filename);
+
+    std::shared_ptr<planning::Domain> get_domain() const { return domain; }
 
    private:
     // get hashed colour if it exists, and constructs it if it doesn't

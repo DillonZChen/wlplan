@@ -36,6 +36,7 @@ setup(
     license="MIT License",
     python_requires=">=3.10",
     install_requires=[
+        "pymdzcf==0.1.0",
         "networkx>=3.0",
     ],
 )

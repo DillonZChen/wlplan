@@ -42,7 +42,7 @@ namespace feature_generation {
     package_version = j["package_version"];
     if (package_version != current_package_version) {
       std::cout << "WARNING: loaded generator was created with version " << package_version
-                << " but current version is " << current_package_version;
+                << " but current version is " << current_package_version << ". ";
       std::cout << "This may lead to unexpected behaviour." << std::endl;
     }
     graph_representation = j.at("graph_representation").get<std::string>();
@@ -318,6 +318,9 @@ namespace feature_generation {
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       int col = get_colour_hash(std::to_string(graph.nodes[node_i]));
       colours[node_i] = col;
+      if (col == -1) {
+        continue;
+      }
       x0[col]++;
     }
 

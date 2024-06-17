@@ -13,6 +13,7 @@ from sklearn.gaussian_process.kernels import DotProduct
 import wlplan
 from util import print_mat
 from wlplan.feature_generation import WLFeatures
+from wlplan.planning import parse_problem
 
 LOGGER = logging.getLogger(__name__)
 
@@ -89,15 +90,7 @@ def test_train_eval_blocks():
             objects=[o.name for o in mimir_atom.terms],
         )
 
-    objects = [o.name for o in mimir_problem.objects]
-    positive_goals = [mimir_to_wlplan_atom(atom) for atom in goal_atoms]
-    negative_goals = []
-    wlplan_problem = wlplan.planning.Problem(
-        domain=wlplan_domain,
-        objects=objects,
-        positive_goals=positive_goals,
-        negative_goals=negative_goals,
-    )
+    wlplan_problem = parse_problem(domain_pddl, problem_pddl)
     feature_generator.set_problem(wlplan_problem)
     goal_names = [str(atom) for atom in goal_atoms]
 

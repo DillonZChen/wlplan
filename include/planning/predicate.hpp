@@ -9,6 +9,8 @@ namespace planning {
     std::string name;
     int arity;
 
+    Predicate() = default;
+
     Predicate(const std::string &name, const int arity);
 
     std::string to_string() const;

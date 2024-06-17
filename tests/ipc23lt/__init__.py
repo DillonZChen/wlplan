@@ -6,7 +6,7 @@ import pymimir
 
 import wlplan
 from wlplan.data import Dataset, ProblemStates
-from wlplan.planning import Predicate
+from wlplan.planning import Predicate, parse_domain
 
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
@@ -45,6 +45,21 @@ def get_domain_benchmark_dir(domain_name: str):
     return ret
 
 
+def get_domain_pddl(domain_name: str):
+    assert domain_name in DOMAINS
+    benchmark_dir = get_domain_benchmark_dir(domain_name)
+    domain_pddl = f"{benchmark_dir}/domain.pddl"
+    return domain_pddl
+
+
+def get_problem_pddl(domain_name: str, problem_name: str):
+    assert domain_name in DOMAINS
+    benchmark_dir = get_domain_benchmark_dir(domain_name)
+    problem_pddl = f"{benchmark_dir}/testing/p{problem_name}.pddl"
+    assert os.path.exists(problem_pddl), problem_pddl
+    return problem_pddl
+
+
 def get_predicates(mimir_domain: pymimir.Domain, keep_statics: bool):
     predicates = {}
     if keep_statics:
@@ -80,7 +95,7 @@ def get_raw_dataset(domain_name: str, keep_statics: bool):
     predicate_names = repr([repr(x) for x in predicates]).replace("'", "")
     LOGGER.info(f"{domain_name} predicates for {keep_statics=}: {predicate_names}")
 
-    wlplan_domain = wlplan.planning.Domain(name=domain_name, predicates=predicates)
+    wlplan_domain = parse_domain(domain_pddl, domain_name, keep_statics)
 
     wlplan_data = []
     y = []
