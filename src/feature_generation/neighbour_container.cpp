@@ -27,16 +27,33 @@ namespace feature_generation {
     std::string str = "";
     if (multiset_hash) {
       for (const auto &kv : neighbours_mset) {
-        str += ";" + std::to_string(kv.first.first);
-        str += "," + std::to_string(kv.first.second);
-        str += "x" + std::to_string(kv.second);  // count in multiset
+        str += "." + std::to_string(kv.first.first);
+        str += "." + std::to_string(kv.first.second);
+        str += "." + std::to_string(kv.second);  // count in multiset
       }
     } else {
       for (const auto &kv : neighbours_set) {
-        str += ";" + std::to_string(kv.first);
-        str += "," + std::to_string(kv.second);
+        str += "." + std::to_string(kv.first);
+        str += "." + std::to_string(kv.second);
       }
     }
     return str;
+  }
+
+  std::vector<int> NeighbourContainer::to_vector() const {
+    std::vector<int> vec;
+    if (multiset_hash) {
+      for (const auto &kv : neighbours_mset) {
+        vec.push_back(kv.first.first);
+        vec.push_back(kv.first.second);
+        vec.push_back(kv.second);  // count in multiset
+      }
+    } else {
+      for (const auto &kv : neighbours_set) {
+        vec.push_back(kv.first);
+        vec.push_back(kv.second);
+      }
+    }
+    return vec;
   }
 }  // namespace feature_generation

@@ -54,6 +54,10 @@ namespace graph {
     return index_to_node_[u];
   }
 
+  int Graph::get_node_index(const std::string &node_name) const {
+    return node_to_index_.at(node_name);
+  }
+
   int Graph::get_n_edges() const {
     int ret = 0;
     for (size_t u = 0; u < nodes.size(); u++) {

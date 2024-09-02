@@ -17,6 +17,8 @@ namespace planning {
     std::string name;
     std::vector<Predicate> predicates;
     std::vector<Object> constant_objects;
+
+    // maps a predicate to an ID in {0, ..., n_pred - 1}, sorted by predicate name and arity
     std::unordered_map<std::string, int> predicate_to_colour;
 
     Domain(const std::string &name,

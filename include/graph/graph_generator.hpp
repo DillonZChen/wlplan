@@ -24,13 +24,18 @@ namespace graph {
 
     // Makes a copy of the base graph and makes the necessary modifications
     // Assumes the state is from the problem that is set but does not check this.
-    virtual std::shared_ptr<Graph> to_graph(const planning::State &state) const = 0;
+    virtual std::shared_ptr<Graph> to_graph(const planning::State &state) = 0;
+
+    virtual std::shared_ptr<Graph> to_graph_opt(const planning::State &state) = 0;
+    virtual void reset_graph() const = 0;
 
     virtual int get_n_edge_labels() const = 0;
 
     virtual std::vector<int> get_init_colours() const = 0;
 
     virtual void print_init_colours() const = 0;
+
+    virtual void dump_graph() const = 0;
   };
 }  // namespace graph
 

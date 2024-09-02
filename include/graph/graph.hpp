@@ -42,6 +42,9 @@ namespace graph {
 
     std::string get_node_name(const int u) const;
 
+    // assumes we checked that the node exists
+    int get_node_index(const std::string &node_name) const;
+
     int get_n_edges() const;
 
     std::string to_string() const;

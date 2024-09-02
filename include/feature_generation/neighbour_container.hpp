@@ -17,6 +17,8 @@ namespace feature_generation {
 
     std::string to_string() const;
 
+    std::vector<int> to_vector() const;
+
    private:
     const bool multiset_hash;
     // profiling showed that using pairs is faster than vector of maps/sets, and that ordered

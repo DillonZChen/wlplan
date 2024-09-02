@@ -22,19 +22,19 @@ namespace data {
       }
 
       std::unordered_set<planning::Object> objects;
-      for (const planning::Object &object : problem.objects) {
+      for (const planning::Object &object : problem.get_problem_objects()) {
         objects.insert(object);
       }
-      for (const planning::Object &object : domain.constant_objects) {
+      for (const planning::Object &object : problem.get_constant_objects()) {
         objects.insert(object);
       }
 
       // check proposition consistency of goals
-      for (const planning::Atom &goal : problem.positive_goals) {
+      for (const planning::Atom &goal : problem.get_positive_goals()) {
         check_good_atom(goal, objects);
       }
 
-      for (const planning::Atom &goal : problem.negative_goals) {
+      for (const planning::Atom &goal : problem.get_negative_goals()) {
         check_good_atom(goal, objects);
       }
 

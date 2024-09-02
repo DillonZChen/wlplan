@@ -17,6 +17,9 @@ file(GLOB_RECURSE SRC_FILES "src/**/*.cpp")
 # Define the library target
 add_library(wlplan ${SRC_FILES})
 
+# Add compile definitions
+target_compile_definitions(wlplan PRIVATE WLPLAN_VERSION="${WLPLAN_VERSION}")
+
 # Specify include directories for the target
 target_include_directories(wlplan PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"

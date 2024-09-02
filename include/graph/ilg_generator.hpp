@@ -37,7 +37,13 @@ namespace graph {
 
     // Makes a copy of the base graph and makes the necessary modifications
     // Assumes the state is from the problem that is set but does not check this.
-    std::shared_ptr<Graph> to_graph(const planning::State &state) const override;
+    std::shared_ptr<Graph> to_graph(const planning::State &state) override;
+
+    // Optimised variant of to_graph() but requires calling reset_graph() after. 
+    // Does not make a copy of the base graph and instead modifies it directly,
+    // and undoing the modifications with reset_graph().
+    std::shared_ptr<Graph> to_graph_opt(const planning::State &state);
+    void reset_graph() const;
 
     int get_n_edge_labels() const override;
 
@@ -45,22 +51,34 @@ namespace graph {
 
     void print_init_colours() const override;
 
+    void dump_graph() const override;
+
    private:
-    // These variables get reset every time a new problem is set
+    /* These variables get reset every time a new problem is set */
     std::shared_ptr<Graph> base_graph;
     std::unordered_set<std::string> positive_goal_names;
     std::unordered_set<std::string> negative_goal_names;
+    std::shared_ptr<planning::Problem> problem;
 
-    // The following variables remain constant for all problems
+    /* The following variables remain constant for all problems */
     const planning::Domain &domain;
     const std::unordered_map<std::string, int> predicate_to_colour;
 
     // Do not use a vector here because colours can be negative, i.e. constant objects
     std::map<int, std::string> colour_to_description;
-
     int fact_colour(const int predicate_idx, const ILGFactDescription &fact_description) const;
-
     int fact_colour(const planning::Atom &atom, const ILGFactDescription &fact_description) const;
+
+    /* For modifying the base graph and redoing its changes */
+    int n_nodes_added;
+    std::vector<int> n_edges_added;
+    std::vector<int> pos_goal_changed;
+    std::vector<int> neg_goal_changed;
+    std::vector<int> pos_goal_changed_pred;
+    std::vector<int> neg_goal_changed_pred;
+    std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
+                                                   const std::shared_ptr<Graph> graph,
+                                                   bool store_changes);
   };
 
   inline int ILGGenerator::fact_colour(const int predicate_idx,

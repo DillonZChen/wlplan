@@ -4,6 +4,8 @@ from typing import Optional
 import pymimir
 from _wlplan.planning import Atom, Domain, Predicate, Problem
 
+State = list[Atom]
+
 
 def _get_predicates(mimir_domain: pymimir.Domain, keep_statics: bool) -> dict[str, Predicate]:
     predicates = {}

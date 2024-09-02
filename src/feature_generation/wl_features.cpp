@@ -4,6 +4,7 @@
 #include "../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>
+#include <sstream>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -57,7 +58,9 @@ namespace feature_generation {
     std::cout << "multiset_hash=" << multiset_hash << std::endl;
 
     // load colours
-    colour_hash = j.at("colour_hash").get<std::unordered_map<std::string, int>>();
+    std::unordered_map<std::string, int> colour_hash_str =
+        j.at("colour_hash").get<std::unordered_map<std::string, int>>();
+    colour_hash = str_to_int_colour_hash(colour_hash_str);
     colour_to_layer = j.at("colour_to_layer").get<std::vector<int>>();
     colours_to_keep = j.at("colours_to_keep").get<std::vector<int>>();
 
@@ -96,7 +99,7 @@ namespace feature_generation {
 
   /* feature functions */
 
-  int WLFeatures::get_colour_hash(const std::string &colour) {
+  int WLFeatures::get_colour_hash(const std::vector<int> &colour) {
     if (!collecting && colour_hash.count(colour) == 0) {
       return -1;
     } else if (collecting && colour_hash.count(colour) == 0) {
@@ -107,14 +110,15 @@ namespace feature_generation {
     return colour_hash[colour];
   }
 
-  void WLFeatures::refine(const graph::Graph &graph,
+  void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                           std::vector<int> &colours,
                           std::vector<int> &colours_tmp) {
     // memory for storing string and hashed int representation of colours
-    std::string new_colour;
+    std::vector<int> new_colour;
+    std::vector<int> neighbour_vector;
     int new_colour_compressed;
 
-    for (size_t u = 0; u < graph.nodes.size(); u++) {
+    for (size_t u = 0; u < graph->nodes.size(); u++) {
       // skip unseen colours
       if (colours[u] == -1) {
         new_colour_compressed = -1;
@@ -122,7 +126,7 @@ namespace feature_generation {
       }
       neighbour_container->clear();
 
-      for (const auto &edge : graph.edges[u]) {
+      for (const auto &edge : graph->edges[u]) {
         // skip unseen colours
         if (colours[edge.second] == -1) {
           new_colour_compressed = -1;
@@ -134,7 +138,10 @@ namespace feature_generation {
       }
 
       // add current colour and sorted neighbours into sorted colour key
-      new_colour = std::to_string(colours[u]) + neighbour_container->to_string();
+      new_colour = {colours[u]};
+      neighbour_vector = neighbour_container->to_vector();
+
+      new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
 
       // hash seen colours
       new_colour_compressed = get_colour_hash(new_colour);
@@ -198,7 +205,7 @@ namespace feature_generation {
       std::vector<int> colours(n_nodes);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         cur_collecting_layer = 0;
-        int col = get_colour_hash(std::to_string(graph.nodes[node_i]));
+        int col = get_colour_hash({graph.nodes[node_i]});
         if (histogram.count(col) == 0) {
           histogram[col] = 0;
         }
@@ -215,7 +222,9 @@ namespace feature_generation {
       int colours_collected = get_n_features();
       cur_collecting_layer = iteration;
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
-        refine(graphs[graph_i], graph_colours[graph_i], graph_colours_tmp[graph_i]);
+        refine(std::make_shared<graph::Graph>(graphs[graph_i]),
+               graph_colours[graph_i],
+               graph_colours_tmp[graph_i]);
 
         for (const int colour : graph_colours[graph_i]) {
           assert(colour != -1);
@@ -300,7 +309,7 @@ namespace feature_generation {
     return X;
   }
 
-  Embedding WLFeatures::embed(const graph::Graph &graph) {
+  Embedding WLFeatures::embed(const std::shared_ptr<graph::Graph> &graph) {
     collecting = false;
     if (!collected) {
       throw std::runtime_error("WLFeatures::collect() must be called before embedding");
@@ -310,18 +319,15 @@ namespace feature_generation {
     Embedding x0(colour_hash.size(), 0);
 
     /* 2. Set up memory for WL updates */
-    int n_nodes = graph.nodes.size();
+    int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::vector<int> colours_tmp(n_nodes);
 
     /* 3. Compute initial colours */
     for (int node_i = 0; node_i < n_nodes; node_i++) {
-      int col = get_colour_hash(std::to_string(graph.nodes[node_i]));
+      int col = get_colour_hash({graph->nodes[node_i]});
       colours[node_i] = col;
-      if (col == -1) {
-        continue;
-      }
-      x0[col]++;
+      x0[col] += (col != -1);  // prevent branch prediction
     }
 
     /* 4. Main WL loop */
@@ -347,6 +353,10 @@ namespace feature_generation {
     return x;
   }
 
+  Embedding WLFeatures::embed(const graph::Graph &graph) {
+    return embed(std::make_shared<graph::Graph>(graph));
+  }
+
   Embedding WLFeatures::embed(const planning::State &state) {
     graph::Graph graph = *(graph_generator->to_graph(state));
     return embed(graph);
@@ -369,7 +379,7 @@ namespace feature_generation {
     return weights;
   }
 
-  double WLFeatures::predict(const graph::Graph &graph) {
+  double WLFeatures::predict(const std::shared_ptr<graph::Graph> &graph) {
     if (!store_weights) {
       throw std::runtime_error("Weights have not been set for prediction.");
     }
@@ -379,9 +389,53 @@ namespace feature_generation {
     return h;
   }
 
+  double WLFeatures::predict(const graph::Graph &graph) {
+    return predict(std::make_shared<graph::Graph>(graph));
+  }
+
+  // double WLFeatures::predict(const planning::State &state) {
+  //   std::shared_ptr<graph::Graph> graph = graph_generator->to_graph(state);
+  //   double h = predict(graph);
+  //   return h;
+  // }
+
   double WLFeatures::predict(const planning::State &state) {
-    graph::Graph graph = *(graph_generator->to_graph(state));
-    return predict(graph);
+    std::shared_ptr<graph::Graph> graph = graph_generator->to_graph_opt(state);
+    double h = predict(graph);
+    graph_generator->reset_graph();
+    return h;
+  }
+
+  // hash type conversion functions
+  std::unordered_map<std::vector<int>, int, int_vector_hasher>
+  WLFeatures::str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const {
+    std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash;
+    for (const auto &pair : str_colour_hash) {
+      std::vector<int> colour;
+      std::istringstream iss(pair.first);
+      std::string token;
+      while (std::getline(iss, token, '.')) {
+        colour.push_back(std::stoi(token));
+      }
+      int_colour_hash[colour] = pair.second;
+    }
+    return int_colour_hash;
+  }
+
+  std::unordered_map<std::string, int>
+  WLFeatures::int_to_str_colour_hash(std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash) const {
+    std::unordered_map<std::string, int> str_colour_hash;
+    for (const auto &pair : int_colour_hash) {
+      std::string colour_str = "";
+      for (size_t i = 0; i < pair.first.size(); i++) {
+        colour_str += std::to_string(pair.first[i]);
+        if (i < pair.first.size() - 1) {
+          colour_str += ".";
+        }
+      }
+      str_colour_hash[colour_str] = pair.second;
+    }
+    return str_colour_hash;
   }
 
   /* I/O functions */
@@ -397,7 +451,7 @@ namespace feature_generation {
 
     j["domain"] = domain->to_json();
 
-    j["colour_hash"] = colour_hash;
+    j["colour_hash"] = int_to_str_colour_hash(colour_hash);
     j["colour_to_layer"] = colour_to_layer;
     j["colours_to_keep"] = colours_to_keep;
 

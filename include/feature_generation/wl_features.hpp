@@ -12,6 +12,31 @@
 #include <string>
 #include <vector>
 
+class int_vector_hasher {
+ public:
+
+  // https://stackoverflow.com/a/27216842
+  std::size_t operator()(std::vector<int> const &vec) const {
+    std::size_t seed = vec.size();
+    for (auto &i : vec) {
+      seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
+  }
+
+  // https://stackoverflow.com/a/72073933
+  // std::size_t operator()(std::vector<int> const &vec) const {
+  //   std::size_t seed = vec.size();
+  //   for (auto x : vec) {
+  //     x = ((x >> 16) ^ x) * 0x45d9f3b;
+  //     x = ((x >> 16) ^ x) * 0x45d9f3b;
+  //     x = (x >> 16) ^ x;
+  //     seed ^= x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  //   }
+  //   return seed;
+  // }
+};
+
 namespace feature_generation {
   using Embedding = std::vector<int>;
 
@@ -25,7 +50,7 @@ namespace feature_generation {
     bool multiset_hash;
 
     // colouring [saved]
-    std::unordered_map<std::string, int> colour_hash;
+    std::unordered_map<std::vector<int>, int, int_vector_hasher> colour_hash;
     std::vector<int> colour_to_layer;
     std::vector<int> colours_to_keep;
 
@@ -70,6 +95,8 @@ namespace feature_generation {
 
     std::vector<Embedding> embed(const std::vector<graph::Graph> &graphs);
 
+    Embedding embed(const std::shared_ptr<graph::Graph> &graph);
+
     Embedding embed(const graph::Graph &graph);
 
     Embedding embed(const planning::State &state);
@@ -79,6 +106,8 @@ namespace feature_generation {
     void set_weights(const std::vector<double> &weights);
 
     std::vector<double> get_weights() const;
+
+    double predict(const std::shared_ptr<graph::Graph> &graph);
 
     double predict(const graph::Graph &graph);
 
@@ -94,17 +123,24 @@ namespace feature_generation {
 
     /* Other useful functions */
 
+    std::unordered_map<std::vector<int>, int, int_vector_hasher>
+    str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const;
+
+    std::unordered_map<std::string, int> int_to_str_colour_hash(
+        std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash) const;
+
     void save(const std::string &filename);
 
     std::shared_ptr<planning::Domain> get_domain() const { return domain; }
 
    private:
     // get hashed colour if it exists, and constructs it if it doesn't
-    int get_colour_hash(const std::string &colour);
+    int get_colour_hash(const std::vector<int> &colour);
 
     // main WL iteration, updates colours and uses colours_tmp as extra memory for refining
-    void
-    refine(const graph::Graph &graph, std::vector<int> &colours, std::vector<int> &colours_tmp);
+    void refine(const std::shared_ptr<graph::Graph> &graph,
+                std::vector<int> &colours,
+                std::vector<int> &colours_tmp);
 
     // convert to ILG
     std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);

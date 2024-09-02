@@ -76,7 +76,7 @@ class WLFeatures(_WLFeatures):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = "collapse",
+        prune_features: Optional[str] = "no_prune",
         multiset_hash: bool = False,
         **kwargs,
     ) -> None:
