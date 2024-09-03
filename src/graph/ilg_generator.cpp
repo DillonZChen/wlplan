@@ -4,14 +4,8 @@
 char const *fact_description_name[] = {ILG_FACT_DESCRIPTIONS};
 #undef X
 
-// #define to_obj_nodeA(x) problem.get_obj_short_str(x)
-// #define to_atom_nodeA(x) problem.get_atom_short_str(x)
-// #define to_obj_nodeB(x) problem->get_obj_short_str(x)
-// #define to_atom_nodeB(x) problem->get_atom_short_str(x)
-#define to_obj_nodeA(x) x
-#define to_atom_nodeA(x) x.to_string()
-#define to_obj_nodeB(x) x
-#define to_atom_nodeB(x) x.to_string()
+#define to_obj_node(x) x
+#define to_atom_node(x) x.to_string()
 
 namespace graph {
   ILGGenerator::ILGGenerator(const planning::Domain &domain)
@@ -45,28 +39,28 @@ namespace graph {
     /// add nodes
     // add constant object nodes
     for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
-      std::string node = to_obj_nodeA(domain.constant_objects[i]);
+      std::string node = to_obj_node(domain.constant_objects[i]);
       int colour = -(i + 1);
       graph.add_node(node, colour);
     }
 
     // objects
     for (const auto &object : problem.get_problem_objects()) {
-      std::string node = to_obj_nodeA(object);
+      std::string node = to_obj_node(object);
       int colour = 0;
       graph.add_node(node, colour);
     }
 
     // atoms
     for (const auto &atom : problem.get_positive_goals()) {
-      std::string node = to_atom_nodeA(atom);
+      std::string node = to_atom_node(atom);
       int colour = fact_colour(atom, ILGFactDescription::F_POS_GOAL);
       graph.add_node(node, colour);
       positive_goal_names.insert(node);
     }
 
     for (const auto &atom : problem.get_negative_goals()) {
-      std::string node = to_atom_nodeA(atom);
+      std::string node = to_atom_node(atom);
       int colour = fact_colour(atom, ILGFactDescription::F_NEG_GOAL);
       graph.add_node(node, colour);
       negative_goal_names.insert(node);
@@ -76,8 +70,8 @@ namespace graph {
     // add edges atoms <-> objects
     for (const auto &atom : problem.get_positive_goals()) {
       for (size_t r = 0; r < atom.objects.size(); r++) {
-        std::string atom_node = to_atom_nodeA(atom);
-        std::string object_node = to_obj_nodeA(atom.objects[r]);
+        std::string atom_node = to_atom_node(atom);
+        std::string object_node = to_obj_node(atom.objects[r]);
         graph.add_edge(atom_node, r, object_node);
         graph.add_edge(object_node, r, atom_node);
       }
@@ -98,13 +92,14 @@ namespace graph {
       neg_goal_changed = std::vector<int>();
       pos_goal_changed_pred = std::vector<int>();
       neg_goal_changed_pred = std::vector<int>();
+      graph->set_store_node_names(false);
     }
 
     int atom_node, object_node, pred_idx;
     std::string atom_node_str;
 
     for (const auto &atom : state) {
-      atom_node_str = to_atom_nodeB(atom);
+      atom_node_str = to_atom_node(atom);
       pred_idx = predicate_to_colour.at(atom.predicate->name);
       if (positive_goal_names.count(atom_node_str)) {
         atom_node = graph->get_node_index(atom_node_str);
@@ -128,7 +123,7 @@ namespace graph {
 
         for (size_t r = 0; r < atom.objects.size(); r++) {
           // object nodes should never be needed to be added
-          object_node = graph->get_node_index(to_obj_nodeB(atom.objects[r]));
+          object_node = graph->get_node_index(to_obj_node(atom.objects[r]));
           graph->add_edge(atom_node, r, object_node);
           graph->add_edge(object_node, r, atom_node);
           if (store_changes) {

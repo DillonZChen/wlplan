@@ -49,10 +49,13 @@ namespace graph {
 
     std::string to_string() const;
 
+    // set to false when directly modifying the base graph to prevent excessive memory usage
+    void set_store_node_names(bool store_node_names) { this->store_node_names = store_node_names; }
+
     void dump() const;
 
    private:
-    const bool store_node_names;
+    bool store_node_names;
     std::unordered_map<std::string, int> node_to_index_;
     std::vector<std::string> index_to_node_;
   };
