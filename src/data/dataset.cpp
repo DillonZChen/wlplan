@@ -63,4 +63,12 @@ namespace data {
       }
     }
   }
+
+  size_t Dataset::get_size() const {
+    size_t ret = 0;
+    for (const auto &problem_states : data) {
+      ret += problem_states.states.size();
+    }
+    return ret;
+  }
 }  // namespace data

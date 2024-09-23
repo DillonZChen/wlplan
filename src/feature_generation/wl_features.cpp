@@ -29,6 +29,11 @@ namespace feature_generation {
     neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
     seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
     store_weights = false;
+
+    n_seen_graphs = 0;
+    n_seen_nodes = 0;
+    n_seen_edges = 0;
+    seen_initial_colours = std::set<int>();
   }
 
   WLFeatures::WLFeatures(const std::string &filename) {
@@ -202,6 +207,9 @@ namespace feature_generation {
       const auto &graph = graphs[graph_i];
       std::unordered_map<int, int> histogram;
       int n_nodes = graph.nodes.size();
+      n_seen_graphs++;
+      n_seen_nodes += n_nodes;
+      n_seen_edges += graph.get_n_edges();
       std::vector<int> colours(n_nodes);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         cur_collecting_layer = 0;
@@ -211,6 +219,7 @@ namespace feature_generation {
         }
         histogram[col]++;
         colours[node_i] = col;
+        seen_initial_colours.insert(col);
       }
       graph_histograms.push_back(histogram);
       graph_colours.push_back(colours);
@@ -291,6 +300,23 @@ namespace feature_generation {
     if (graph_generator != nullptr) {
       graph_generator->set_problem(problem);
     }
+  }
+
+  std::string WLFeatures::get_string_representation(const Embedding &embedding) {
+    std::string str_embed = "";
+    for (size_t i = 0; i < embedding.size(); i++) {
+      int count = embedding[i];
+      if (count == 0) {
+        continue;
+      }
+      str_embed += std::to_string(i) + "." + std::to_string(count) + ".";
+    }
+    return str_embed;
+  }
+
+  std::string WLFeatures::get_string_representation(const planning::State &state) {
+    Embedding x = embed(state);
+    return get_string_representation(x);
   }
 
   std::vector<Embedding> WLFeatures::embed(const data::Dataset &dataset) {
@@ -422,8 +448,8 @@ namespace feature_generation {
     return int_colour_hash;
   }
 
-  std::unordered_map<std::string, int>
-  WLFeatures::int_to_str_colour_hash(std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash) const {
+  std::unordered_map<std::string, int> WLFeatures::int_to_str_colour_hash(
+      std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash) const {
     std::unordered_map<std::string, int> str_colour_hash;
     for (const auto &pair : int_colour_hash) {
       std::string colour_str = "";

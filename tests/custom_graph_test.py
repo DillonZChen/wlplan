@@ -13,7 +13,9 @@ LOGGER = logging.getLogger(__name__)
 
 def test_blocksworld_random_path():
     random.seed(0)
+    LOGGER.info("Getting raw dataset")
     domain, dataset, _ = get_raw_dataset(domain_name="blocksworld", keep_statics=False)
+    LOGGER.info("Constructing feature generator")
     feature_generator = WLFeatures(
         domain=domain,
         graph_representation=None,
@@ -21,6 +23,7 @@ def test_blocksworld_random_path():
         prune_features=None,
     )
     graphs = []
+    LOGGER.info("Converting to random path graphs")
     for _, states in dataset:
         for state in states:
             G = nx.Graph()
@@ -31,7 +34,9 @@ def test_blocksworld_random_path():
             G = from_networkx(G)
             graphs.append(G)
             G.dump()
+    LOGGER.info("Collecting features")
     feature_generator.collect(graphs)
+    LOGGER.info("Embedding")
     X = np.array(feature_generator.embed(graphs)).astype(float)
     n_features = feature_generator.get_n_features()
     assert X.shape[1] == n_features

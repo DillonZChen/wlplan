@@ -199,6 +199,10 @@ wl_features
         "graphs"_a)
   .def("set_problem", &feature_generation::WLFeatures::set_problem,
         "problem"_a)
+  .def("get_string_representation", py::overload_cast<const feature_generation::Embedding &>(&feature_generation::WLFeatures::get_string_representation),
+        "embedding"_a)
+  .def("get_string_representation", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::get_string_representation),
+        "state"_a)
   .def("embed", py::overload_cast<const data::Dataset &>(&feature_generation::WLFeatures::embed), 
         "dataset"_a)
   .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::WLFeatures::embed),
@@ -208,6 +212,11 @@ wl_features
   .def("get_n_features", &feature_generation::WLFeatures::get_n_features)
   .def("get_seen_counts", &feature_generation::WLFeatures::get_seen_counts)
   .def("get_unseen_counts", &feature_generation::WLFeatures::get_unseen_counts)
+  .def("get_n_seen_graphs", &feature_generation::WLFeatures::get_n_seen_graphs)
+  .def("get_n_seen_nodes", &feature_generation::WLFeatures::get_n_seen_nodes)
+  .def("get_n_seen_edges", &feature_generation::WLFeatures::get_n_seen_edges)
+  .def("get_n_seen_initial_colours", &feature_generation::WLFeatures::get_n_seen_initial_colours)
+  .def("get_n_seen_refined_colours", &feature_generation::WLFeatures::get_n_seen_refined_colours)
   .def("set_weights", &feature_generation::WLFeatures::set_weights,
         "weights"_a)
   .def("get_weights", &feature_generation::WLFeatures::get_weights)
