@@ -30,7 +30,7 @@ enum class ILGFactDescription { ILG_FACT_DESCRIPTIONS };
 namespace graph {
   class ILGGenerator : public GraphGenerator {
    public:
-    ILGGenerator(const planning::Domain &domain);
+    ILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
 
     // Change the base graph based on the input problem
     void set_problem(const planning::Problem &problem) override;
@@ -54,15 +54,16 @@ namespace graph {
     void dump_graph() const override;
 
    private:
+    /* The following variables remain constant for all problems */
+    const planning::Domain &domain;
+    const std::unordered_map<std::string, int> predicate_to_colour;
+    bool differentiate_constant_objects;
+
     /* These variables get reset every time a new problem is set */
     std::shared_ptr<Graph> base_graph;
     std::unordered_set<std::string> positive_goal_names;
     std::unordered_set<std::string> negative_goal_names;
     std::shared_ptr<planning::Problem> problem;
-
-    /* The following variables remain constant for all problems */
-    const planning::Domain &domain;
-    const std::unordered_map<std::string, int> predicate_to_colour;
 
     // Do not use a vector here because colours can be negative, i.e. constant objects
     std::map<int, std::string> colour_to_description;

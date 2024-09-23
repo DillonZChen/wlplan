@@ -27,6 +27,8 @@ namespace data {
 
     Dataset(const planning::Domain &domain, const std::vector<ProblemStates> &data);
 
+    size_t get_size() const;
+
    private:
     std::unordered_map<std::string, int> predicate_to_arity;
 

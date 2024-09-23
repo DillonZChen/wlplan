@@ -14,7 +14,6 @@
 
 class int_vector_hasher {
  public:
-
   // https://stackoverflow.com/a/27216842
   std::size_t operator()(std::vector<int> const &vec) const {
     std::size_t seed = vec.size();
@@ -71,6 +70,12 @@ namespace feature_generation {
     // for iteration j = 0, ..., iterations - 1
     std::vector<std::vector<long>> seen_colour_statistics;
 
+    // training statistics
+    int n_seen_graphs;
+    int n_seen_nodes;
+    int n_seen_edges;
+    std::set<int> seen_initial_colours;
+
    public:
     WLFeatures(const planning::Domain &domain,
                std::string graph_representation,
@@ -85,10 +90,17 @@ namespace feature_generation {
     // collect training colours
     void collect(const data::Dataset dataset);
 
+    void collect(const planning::State state);
+
     void collect(const std::vector<graph::Graph> &graphs);
 
     // set problem for graph generator if it exists
     void set_problem(const planning::Problem &problem);
+
+    // get string representation of WL colours agnostic to the number of collected colours
+    std::string get_string_representation(const Embedding &embedding);
+
+    std::string get_string_representation(const planning::State &state);
 
     // assumes training is done, and returns a feature matrix X
     std::vector<Embedding> embed(const data::Dataset &dataset);
@@ -120,6 +132,16 @@ namespace feature_generation {
     std::vector<long> get_seen_counts() const { return seen_colour_statistics[1]; };
 
     std::vector<long> get_unseen_counts() const { return seen_colour_statistics[0]; };
+
+    int get_n_seen_graphs() const { return n_seen_graphs; }
+
+    int get_n_seen_nodes() const { return n_seen_nodes; }
+
+    int get_n_seen_edges() const { return n_seen_edges; }
+
+    int get_n_seen_initial_colours() const { return seen_initial_colours.size(); }
+
+    int get_n_seen_refined_colours() const { return (int)colour_hash.size(); }
 
     /* Other useful functions */
 

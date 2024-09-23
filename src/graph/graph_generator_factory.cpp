@@ -6,7 +6,7 @@ namespace graph {
   std::shared_ptr<GraphGenerator> create_graph_generator(const std::string &name,
                                                          const planning::Domain &domain) {
     if (name == "ilg") {
-      return std::make_shared<ILGGenerator>(domain);
+      return std::make_shared<ILGGenerator>(domain, false);
     } else if (name == "custom") {
       return NULL;
     } else {

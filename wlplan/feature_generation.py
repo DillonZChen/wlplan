@@ -20,7 +20,7 @@ class WLFeatures(_WLFeatures):
         iterations : int, default=2
             The number of WL iterations to perform.
 
-        prune_features : "collapse", "collapse_by_layer" or None, default="collapse"
+        prune_features : "collapse", "collapse_by_layer" or None, default=None
             How to detect and prune duplicate features. If None, no pruning is done.
 
         multiset_hash : bool, default=False
@@ -55,6 +55,21 @@ class WLFeatures(_WLFeatures):
         get_unseen_counts(self) -> List[int]
             Returns a list of length `iterations` with the count of unseen colours at each iteration. Counts are from colours not seen from `collect` calls. The values are collected over all `embed` calls from the initialisation of this class.
 
+        get_n_seen_graphs -> int
+            Returns the number of training graphs collected from `collect` calls.
+
+        get_n_seen_nodes -> int
+            Returns the number of training nodes collected from `collect` calls.
+
+        get_n_seen_edges -> int
+            Returns the number of training edges collected from `collect` calls.
+
+        get_n_seen_initial_colours -> int
+            Returns the number of initial colours collected from `collect` calls.
+
+        get_n_seen_refined_colours -> int
+            Returns the number of refined colours collected from `collect` calls.
+
         set_weights(self, weights: Union[list[float], list[int]]) -> None
             Set the weights to predict heuristics directly with this class. The weights must be a list of floats, integers or a numpy array of floats. The length of the weights must be the same as the number of features collected.
 
@@ -76,7 +91,7 @@ class WLFeatures(_WLFeatures):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = "no_prune",
+        prune_features: Optional[str] = None,
         multiset_hash: bool = False,
         **kwargs,
     ) -> None:
