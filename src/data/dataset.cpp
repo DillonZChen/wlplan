@@ -40,8 +40,8 @@ namespace data {
 
       // check proposition consistency of states
       for (const planning::State &state : states) {
-        for (const planning::Atom &atom : state) {
-          check_good_atom(atom, objects);
+        for (const std::shared_ptr<planning::Atom> &atom : state.atoms) {
+          check_good_atom(*atom, objects);
         }
       }
     }

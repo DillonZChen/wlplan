@@ -4,9 +4,6 @@
 char const *fact_description_name[] = {ILG_FACT_DESCRIPTIONS};
 #undef X
 
-#define to_obj_node(x) x
-#define to_atom_node(x) x.to_string()
-
 namespace graph {
   ILGGenerator::ILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects)
       : domain(domain),
@@ -17,11 +14,11 @@ namespace graph {
       // add constant object colours
       for (size_t i = 0; i < domain.constant_objects.size(); i++) {
         int colour = -(i + 1);
-        colour_to_description[colour] = "_constant_object_ " + domain.constant_objects[i];
+        colour_to_description[colour] = domain.constant_objects[i] + " _CONSTANT_";
       }
     }
 
-    colour_to_description[0] = "_object_";
+    colour_to_description[0] = "_OBJECT_";
 
     // add predicate colours
     for (size_t i = 0; i < domain.predicates.size(); i++) {
@@ -40,12 +37,12 @@ namespace graph {
     negative_goal_names = std::unordered_set<std::string>();
     this->problem = std::make_shared<planning::Problem>(problem);
 
-    /// add nodes
+    /* add nodes */
     int colour;
 
     // add constant object nodes
     for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
-      std::string node = to_obj_node(domain.constant_objects[i]);
+      std::string node = domain.constant_objects[i];
       if (differentiate_constant_objects) {
         colour = -(i + 1);
       } else {
@@ -56,38 +53,39 @@ namespace graph {
 
     // objects
     for (const auto &object : problem.get_problem_objects()) {
-      std::string node = to_obj_node(object);
+      std::string node = object;
       colour = 0;
       graph.add_node(node, colour);
     }
 
     // atoms
     for (const auto &atom : problem.get_positive_goals()) {
-      std::string node = to_atom_node(atom);
+      std::string node = atom.to_string();
       colour = fact_colour(atom, ILGFactDescription::F_POS_GOAL);
       graph.add_node(node, colour);
       positive_goal_names.insert(node);
     }
 
     for (const auto &atom : problem.get_negative_goals()) {
-      std::string node = to_atom_node(atom);
+      std::string node = atom.to_string();
       colour = fact_colour(atom, ILGFactDescription::F_NEG_GOAL);
       graph.add_node(node, colour);
       negative_goal_names.insert(node);
     }
 
-    /// add labelled edges
+    /* add edges */
+
     // add edges atoms <-> objects
     for (const auto &atom : problem.get_positive_goals()) {
       for (size_t r = 0; r < atom.objects.size(); r++) {
-        std::string atom_node = to_atom_node(atom);
-        std::string object_node = to_obj_node(atom.objects[r]);
+        std::string atom_node = atom.to_string();
+        std::string object_node = atom.objects[r];
         graph.add_edge(atom_node, r, object_node);
         graph.add_edge(object_node, r, atom_node);
       }
     }
 
-    /// set pointer
+    /* set pointer */
     base_graph = std::make_shared<Graph>(graph);
     n_edges_added = std::vector<int>(base_graph->nodes.size(), 0);
   }
@@ -108,9 +106,9 @@ namespace graph {
     int atom_node, object_node, pred_idx;
     std::string atom_node_str;
 
-    for (const auto &atom : state) {
-      atom_node_str = to_atom_node(atom);
-      pred_idx = predicate_to_colour.at(atom.predicate->name);
+    for (const auto &atom : state.atoms) {
+      atom_node_str = atom->to_string();
+      pred_idx = predicate_to_colour.at(atom->predicate->name);
       if (positive_goal_names.count(atom_node_str)) {
         atom_node = graph->get_node_index(atom_node_str);
         graph->change_node_colour(atom_node, fact_colour(pred_idx, ILGFactDescription::T_POS_GOAL));
@@ -132,9 +130,9 @@ namespace graph {
           n_nodes_added++;
         }
 
-        for (size_t r = 0; r < atom.objects.size(); r++) {
+        for (size_t r = 0; r < atom->objects.size(); r++) {
           // object nodes should never be needed to be added
-          object_node = graph->get_node_index(to_obj_node(atom.objects[r]));
+          object_node = graph->get_node_index(atom->objects[r]);
           graph->add_edge(atom_node, r, object_node);
           graph->add_edge(object_node, r, atom_node);
           if (store_changes) {
@@ -185,18 +183,10 @@ namespace graph {
     return base_graph;
   }
 
-  int ILGGenerator::get_n_edge_labels() const { return domain.max_arity(); }
-
-  std::vector<int> ILGGenerator::get_init_colours() const {
-    std::vector<int> init_colours;
-    for (const auto &kv : colour_to_description) {
-      init_colours.push_back(kv.first);
-    }
-    return init_colours;
-  }
+  int ILGGenerator::get_n_edge_labels() const { return domain.get_max_arity(); }
 
   void ILGGenerator::print_init_colours() const {
-    std::cout << "Initial ILG node colours:" << std::endl;
+    std::cout << "Initial node colours:" << std::endl;
     for (const auto &kv : colour_to_description) {
       std::cout << kv.first << " -> " << kv.second << std::endl;
     }

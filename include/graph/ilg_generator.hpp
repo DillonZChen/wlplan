@@ -39,7 +39,7 @@ namespace graph {
     // Assumes the state is from the problem that is set but does not check this.
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
 
-    // Optimised variant of to_graph() but requires calling reset_graph() after. 
+    // Optimised variant of to_graph() but requires calling reset_graph() after.
     // Does not make a copy of the base graph and instead modifies it directly,
     // and undoing the modifications with reset_graph().
     std::shared_ptr<Graph> to_graph_opt(const planning::State &state);
@@ -47,13 +47,11 @@ namespace graph {
 
     int get_n_edge_labels() const override;
 
-    std::vector<int> get_init_colours() const override;
-
     void print_init_colours() const override;
 
     void dump_graph() const override;
 
-   private:
+   protected:
     /* The following variables remain constant for all problems */
     const planning::Domain &domain;
     const std::unordered_map<std::string, int> predicate_to_colour;
