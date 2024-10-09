@@ -1,7 +1,18 @@
 #include "../include/data/dataset.hpp"
+#include "../include/feature_generation/ccwl_features.hpp"
+#include "../include/feature_generation/features.hpp"
+#include "../include/feature_generation/iwl_features.hpp"
+#include "../include/feature_generation/kwl2_features.hpp"
+#include "../include/feature_generation/lwl2_features.hpp"
+#include "../include/feature_generation/niwl_features.hpp"
 #include "../include/feature_generation/wl_features.hpp"
 #include "../include/graph/ilg_generator.hpp"
+#include "../include/planning/atom.hpp"
 #include "../include/planning/domain.hpp"
+#include "../include/planning/fluent.hpp"
+#include "../include/planning/function.hpp"
+#include "../include/planning/numeric_condition.hpp"
+#include "../include/planning/numeric_expression.hpp"
 #include "../include/planning/object.hpp"
 #include "../include/planning/predicate.hpp"
 #include "../include/planning/problem.hpp"
@@ -21,33 +32,17 @@ using namespace py::literals;
 PYBIND11_MODULE(_wlplan, m) {
 m.doc() = "WLPlan: WL Features for PDDL Planning";
 
-/* Planning */
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Planning
+//////////////////////////////////////////////////////////////////////////////
 auto planning_m = m.def_submodule("planning");
-auto atom = py::class_<planning::Atom>(planning_m, "Atom", 
-R"(Parameters
-----------
-    predicate : Predicate
-        Predicate object.
 
-    objects : List[Object]
-        List of object names.
-)");
-auto domain = py::class_<planning::Domain>(planning_m, "Domain", 
-R"(Parameters
-----------
-    name : str
-        Domain name.
+/* Domain components */
 
-    predicates : List[Predicate]
-        List of predicates.
-
-    constant_objects : List[Object], optional
-        List of constant objects.
-)");
-auto object = py::class_<planning::Object>(planning_m, "Object", 
-R"(Object is a type alias for a str.
-)");
-auto predicate = py::class_<planning::Predicate>(planning_m, "Predicate", 
+// Predicate
+py::class_<planning::Predicate>(planning_m, "Predicate", 
 R"(Parameters
 ----------
     name : str
@@ -55,53 +50,284 @@ R"(Parameters
 
     arity : int
         Predicate arity.
-)");
-auto problem = py::class_<planning::Problem>(planning_m, "Problem", 
-R"(Parameters
-----------
-    domain : Domain
-        Domain object.
-
-    objects : List[Object]
-        List of object names.
-
-    positive_goals : List[Atom]
-        List of positive goal atoms.
-
-    negative_goals : List[Atom]
-        List of negative goal atoms.
-)");
-auto state = py::class_<planning::State>(planning_m, "State", 
-R"(State is a type alias for a list of Atoms.
-)");
-
-predicate
+)")
   .def(py::init<std::string &, int>(), 
         "name"_a, "arity"_a)
+  .def_readonly("name", &planning::Predicate::name, ":meta private:")
+  .def_readonly("arity", &planning::Predicate::arity, ":meta private:")
   .def("__repr__", &::planning::Predicate::to_string)
   .def("__eq__", &::planning::Predicate::operator==);
 
-domain
+// Function
+py::class_<planning::Function>(planning_m, "Function",
+R"(Parameters
+----------
+    name : str
+        Predicate name.
+
+    arity : int
+        Predicate arity.
+)")
+  .def(py::init<std::string &, int>(), 
+        "name"_a, "arity"_a)
+  .def_readonly("name", &planning::Function::name, ":meta private:")
+  .def_readonly("arity", &planning::Function::arity, ":meta private:")
+  .def("__repr__", &::planning::Function::to_string)
+  .def("__eq__", &::planning::Function::operator==);
+
+// Domain
+py::class_<planning::Domain>(planning_m, "Domain", 
+R"(Parameters
+----------
+    name : str
+        Domain name.
+
+    predicates : list[Predicate]
+        List of predicates.
+
+    functions : list[Function], optional
+        List of functions.
+
+    constant_objects : list[Object], optional
+        List of constant objects.
+)")
+  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>, std::vector<planning::Object>>(), 
+        "name"_a, "predicates"_a, "functions"_a, "constant_objects"_a)
   .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Object>>(), 
         "name"_a, "predicates"_a, "constant_objects"_a)
   .def(py::init<std::string &, std::vector<planning::Predicate>>(), 
         "name"_a, "predicates"_a)
+  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>>(), 
+        "name"_a, "predicates"_a, "functions"_a)
+  .def_readonly("name", &planning::Domain::name, ":meta private:")
+  .def_readonly("predicates", &planning::Domain::predicates, ":meta private:")
+  .def_readonly("functions", &planning::Domain::functions, ":meta private:")
+  .def_readonly("constant_objects", &planning::Domain::constant_objects, ":meta private:")
   .def("__repr__", &::planning::Domain::to_string)
   .def("__eq__", &::planning::Domain::operator==);
 
-atom
+/* Task components */
+
+// Object
+py::class_<planning::Object>(planning_m, "Object", 
+R"(Object is a type alias for a str. WLPlan does not exploit object types.
+)");
+
+// Atom
+py::class_<planning::Atom>(planning_m, "Atom", 
+R"(Parameters
+----------
+    predicate : Predicate
+        Predicate object.
+
+    objects : list[Object]
+        List of object names.
+)")
   .def(py::init<planning::Predicate &, std::vector<std::string> &>(), 
         "predicate"_a, "objects"_a)
   .def("__repr__", &::planning::Atom::to_string)
   .def("__eq__", &::planning::Atom::operator==);
 
-problem
-  .def(py::init<planning::Domain &, std::vector<std::string> &, std::vector<planning::Atom> &, std::vector<planning::Atom> &>(), 
-        "domain"_a, "objects"_a, "positive_goals"_a, "negative_goals"_a);
+// Fluent
+py::class_<planning::Fluent>(planning_m, "Fluent",
+R"(Parameters
+----------
+    function : Function
+        Function object.
 
-/* Data */
+    objects : list[Object]
+        List of object names.
+)")
+  .def(py::init<planning::Function &, std::vector<std::string> &>(), 
+        "function"_a, "objects"_a)
+  .def("__repr__", &::planning::Fluent::to_string)
+  .def("__eq__", &::planning::Fluent::operator==);
+
+// OperatorType
+py::enum_<planning::OperatorType>(planning_m, "OperatorType")
+  .value("Plus", planning::OperatorType::Plus)
+  .value("Minus", planning::OperatorType::Minus)
+  .value("Multiply", planning::OperatorType::Multiply)
+  .value("Divide", planning::OperatorType::Divide);
+
+// NumericExpression (FormulaExpression, ConstantExpression, FluentExpression)
+py::class_<planning::NumericExpression, std::shared_ptr<planning::NumericExpression>>(planning_m, "NumericExpression",
+R"(NumericExpression is an abstract class for numeric expressions.
+)")
+  .def("evaluate", &planning::NumericExpression::evaluate, "values"_a)
+  .def("get_fluent_ids", &planning::NumericExpression::get_fluent_ids)
+  .def("__repr__", &planning::NumericExpression::to_string);
+
+// FormulaExpression
+py::class_<planning::FormulaExpression, planning::NumericExpression, std::shared_ptr<planning::FormulaExpression>>(planning_m, "FormulaExpression",
+R"(Parameters
+----------
+    op_type : OperatorType
+        Operator enum class.
+
+    expr_a : NumericExpression
+        Numeric expression.
+
+    expr_b : NumericExpression
+        Numeric expression.
+)")
+  .def(py::init<planning::OperatorType, std::shared_ptr<planning::NumericExpression> &, std::shared_ptr<planning::NumericExpression> &>(), 
+        "op_type"_a, "expr_a"_a, "expr_b"_a);
+
+// ConstantExpression
+py::class_<planning::ConstantExpression, planning::NumericExpression, std::shared_ptr<planning::ConstantExpression>>(planning_m, "ConstantExpression",
+R"(Parameters
+----------
+    value : float
+        Numeric value.
+)")
+  .def(py::init<double>(), 
+        "value"_a);
+
+// FluentExpression
+py::class_<planning::FluentExpression, planning::NumericExpression, std::shared_ptr<planning::FluentExpression>>(planning_m, "FluentExpression",
+R"(Parameters
+----------
+    id : int
+        Fluent ID.
+
+    fluent_name : str
+        Fluent name.
+)")
+  .def(py::init<int, std::string>(), 
+        "id"_a, "fluent_name"_a);
+
+// ComparatorType
+py::enum_<planning::ComparatorType>(planning_m, "ComparatorType")
+  .value("GreaterThan", planning::ComparatorType::GreaterThan)
+  .value("GreaterThanOrEqual", planning::ComparatorType::GreaterThanOrEqual)
+  .value("Equal", planning::ComparatorType::Equal);
+
+// NumericCondition
+py::class_<planning::NumericCondition>(planning_m, "NumericCondition",
+R"(Parameters
+----------
+    comparator_type : ComparatorType
+        Comparator enum class.
+
+    expression : NumericExpression
+        Numeric expression constituting the LHS of the condition :math:`\xi \unrhd 0`.
+)")
+  .def(py::init<planning::ComparatorType, std::shared_ptr<planning::NumericExpression> &>(), 
+        "comparator_type"_a, "expression"_a)
+  .def("evaluate_formula", &planning::NumericCondition::evaluate_formula, "values"_a)
+  .def("evaluate_error", &planning::NumericCondition::evaluate_error, "values"_a)
+  .def("evaluate_formula_and_error", &planning::NumericCondition::evaluate_formula_and_error, "values"_a);
+
+// Problem
+py::class_<planning::Problem>(planning_m, "Problem", 
+R"(Parameters
+----------
+    domain : Domain
+        Domain object.
+
+    objects : list[Object]
+        List of object names.
+
+    statics: list[Atom], optional
+        List of static atoms.
+
+    fluents: list[Fluent], optional
+        List of fluents.
+
+    fluent_values: list[float], optional
+        List of fluent values of the initial state of the problem.
+
+    positive_goals : list[Atom]
+        List of positive goal atoms.
+
+    negative_goals : list[Atom]
+        List of negative goal atoms.
+    
+    numeric_goals : list[NumericCondition], optional
+        List of numeric goals.
+)")
+  .def(py::init<planning::Domain &, 
+                std::vector<std::string> &, 
+                std::vector<planning::Atom> &, 
+                std::vector<planning::Fluent> &, 
+                std::vector<double> &, 
+                std::vector<planning::Atom> &, 
+                std::vector<planning::Atom> &, 
+                std::vector<planning::NumericCondition> &>(), 
+        "domain"_a, 
+        "objects"_a, 
+        "statics"_a, 
+        "fluents"_a, 
+        "fluent_values"_a, 
+        "positive_goals"_a, 
+        "negative_goals"_a, 
+        "numeric_goals"_a)
+  .def(py::init<planning::Domain &, 
+                std::vector<std::string> &, 
+                std::vector<planning::Fluent> &, 
+                std::vector<double> &, 
+                std::vector<planning::Atom> &, 
+                std::vector<planning::Atom> &, 
+                std::vector<planning::NumericCondition> &>(), 
+        "domain"_a, 
+        "objects"_a, 
+        "fluents"_a, 
+        "fluent_values"_a, 
+        "positive_goals"_a, 
+        "negative_goals"_a, 
+        "numeric_goals"_a)
+  .def(py::init<planning::Domain &, 
+                std::vector<std::string> &, 
+                std::vector<planning::Atom> &, 
+                std::vector<planning::Atom> &>(), 
+        "domain"_a, 
+        "objects"_a, 
+        "positive_goals"_a, 
+        "negative_goals"_a)
+  .def_property_readonly("domain", &planning::Problem::get_domain, ":meta private:")
+  .def_property_readonly("objects", &planning::Problem::get_problem_objects, ":meta private:")
+  .def_property_readonly("constant_objects", &planning::Problem::get_constant_objects, ":meta private:")
+  .def_property_readonly("statics", &planning::Problem::get_statics, ":meta private:")
+  .def_property_readonly("fluents", &planning::Problem::get_fluents, ":meta private:")
+  .def_property_readonly("fluent_name_to_id", &planning::Problem::get_fluent_name_to_id, ":meta private:")
+  .def_property_readonly("init_fluent_values", &planning::Problem::get_fluent_values, ":meta private:")
+  .def_property_readonly("positive_goals", &planning::Problem::get_positive_goals, ":meta private:")
+  .def_property_readonly("negative_goals", &planning::Problem::get_negative_goals, ":meta private:")
+  .def_property_readonly("numeric_goals", &planning::Problem::get_numeric_goals, ":meta private:")
+  .def("dump", &planning::Problem::dump)
+;
+
+// State
+py::class_<planning::State>(planning_m, "State", 
+R"(Parameters
+----------
+    atoms : list[Atom]
+        List of atoms.
+
+    values : list[float], optional
+        List of values for fluents defined in the problem.
+)")
+  .def(py::init<std::vector<planning::Atom> &>(), 
+        "atoms"_a)
+  .def(py::init<std::vector<planning::Atom> &, std::vector<double> &>(), 
+        "atoms"_a, "values"_a)
+  .def_property_readonly("atoms", &planning::State::get_atoms, ":meta private:")
+  .def_readonly("values", &planning::State::values, ":meta private:")
+  .def("__repr__", &::planning::State::to_string)
+  .def("__eq__", &::planning::State::operator==)
+  .def("__hash__", &::planning::State::hash)
+;
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Data
+//////////////////////////////////////////////////////////////////////////////
 auto data_m = m.def_submodule("data");
-auto dataset = py::class_<data::Dataset>(data_m, "Dataset", 
+
+// Dataset
+py::class_<data::Dataset>(data_m, "Dataset", 
 R"(WLPlan dataset object.
 
 Datasets contain a domain and a list of problem states.
@@ -111,10 +337,14 @@ Parameters
     domain : Domain
         Domain object.
 
-    data : List[ProblemStates]
+    data : list[ProblemStates]
         List of problem states.
-)");
-auto problem_states = py::class_<data::ProblemStates>(data_m, "ProblemStates", 
+)")
+  .def(py::init<planning::Domain &, std::vector<data::ProblemStates> &>(), 
+        "domain"_a, "data"_a);
+
+// ProblemStates
+py::class_<data::ProblemStates>(data_m, "ProblemStates", 
 R"(Stores a problem and training states for the problem.
 
 Upon initialisation, the problem and states are checked for consistency.
@@ -124,43 +354,48 @@ Parameters
     problem : Problem
         Problem object.
 
-    states : List[State]
+    states : list[State]
         List of training states.
-)");
-
-
-problem_states
+)")
   .def(py::init<planning::Problem &, std::vector<planning::State> &>(), 
         "problem"_a, "states"_a);
 
-dataset
-  .def(py::init<planning::Domain &, std::vector<data::ProblemStates> &>(), 
-        "domain"_a, "data"_a);
 
-/* Graph */
+
+//////////////////////////////////////////////////////////////////////////////
+// Graph
+//////////////////////////////////////////////////////////////////////////////
 auto graph_m = m.def_submodule("graph");
-auto graph = py::class_<graph::Graph>(graph_m, "Graph", 
+
+// Graph
+py::class_<graph::Graph>(graph_m, "Graph",
 R"(WLPlan graph object.
 
 Graphs have integer node colours and edge labels.
 
 Parameters
 ----------
-    node_colours : List[int]
+    node_colours : list[int]
         List of node colours, where `node[i]` is the colour of node `i` indexed from 0.
 
-    node_names : List[str], optional
+    node_values : list[float], optional
+        List of node values. Empty if not provided.
+
+    node_names : list[str], optional
         List of node names, where `node_names[i]` is the name of node `i` indexed from 0.
 
-    edges : List[Tuple[int, int]]
+    edges : list[list[tuple[int, int]]]
         List of labelled edges, where `edges[u] = [(r_1, v_1), ..., (r_k, v_k)]` represents edges from node `u` to nodes `v_1, ..., v_k` with labels `r_1, ..., r_k`, respectively. WLPlan graphs are directed so users must ensure that edges are undirected.
 
 Attributes
 ----------
-    node_colours : List[int]
+    node_colours : list[int]
         List of node colours.
 
-    edges : List[Tuple[int, int]]
+    node_values : list[float]
+        List of node values. Empty if not provided.
+
+    edges : list[list[tuple[int, int]]]
         List of labelled edges.
 
 Methods
@@ -170,63 +405,114 @@ Methods
 
     dump() -> None
         Print the graph representation.
-)");
-// auto ilg_generator = py::class_<graph::ILGGenerator>(graph_m, "ILGGenerator");
-
-graph
-  .def(py::init<std::vector<int>, std::vector<std::vector<std::pair<int, int>>>>(), 
-        "node_colours"_a, "edges"_a)
+)")
+  .def(py::init<std::vector<int>, std::vector<double>, std::vector<std::string>, std::vector<std::vector<std::pair<int, int>>>>(), 
+        "node_colours"_a, "node_values"_a, "node_names"_a, "edges"_a)
+  .def(py::init<std::vector<int>, std::vector<double>, std::vector<std::vector<std::pair<int, int>>>>(),
+        "node_colours"_a, "node_values"_a, "edges"_a)
   .def(py::init<std::vector<int>, std::vector<std::string>, std::vector<std::vector<std::pair<int, int>>>>(), 
         "node_colours"_a, "node_names"_a, "edges"_a)
+  .def(py::init<std::vector<int>, std::vector<std::vector<std::pair<int, int>>>>(), 
+        "node_colours"_a, "edges"_a)
   .def_readonly("node_colours", &graph::Graph::nodes, ":meta private:")
+  .def_readonly("node_values", &graph::Graph::node_values, ":meta private:")
   .def_readonly("edges", &graph::Graph::edges, ":meta private:")
   .def("get_node_name", &graph::Graph::get_node_name, "u"_a, ":meta private:")
   .def("dump", &graph::Graph::dump, ":meta private:")
   .def("__repr__", &::graph::Graph::to_string, ":meta private:");
 
-/* Feature generation */
-auto feature_generation_m = m.def_submodule("feature_generation");
-auto wl_features = py::class_<feature_generation::WLFeatures>(feature_generation_m, "_WLFeatures");
 
-wl_features
+
+//////////////////////////////////////////////////////////////////////////////
+// Feature Generation
+//////////////////////////////////////////////////////////////////////////////
+auto feature_generation_m = m.def_submodule("feature_generation");
+
+py::class_<feature_generation::Features>(feature_generation_m, "_Features")
+  .def("collect", py::overload_cast<const data::Dataset>(&feature_generation::Features::collect_from_dataset),
+        "dataset"_a)
+  .def("collect", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::collect),
+        "graphs"_a)
+  .def("set_problem", &feature_generation::Features::set_problem,
+        "problem"_a)
+  .def("get_string_representation", py::overload_cast<const feature_generation::Embedding &>(&feature_generation::Features::get_string_representation),
+        "embedding"_a)
+  .def("get_string_representation", py::overload_cast<const planning::State &>(&feature_generation::Features::get_string_representation),
+        "state"_a)
+  .def("embed", py::overload_cast<const data::Dataset &>(&feature_generation::Features::embed_dataset), 
+        "dataset"_a)
+  .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::embed_graphs),
+        "graphs"_a)
+  .def("embed", py::overload_cast<const planning::State &>(&feature_generation::Features::embed_state),
+        "state"_a)
+  .def("get_n_features", &feature_generation::Features::get_n_features)
+  .def("get_seen_counts", &feature_generation::Features::get_seen_counts)
+  .def("get_unseen_counts", &feature_generation::Features::get_unseen_counts)
+  .def("get_n_seen_graphs", &feature_generation::Features::get_n_seen_graphs)
+  .def("get_n_seen_nodes", &feature_generation::Features::get_n_seen_nodes)
+  .def("get_n_seen_edges", &feature_generation::Features::get_n_seen_edges)
+  .def("get_n_seen_initial_colours", &feature_generation::Features::get_n_seen_initial_colours)
+  .def("get_n_seen_refined_colours", &feature_generation::Features::get_n_seen_refined_colours)
+  .def("print_init_colours", &feature_generation::Features::print_init_colours)
+  .def("set_weights", &feature_generation::Features::set_weights,
+        "weights"_a)
+  .def("get_weights", &feature_generation::Features::get_weights)
+  .def("predict", py::overload_cast<const graph::Graph &>(&feature_generation::Features::predict),
+        "graph"_a)
+  .def("predict", py::overload_cast<const planning::State &>(&feature_generation::Features::predict),
+        "state"_a)
+  .def("save", &feature_generation::Features::save)
+;
+
+py::class_<feature_generation::WLFeatures, feature_generation::Features>(feature_generation_m, "_WLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
-  .def("collect", py::overload_cast<const data::Dataset>(&feature_generation::WLFeatures::collect),
-        "dataset"_a)
-  .def("collect", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::WLFeatures::collect),
-        "graphs"_a)
-  .def("set_problem", &feature_generation::WLFeatures::set_problem,
-        "problem"_a)
-  .def("get_string_representation", py::overload_cast<const feature_generation::Embedding &>(&feature_generation::WLFeatures::get_string_representation),
-        "embedding"_a)
-  .def("get_string_representation", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::get_string_representation),
-        "state"_a)
-  .def("embed", py::overload_cast<const data::Dataset &>(&feature_generation::WLFeatures::embed), 
-        "dataset"_a)
-  .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::WLFeatures::embed),
-        "graphs"_a)
-  .def("embed", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::embed),
-        "state"_a)
-  .def("get_n_features", &feature_generation::WLFeatures::get_n_features)
-  .def("get_seen_counts", &feature_generation::WLFeatures::get_seen_counts)
-  .def("get_unseen_counts", &feature_generation::WLFeatures::get_unseen_counts)
-  .def("get_n_seen_graphs", &feature_generation::WLFeatures::get_n_seen_graphs)
-  .def("get_n_seen_nodes", &feature_generation::WLFeatures::get_n_seen_nodes)
-  .def("get_n_seen_edges", &feature_generation::WLFeatures::get_n_seen_edges)
-  .def("get_n_seen_initial_colours", &feature_generation::WLFeatures::get_n_seen_initial_colours)
-  .def("get_n_seen_refined_colours", &feature_generation::WLFeatures::get_n_seen_refined_colours)
-  .def("set_weights", &feature_generation::WLFeatures::set_weights,
-        "weights"_a)
-  .def("get_weights", &feature_generation::WLFeatures::get_weights)
-  .def("predict", py::overload_cast<const graph::Graph &>(&feature_generation::WLFeatures::predict),
-        "graph"_a)
-  .def("predict", py::overload_cast<const planning::State &>(&feature_generation::WLFeatures::predict),
-        "state"_a)
-  .def("save", &feature_generation::WLFeatures::save);
+;
 
-/* Version */
+py::class_<feature_generation::LWL2Features, feature_generation::Features>(feature_generation_m, "_LWL2Features")
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
+  .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
+        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+;
+
+py::class_<feature_generation::KWL2Features, feature_generation::Features>(feature_generation_m, "_KWL2Features")
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
+  .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
+        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+;
+
+py::class_<feature_generation::IWLFeatures, feature_generation::Features>(feature_generation_m, "_IWLFeatures")
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
+  .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
+        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+;
+
+py::class_<feature_generation::NIWLFeatures, feature_generation::IWLFeatures>(feature_generation_m, "_NIWLFeatures")
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
+  .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
+        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+;
+
+py::class_<feature_generation::CCWLFeatures, feature_generation::WLFeatures>(feature_generation_m, "_CCWLFeatures")
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
+  .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
+        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+  .def("set_weights", &feature_generation::CCWLFeatures::set_weights,
+        "weights"_a)
+;
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Version
+//////////////////////////////////////////////////////////////////////////////
 #ifdef WLPLAN_VERSION
   m.attr("__version__") = MACRO_STRINGIFY(WLPLAN_VERSION);
 #else

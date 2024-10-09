@@ -6,7 +6,7 @@ import pymimir
 
 import wlplan
 from wlplan.data import Dataset, ProblemStates
-from wlplan.planning import Predicate, parse_domain
+from wlplan.planning import Predicate, State, parse_domain
 
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
@@ -151,7 +151,7 @@ def get_raw_dataset(domain_name: str, keep_statics: bool):
         wlplan_states = []
 
         def mimir_to_wlplan_state(mimir_state: pymimir.State):
-            wlplan_state = []
+            atoms = []
             for atom in mimir_state.get_atoms():
                 predicate_name = atom.predicate.name
                 if predicate_name not in name_to_predicate:
@@ -160,8 +160,8 @@ def get_raw_dataset(domain_name: str, keep_statics: bool):
                     predicate=name_to_predicate[predicate_name],
                     objects=[o.name for o in atom.terms],
                 )
-                wlplan_state.append(wlplan_atom)
-            return wlplan_state
+                atoms.append(wlplan_atom)
+            return State(atoms)
 
         h_opt = len(actions)
         wlplan_states.append(mimir_to_wlplan_state(mimir_state))

@@ -31,8 +31,6 @@ namespace graph {
 
     virtual int get_n_edge_labels() const = 0;
 
-    virtual std::vector<int> get_init_colours() const = 0;
-
     virtual void print_init_colours() const = 0;
 
     virtual void dump_graph() const = 0;

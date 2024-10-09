@@ -22,11 +22,8 @@ namespace planning {
 
 }  // namespace planning
 
-template <> 
-class std::hash<planning::Predicate>
-{
-  std::size_t operator()(const planning::Predicate& k) const
-  {
+template <> class std::hash<planning::Predicate> {
+  std::size_t operator()(const planning::Predicate &k) const {
     // Compute individual hash values for first,
     // second and third and combine them using XOR
     // and bit shifting:

@@ -1,14 +1,47 @@
 import os
-from typing import Optional, Union
+from typing import Optional
 
-from _wlplan.feature_generation import _WLFeatures
-from _wlplan.planning import Atom, Domain
+from _wlplan.feature_generation import (_CCWLFeatures, _IWLFeatures, _KWL2Features, _LWL2Features,
+                                        _NIWLFeatures, _WLFeatures)
+from _wlplan.planning import Domain
 
 
-class WLFeatures(_WLFeatures):
-    """WL Feature Generator object.
+def get_feature_generator(feature_algorithm: str, domain: Domain, **kwargs):
+    """
+    Returns a feature generator based on the specified feature algorithm.
 
-    The implementation supports graphs with node colours and edge labels.
+    Args:
+        feature_algorithm (str): The feature algorithm to use.
+        domain (Domain): The domain object.
+        **kwargs: Additional keyword arguments to pass to the feature generator.
+
+    Returns:
+        FeatureGenerator: The instantiated feature generator.
+
+    Raises:
+        ValueError: If the specified feature algorithm is unknown.
+    """
+    match feature_algorithm:
+        case "wl":
+            return WLFeatures(domain=domain, **kwargs)
+        case "kwl2":
+            return KWL2Features(domain=domain, **kwargs)
+        case "lwl2":
+            return LWL2Features(domain=domain, **kwargs)
+        case "ccwl":
+            return CCWLFeatures(domain=domain, **kwargs)
+        case "iwl":
+            return IWLFeatures(domain=domain, **kwargs)
+        case "niwl":
+            return NIWLFeatures(domain=domain, **kwargs)
+        case _:
+            raise ValueError(f"Unknown feature algorithm: {feature_algorithm}")
+
+
+class Features:
+    """Feature Generator object.
+
+    Derived classes support graphs with nodes with categorical and continuous attributes and edge labels.
 
     Parameters
     ----------
@@ -44,75 +77,46 @@ class WLFeatures(_WLFeatures):
             Converts a list of graphs into a 2D matrix in the form of a list of lists. Throws an error if training colours have not been collected by calling `collect`.
 
         embed(self, state: State) -> list[int]
-            Converts a state into a list. Throws an error if training colours have not been collected by calling `collect`. An error may also occur if the state does not belong to the problem set by `set_problem`, or if `set_problem` is not called beforehand.
+            Converts a state into a 1D embeddings. Throws an error if training colours have not been collected by calling `collect`. An error may also occur if the state does not belong to the problem set by `set_problem`, or if `set_problem` is not called beforehand.
 
-        get_n_features(self) -> int
-            Returns number of collected features after pruning.
-
-        get_seen_counts(self) -> List[int]
-            Returns a list of length `iterations` with the count of seen features at each iteration. Counts are from seen colours collected from `collect` calls. The values are collected over all `embed` calls from the initialisation of this class.
-
-        get_unseen_counts(self) -> List[int]
-            Returns a list of length `iterations` with the count of unseen colours at each iteration. Counts are from colours not seen from `collect` calls. The values are collected over all `embed` calls from the initialisation of this class.
-
-        get_n_seen_graphs -> int
-            Returns the number of training graphs collected from `collect` calls.
-
-        get_n_seen_nodes -> int
-            Returns the number of training nodes collected from `collect` calls.
-
-        get_n_seen_edges -> int
-            Returns the number of training edges collected from `collect` calls.
-
-        get_n_seen_initial_colours -> int
-            Returns the number of initial colours collected from `collect` calls.
-
-        get_n_seen_refined_colours -> int
-            Returns the number of refined colours collected from `collect` calls.
-
-        set_weights(self, weights: Union[list[float], list[int]]) -> None
+        set_weights(self, weights: list[float]) -> None
             Set the weights to predict heuristics directly with this class. The weights must be a list of floats, integers or a numpy array of floats. The length of the weights must be the same as the number of features collected.
 
-        get_weights(self) -> np.ndarray
+        get_weights(self) -> list[float]
             Return stored weights. Raises an error if weights do not exist.
 
-        predict(self, state: list[Atom]) -> float
+        predict(self, state: State) -> float
             Predict a heuristic value for a state. The state must be a list of atoms. The weights must be set with `set_weights` before calling this method.
-
-        save(self, filename: str) -> None
-            Save the feature generator to a json file with path `filename`. The directory to `filename` will be created automatically if it does not exist. The file will contain information about the generator configuration, the computed hash function, and information about features.
-
-        load(filename: str) -> WLFeatures
-            Load a feature generator from a json file with path `filename`. The file should have been created by `save`. The directory to `filename` will be created automatically if it does not exist.
     """
-
     def __init__(
         self,
-        domain: Domain,
-        graph_representation: Optional[str] = "ilg",
-        iterations: int = 2,
-        prune_features: Optional[str] = None,
-        multiset_hash: bool = False,
+        domain: Optional[Domain],
+        graph_representation: Optional[str],
+        iterations: int,
+        prune_features: Optional[str],
+        multiset_hash: bool,
+        base_class=None,  # Pass the base class dynamically
         **kwargs,
     ) -> None:
-        # Check if we want to load from a file. See WLFeatures.load
+        # Check if we want to load from a file. See Features.load
         if "filename" in kwargs:
-            super().__init__(filename=kwargs["filename"])
+            base_class.__init__(self, filename=kwargs["filename"])
             return
 
-        choices = [None, "custom", "ilg"]
-        if graph_representation not in choices:
-            raise ValueError(f"graph_representation must be one of {choices}")
+        graph_choices = [None, "custom", "ilg", "nilg"]
+        if graph_representation not in graph_choices:
+            raise ValueError(f"graph_representation must be one of {graph_choices}")
         if graph_representation is None:
             graph_representation = "custom"
 
-        choices = [None, "no_prune", "collapse", "collapse_by_layer"]
-        if prune_features not in choices:
-            raise ValueError(f"prune_features must be one of {choices}")
+        prune_choices = [None, "no_prune", "collapse", "collapse_by_layer"]
+        if prune_features not in prune_choices:
+            raise ValueError(f"prune_features must be one of {prune_choices}")
         if prune_features is None:
             prune_features = "no_prune"
 
-        super().__init__(
+        base_class.__init__(
+            self,
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
@@ -120,24 +124,164 @@ class WLFeatures(_WLFeatures):
             multiset_hash=multiset_hash,
         )
 
-    def set_weights(self, weights: Union[list[float], list[int]]) -> None:
-        if not isinstance(weights, list):
-            raise ValueError("Input weights must be a Python list.")
-        super().set_weights(weights)
-
-    def get_weights(self) -> list[float]:
-        weights = super().get_weights()
-        return weights
-    
-    def predict(self, state: list[Atom]) -> float:
-        return super().predict(state)
-
-    @staticmethod
-    def load(filename: str) -> "WLFeatures":
-        return WLFeatures(domain=None, filename=filename)
-
     def save(self, filename: str) -> None:
         filename_dir = os.path.dirname(filename)
         if len(filename_dir) > 0 and not os.path.exists(filename_dir):
             os.makedirs(filename_dir)
         super().save(filename)
+
+    @staticmethod
+    def load(filename: str, cls) -> "Features":
+        return cls(domain=None, filename=filename)
+
+
+class WLFeatures(Features, _WLFeatures):
+    def __init__(
+        self,
+        domain: Domain,
+        graph_representation: Optional[str] = "ilg",
+        iterations: int = 2,
+        prune_features: Optional[str] = None,
+        multiset_hash: bool = True,
+        **kwargs,
+    ) -> None:
+        super().__init__(
+            domain=domain,
+            graph_representation=graph_representation,
+            iterations=iterations,
+            prune_features=prune_features,
+            multiset_hash=multiset_hash,
+            base_class=_WLFeatures,  # Pass the correct base class
+            **kwargs,
+        )
+
+    @staticmethod
+    def load(filename: str) -> "WLFeatures":
+        return Features.load(filename, WLFeatures)
+
+
+class IWLFeatures(Features, _IWLFeatures):
+    def __init__(
+        self,
+        domain: Domain,
+        graph_representation: Optional[str] = "ilg",
+        iterations: int = 2,
+        prune_features: Optional[str] = None,
+        multiset_hash: bool = True,
+        **kwargs,
+    ) -> None:
+        super().__init__(
+            domain=domain,
+            graph_representation=graph_representation,
+            iterations=iterations,
+            prune_features=prune_features,
+            multiset_hash=multiset_hash,
+            base_class=_IWLFeatures,  # Pass the correct base class
+            **kwargs,
+        )
+
+    @staticmethod
+    def load(filename: str) -> "IWLFeatures":
+        return Features.load(filename, IWLFeatures)
+
+
+class NIWLFeatures(Features, _NIWLFeatures):
+    def __init__(
+        self,
+        domain: Domain,
+        graph_representation: Optional[str] = "ilg",
+        iterations: int = 2,
+        prune_features: Optional[str] = None,
+        multiset_hash: bool = True,
+        **kwargs,
+    ) -> None:
+        super().__init__(
+            domain=domain,
+            graph_representation=graph_representation,
+            iterations=iterations,
+            prune_features=prune_features,
+            multiset_hash=multiset_hash,
+            base_class=_NIWLFeatures,  # Pass the correct base class
+            **kwargs,
+        )
+
+    @staticmethod
+    def load(filename: str) -> "NIWLFeatures":
+        return Features.load(filename, NIWLFeatures)
+
+
+class LWL2Features(Features, _LWL2Features):
+    def __init__(
+        self,
+        domain: Domain,
+        graph_representation: Optional[str] = "ilg",
+        iterations: int = 2,
+        prune_features: Optional[str] = None,
+        multiset_hash: bool = True,
+        **kwargs,
+    ) -> None:
+        super().__init__(
+            domain=domain,
+            graph_representation=graph_representation,
+            iterations=iterations,
+            prune_features=prune_features,
+            multiset_hash=multiset_hash,
+            base_class=_LWL2Features,  # Pass the correct base class
+            **kwargs,
+        )
+
+    @staticmethod
+    def load(filename: str) -> "LWL2Features":
+        return Features.load(filename, LWL2Features)
+
+
+class KWL2Features(Features, _KWL2Features):
+    def __init__(
+        self,
+        domain: Domain,
+        graph_representation: Optional[str] = "ilg",
+        iterations: int = 2,
+        prune_features: Optional[str] = None,
+        multiset_hash: bool = True,
+        **kwargs,
+    ) -> None:
+        super().__init__(
+            domain=domain,
+            graph_representation=graph_representation,
+            iterations=iterations,
+            prune_features=prune_features,
+            multiset_hash=multiset_hash,
+            base_class=_KWL2Features,  # Pass the correct base class
+            **kwargs,
+        )
+
+    @staticmethod
+    def load(filename: str) -> "KWL2Features":
+        return Features.load(filename, KWL2Features)
+
+
+class CCWLFeatures(Features, _CCWLFeatures):
+    def __init__(
+        self,
+        domain: Domain,
+        graph_representation: Optional[str] = "nilg",
+        iterations: int = 2,
+        prune_features: Optional[str] = None,
+        multiset_hash: bool = False,  # NeurIPS-24 experiments used sets
+        **kwargs,
+    ) -> None:
+        if graph_representation != "nilg":
+            raise ValueError("ccWL only supports the graph_representation=nilg")
+        super().__init__(
+            domain=domain,
+            graph_representation=graph_representation,
+            iterations=iterations,
+            prune_features=prune_features,
+            multiset_hash=multiset_hash,
+            base_class=_CCWLFeatures,  # Pass the correct base class
+            **kwargs,
+        )
+
+    @staticmethod
+    def load(filename: str) -> "CCWLFeatures":
+        return Features.load(filename, CCWLFeatures)

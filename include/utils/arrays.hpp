@@ -4,8 +4,6 @@
 #include <iostream>
 #include <vector>
 
-namespace py = pybind11;
-
 namespace utils {
   template <typename T> void print_1d(const std::vector<T> &v) {
     std::cout << "[";

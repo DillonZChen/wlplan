@@ -18,9 +18,7 @@ namespace planning {
 
     std::string to_string() const;
 
-    bool operator==(const Atom &other) const {
-      return *predicate == *other.predicate && objects == other.objects;
-    }
+    bool operator==(const Atom &other) const { return to_string() == other.to_string(); }
   };
 
 }  // namespace planning

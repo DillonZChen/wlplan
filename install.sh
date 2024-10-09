@@ -5,7 +5,7 @@ set -x
 # Exit on the first error
 set -e
 
-# Build with all cores
+# Build with all threads
 export MAKEFLAGS="-j$(nproc)"
 
 # Install the package from sources
