@@ -14,9 +14,7 @@ WLPlan is a package for generating embeddings of PDDL planning problems for mach
 ### Python Interface
 The Python interface can be installed simply with
 
-    pip install wlplan
-
-The PyPI release only supports `python>=3.10`. Alternatively, you can also install the package from the source code.
+    sh install.sh
 
 ### C++ Interface
 The C++ interface can be installed in your project by running
