@@ -37,6 +37,6 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "networkx>=3.0",
-        "pddl @ git+https://git@github.com/AI-Planning/pddl.git@42c819840db997148efc55d608c9ab57e8143374",
+        "pddl==0.4.1",
     ],
 )
