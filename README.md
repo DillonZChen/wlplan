@@ -1,6 +1,7 @@
 WLPlan
 ======
 
+[![PyPI version](https://badge.fury.io/py/wlplan.svg)](https://pypi.org/project/wlplan/)
 [![License](https://img.shields.io/pypi/l/wlplan)](LICENSE)
 
 WLPlan is a package for generating embeddings of PDDL planning problems for machine learning tasks. It supports both classical and numeric planning problems.
@@ -13,7 +14,9 @@ WLPlan is a package for generating embeddings of PDDL planning problems for mach
 ### Python Interface
 The Python interface can be installed simply with
 
-    sh install.sh
+    pip install wlplan
+
+The PyPI release only supports `python>=3.10`. Alternatively, you can also install the package from the source code with the `install.sh` script.
 
 ### C++ Interface
 The C++ interface can be installed in your project by running
