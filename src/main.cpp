@@ -7,6 +7,7 @@
 #include "../include/feature_generation/niwl_features.hpp"
 #include "../include/feature_generation/wl_features.hpp"
 #include "../include/graph/ilg_generator.hpp"
+#include "../include/graph/nilg_generator.hpp"
 #include "../include/planning/atom.hpp"
 #include "../include/planning/domain.hpp"
 #include "../include/planning/fluent.hpp"
@@ -53,8 +54,8 @@ R"(Parameters
 )")
   .def(py::init<std::string &, int>(), 
         "name"_a, "arity"_a)
-  .def_readonly("name", &planning::Predicate::name, ":meta private:")
-  .def_readonly("arity", &planning::Predicate::arity, ":meta private:")
+  .def_readonly("name", &planning::Predicate::name)
+  .def_readonly("arity", &planning::Predicate::arity)
   .def("__repr__", &::planning::Predicate::to_string)
   .def("__eq__", &::planning::Predicate::operator==);
 
@@ -70,8 +71,8 @@ R"(Parameters
 )")
   .def(py::init<std::string &, int>(), 
         "name"_a, "arity"_a)
-  .def_readonly("name", &planning::Function::name, ":meta private:")
-  .def_readonly("arity", &planning::Function::arity, ":meta private:")
+  .def_readonly("name", &planning::Function::name)
+  .def_readonly("arity", &planning::Function::arity)
   .def("__repr__", &::planning::Function::to_string)
   .def("__eq__", &::planning::Function::operator==);
 
@@ -99,10 +100,10 @@ R"(Parameters
         "name"_a, "predicates"_a)
   .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>>(), 
         "name"_a, "predicates"_a, "functions"_a)
-  .def_readonly("name", &planning::Domain::name, ":meta private:")
-  .def_readonly("predicates", &planning::Domain::predicates, ":meta private:")
-  .def_readonly("functions", &planning::Domain::functions, ":meta private:")
-  .def_readonly("constant_objects", &planning::Domain::constant_objects, ":meta private:")
+  .def_readonly("name", &planning::Domain::name)
+  .def_readonly("predicates", &planning::Domain::predicates)
+  .def_readonly("functions", &planning::Domain::functions)
+  .def_readonly("constant_objects", &planning::Domain::constant_objects)
   .def("__repr__", &::planning::Domain::to_string)
   .def("__eq__", &::planning::Domain::operator==);
 
@@ -285,16 +286,16 @@ R"(Parameters
         "objects"_a, 
         "positive_goals"_a, 
         "negative_goals"_a)
-  .def_property_readonly("domain", &planning::Problem::get_domain, ":meta private:")
-  .def_property_readonly("objects", &planning::Problem::get_problem_objects, ":meta private:")
-  .def_property_readonly("constant_objects", &planning::Problem::get_constant_objects, ":meta private:")
-  .def_property_readonly("statics", &planning::Problem::get_statics, ":meta private:")
-  .def_property_readonly("fluents", &planning::Problem::get_fluents, ":meta private:")
-  .def_property_readonly("fluent_name_to_id", &planning::Problem::get_fluent_name_to_id, ":meta private:")
-  .def_property_readonly("init_fluent_values", &planning::Problem::get_fluent_values, ":meta private:")
-  .def_property_readonly("positive_goals", &planning::Problem::get_positive_goals, ":meta private:")
-  .def_property_readonly("negative_goals", &planning::Problem::get_negative_goals, ":meta private:")
-  .def_property_readonly("numeric_goals", &planning::Problem::get_numeric_goals, ":meta private:")
+  .def_property_readonly("domain", &planning::Problem::get_domain)
+  .def_property_readonly("objects", &planning::Problem::get_problem_objects)
+  .def_property_readonly("constant_objects", &planning::Problem::get_constant_objects)
+  .def_property_readonly("statics", &planning::Problem::get_statics)
+  .def_property_readonly("fluents", &planning::Problem::get_fluents)
+  .def_property_readonly("fluent_name_to_id", &planning::Problem::get_fluent_name_to_id)
+  .def_property_readonly("init_fluent_values", &planning::Problem::get_fluent_values)
+  .def_property_readonly("positive_goals", &planning::Problem::get_positive_goals)
+  .def_property_readonly("negative_goals", &planning::Problem::get_negative_goals)
+  .def_property_readonly("numeric_goals", &planning::Problem::get_numeric_goals)
   .def("dump", &planning::Problem::dump)
 ;
 
@@ -312,8 +313,8 @@ R"(Parameters
         "atoms"_a)
   .def(py::init<std::vector<planning::Atom> &, std::vector<double> &>(), 
         "atoms"_a, "values"_a)
-  .def_property_readonly("atoms", &planning::State::get_atoms, ":meta private:")
-  .def_readonly("values", &planning::State::values, ":meta private:")
+  .def_property_readonly("atoms", &planning::State::get_atoms)
+  .def_readonly("values", &planning::State::values)
   .def("__repr__", &::planning::State::to_string)
   .def("__eq__", &::planning::State::operator==)
   .def("__hash__", &::planning::State::hash)
@@ -368,7 +369,7 @@ Parameters
 auto graph_m = m.def_submodule("graph");
 
 // Graph
-py::class_<graph::Graph>(graph_m, "Graph",
+py::class_<graph::Graph, std::shared_ptr<graph::Graph>>(graph_m, "Graph",
 R"(WLPlan graph object.
 
 Graphs have integer node colours and edge labels.
@@ -414,14 +415,29 @@ Methods
         "node_colours"_a, "node_names"_a, "edges"_a)
   .def(py::init<std::vector<int>, std::vector<std::vector<std::pair<int, int>>>>(), 
         "node_colours"_a, "edges"_a)
-  .def_readonly("node_colours", &graph::Graph::nodes, ":meta private:")
-  .def_readonly("node_values", &graph::Graph::node_values, ":meta private:")
-  .def_readonly("edges", &graph::Graph::edges, ":meta private:")
-  .def("get_node_name", &graph::Graph::get_node_name, "u"_a, ":meta private:")
-  .def("dump", &graph::Graph::dump, ":meta private:")
-  .def("__repr__", &::graph::Graph::to_string, ":meta private:");
+  .def_readonly("node_colours", &graph::Graph::nodes)
+  .def_readonly("node_values", &graph::Graph::node_values)
+  .def_readonly("edges", &graph::Graph::edges)
+  .def("get_node_name", &graph::Graph::get_node_name, "u"_a)
+  .def("dump", &graph::Graph::dump)
+  .def("__repr__", &::graph::Graph::to_string);
 
 
+// ILGGenerator
+py::class_<graph::ILGGenerator>(graph_m, "ILGGenerator")
+  .def(py::init<planning::Domain &, bool>(), 
+        "domain"_a, "differentiate_constant_objects"_a)
+  .def("set_problem", &graph::ILGGenerator::set_problem, "problem"_a)
+  .def("to_graph", &graph::ILGGenerator::to_graph, "state"_a)
+;
+
+// NILGGenerator
+py::class_<graph::NILGGenerator, graph::ILGGenerator>(graph_m, "NILGGenerator")
+  .def(py::init<planning::Domain &, bool>(), 
+        "domain"_a, "differentiate_constant_objects"_a)
+  .def("set_problem", &graph::NILGGenerator::set_problem, "problem"_a)
+  .def("to_graph", &graph::NILGGenerator::to_graph, "state"_a)
+;
 
 //////////////////////////////////////////////////////////////////////////////
 // Feature Generation

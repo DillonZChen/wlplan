@@ -5,6 +5,17 @@ from _wlplan.feature_generation import (_CCWLFeatures, _IWLFeatures, _KWL2Featur
                                         _NIWLFeatures, _WLFeatures)
 from _wlplan.planning import Domain
 
+__all__ = [
+    "get_feature_generator",
+    "Features",
+    "WLFeatures",
+    "IWLFeatures",
+    "NIWLFeatures",
+    "LWL2Features",
+    "KWL2Features",
+    "CCWLFeatures",
+]
+
 
 def get_feature_generator(feature_algorithm: str, domain: Domain, **kwargs):
     """
@@ -88,6 +99,7 @@ class Features:
         predict(self, state: State) -> float
             Predict a heuristic value for a state. The state must be a list of atoms. The weights must be set with `set_weights` before calling this method.
     """
+
     def __init__(
         self,
         domain: Optional[Domain],

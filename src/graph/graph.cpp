@@ -48,7 +48,7 @@ namespace graph {
   }
 
   void Graph::add_edge(const int u, const int r, const int v) {
-    edges[u].push_back(std::make_pair(r, v));
+    edges.at(u).push_back(std::make_pair(r, v));
   }
 
   void Graph::add_edge(const std::string &u_name, const int r, const std::string &v_name) {
@@ -96,7 +96,7 @@ namespace graph {
       std::cout << "Error: cannot get node name as store_node_names is false" << std::endl;
       exit(-1);
     }
-    return index_to_node_[u];
+    return index_to_node_.at(u);
   }
 
   int Graph::get_node_index(const std::string &node_name) const {
@@ -108,7 +108,7 @@ namespace graph {
   int Graph::get_n_edges() const {
     int ret = 0;
     for (size_t u = 0; u < nodes.size(); u++) {
-      ret += edges[u].size();
+      ret += edges.at(u).size();
     }
     return ret;
   }

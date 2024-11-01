@@ -66,7 +66,7 @@ def get_predicates(mimir_domain: pymimir.Domain, keep_statics: bool):
 
 
 def get_raw_dataset(domain_name: str):
-    raise NotImplementedError
+    raise NotImplementedError  # no nice numeric planning parser
 
 
 def get_dataset(domain_name: str):
