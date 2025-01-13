@@ -140,7 +140,17 @@ namespace feature_generation {
             collect_colour_remap[colour] = collect_colour_remap.size() + colours_collected_so_far;
           } else {
             // throw out because not unique
-            collect_colour_remap[colour] = -1;
+            collect_colour_remap[colour] = UNSEEN_COLOUR;
+          }
+        }
+
+        // map all current thrown out nodes to UNSEEN_COLOUR in the graphs
+        for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
+          for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
+            int colour = graph_colours[graph_i][node_i];
+            if (collect_colour_remap.count(colour) && collect_colour_remap[colour] == UNSEEN_COLOUR) {
+              graph_colours[graph_i][node_i] = UNSEEN_COLOUR;
+            }
           }
         }
 

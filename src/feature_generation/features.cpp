@@ -141,7 +141,7 @@ namespace feature_generation {
     std::vector<int> throw_out_hash;
     for (const auto &[old_colour, new_colour] : remap) {
       std::vector<int> long_colour = reverse_hash[old_colour];
-      if (new_colour == -1) {
+      if (new_colour == UNSEEN_COLOUR) {
         throw_out_long.push_back(long_colour);
         throw_out_hash.push_back(old_colour);
       } else {
