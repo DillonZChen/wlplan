@@ -13,17 +13,18 @@ namespace feature_generation {
                      const planning::Domain &domain,
                      std::string graph_representation,
                      int iterations,
-                     std::string prune_features,
+                     std::string pruning,
                      bool multiset_hash)
       : package_version(MACRO_STRINGIFY(WLPLAN_VERSION)),
         feature_name(feature_name),
         graph_representation(graph_representation),
         iterations(iterations),
-        prune_features(prune_features),
+        pruning(pruning),
         multiset_hash(multiset_hash) {
     this->domain = std::make_shared<planning::Domain>(domain);
     graph_generator = graph::create_graph_generator(graph_representation, domain);
     collected = false;
+    collapse_pruned = false;
     collecting = false;
     neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
     seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
@@ -33,6 +34,8 @@ namespace feature_generation {
     n_seen_nodes = 0;
     n_seen_edges = 0;
     seen_initial_colours = std::set<int>();
+    // plus 1 because zeroth iteration is also included
+    layer_to_colours = std::vector<std::set<int>>(iterations + 1, std::set<int>());
   }
 
   Features::Features(const std::string &filename) {
@@ -53,22 +56,21 @@ namespace feature_generation {
     feature_name = j.at("feature_name").get<std::string>();
     graph_representation = j.at("graph_representation").get<std::string>();
     iterations = j.at("iterations").get<int>();
-    prune_features = j.at("prune_features").get<std::string>();
+    pruning = j.at("pruning").get<std::string>();
     multiset_hash = j.at("multiset_hash").get<bool>();
 
     std::cout << "package_version=" << package_version << std::endl;
     std::cout << "feature_name=" << feature_name << std::endl;
     std::cout << "graph_representation=" << graph_representation << std::endl;
     std::cout << "iterations=" << iterations << std::endl;
-    std::cout << "prune_features=" << prune_features << std::endl;
+    std::cout << "pruning=" << pruning << std::endl;
     std::cout << "multiset_hash=" << multiset_hash << std::endl;
 
     // load colours
     std::unordered_map<std::string, int> colour_hash_str =
         j.at("colour_hash").get<std::unordered_map<std::string, int>>();
     colour_hash = str_to_int_colour_hash(colour_hash_str);
-    colour_to_layer = j.at("colour_to_layer").get<std::vector<int>>();
-    colours_to_keep = j.at("colours_to_keep").get<std::vector<int>>();
+    colour_to_layer = j.at("colour_to_layer").get<std::unordered_map<int, int>>();
 
     // initialise domain object
     std::string domain_name = j.at("domain").at("name").get<std::string>();
@@ -127,9 +129,37 @@ namespace feature_generation {
     } else if (collecting && colour_hash.count(colour) == 0) {
       int hash = (int)colour_hash.size();
       colour_hash[colour] = hash;
-      colour_to_layer.push_back(cur_collecting_layer);
+      reverse_hash[hash] = colour;
+      colour_to_layer[hash] = cur_collecting_layer;
+      layer_to_colours[cur_collecting_layer].insert(hash);
     }
     return colour_hash[colour];
+  }
+
+  void Features::reformat_colour_hash(const std::map<int, int> &remap) {
+    std::vector<std::vector<int>> throw_out_long;
+    std::vector<int> throw_out_hash;
+    for (const auto &[old_colour, new_colour] : remap) {
+      std::vector<int> long_colour = reverse_hash[old_colour];
+      if (new_colour == -1) {
+        throw_out_long.push_back(long_colour);
+        throw_out_hash.push_back(old_colour);
+      } else {
+        colour_hash[long_colour] = new_colour;
+      }
+    }
+    for (const auto &key : throw_out_long) {
+      colour_hash.erase(key);
+    }
+    for (const auto &col : throw_out_hash) {
+      reverse_hash.erase(col);
+      if (colour_to_layer.count(col) == 0) {
+        continue;
+      }
+      int layer = colour_to_layer[col];
+      colour_to_layer.erase(col);
+      layer_to_colours[layer].erase(col);
+    }
   }
 
   std::vector<graph::Graph> Features::convert_to_graphs(const data::Dataset dataset) {
@@ -149,58 +179,21 @@ namespace feature_generation {
     return graphs;
   }
 
-  void Features::post_process_features(const std::vector<graph::Graph> &graphs) {
-    if (prune_features == "no_prune") {
-      // do not detect equivalent features
-      colours_to_keep = std::vector<int>(colour_hash.size());
-      std::iota(colours_to_keep.begin(), colours_to_keep.end(), 0);
-      return;
-    }
-
-    // want to call embed without invoking collapse features
-    std::string prune_features_tmp = prune_features;
-    prune_features = "no_prune";
-    colours_to_keep = std::vector<int>();
-    std::vector<Embedding> X = embed_graphs(graphs);
-    if (prune_features_tmp == "collapse") {
-      std::set<std::vector<int>> unique_columns;
-      for (int i = 0; i < (int)colour_hash.size(); i++) {
-        std::vector<int> column;
-        for (const auto &x : X) {
-          column.push_back(x[i]);
-        }
-        if (unique_columns.count(column) == 0) {
-          unique_columns.insert(column);
-          colours_to_keep.push_back(i);
-        }
-      }
-    } else if (prune_features_tmp == "collapse_by_layer") {
-      std::vector<std::set<std::vector<int>>> unique_columns(iterations + 1);
-      for (int i = 0; i < (int)colour_hash.size(); i++) {
-        std::vector<int> column;
-        for (const auto &x : X) {
-          column.push_back(x[i]);
-        }
-        int layer = colour_to_layer[i];
-        if (unique_columns[layer].count(column) == 0) {
-          unique_columns[layer].insert(column);
-          colours_to_keep.push_back(i);
-        }
-      }
-    }
-    prune_features = prune_features_tmp;
-  }
-
   void Features::collect(const std::vector<graph::Graph> &graphs) {
+    if (pruning == "collapse" && collapse_pruned) {
+      std::cout << "collect with collapse pruning can only be called at most once" << std::endl;
+      exit(-1);
+    }
+
     collecting = true;
 
     collect_main(graphs);
 
+    if (pruning == "collapse") {
+      collapse_pruned = true;
+    }
     collected = true;
     collecting = false;
-
-    // post processing to detect equivalent features based on final X
-    post_process_features(graphs);
 
     // check features have been collected
     if (get_n_features() == 0) {
@@ -316,6 +309,14 @@ namespace feature_generation {
     return str_colour_hash;
   }
 
+  std::vector<long> Features::get_layer_to_n_colours() const {
+    std::vector<long> layer_to_n_colours;
+    for (size_t i = 0; i < layer_to_colours.size(); i++) {
+      layer_to_n_colours.push_back(layer_to_colours[i].size());
+    }
+    return layer_to_n_colours;
+  }
+
   void Features::set_weights(const std::vector<double> &weights) {
     if (((int)weights.size()) != get_n_features()) {
       throw std::runtime_error("Number of weights must match number of features.");
@@ -340,14 +341,13 @@ namespace feature_generation {
     j["feature_name"] = feature_name;
     j["graph_representation"] = graph_representation;
     j["iterations"] = iterations;
-    j["prune_features"] = prune_features;
+    j["pruning"] = pruning;
     j["multiset_hash"] = multiset_hash;
 
     j["domain"] = domain->to_json();
 
     j["colour_hash"] = int_to_str_colour_hash(colour_hash);
     j["colour_to_layer"] = colour_to_layer;
-    j["colours_to_keep"] = colours_to_keep;
 
     j["weights"] = weights;
 

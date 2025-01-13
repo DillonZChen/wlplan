@@ -22,7 +22,7 @@ def test_blocksworld_random_path_graph():
         domain=domain,
         graph_representation=None,
         iterations=4,
-        prune_features=None,
+        pruning=None,
     )
     graphs = []
     LOGGER.info("Converting to random path graphs")

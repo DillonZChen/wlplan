@@ -9,9 +9,9 @@ import pymimir  # pip install pymdzcf==0.1.0
 from ipc23lt import get_dataset, get_domain_benchmark_dir, get_mimir_problem, get_predicates
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct
-from util import print_mat
 
 import wlplan
+from util import print_mat
 from wlplan.feature_generation import WLFeatures
 from wlplan.planning import State, parse_problem
 
@@ -39,7 +39,7 @@ def test_train_eval_blocks():
         domain=wlplan_domain,
         graph_representation="ilg",
         iterations=4,
-        prune_features=None,
+        pruning=None,
         multiset_hash=False,
     )
     feature_generator.collect(dataset)

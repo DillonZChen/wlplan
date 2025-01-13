@@ -13,17 +13,16 @@ namespace feature_generation {
                          const planning::Domain &domain,
                          std::string graph_representation,
                          int iterations,
-                         std::string prune_features,
+                         std::string pruning,
                          bool multiset_hash)
-      : Features(wl_name, domain, graph_representation, iterations, prune_features, multiset_hash) {
-  }
+      : Features(wl_name, domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   WLFeatures::WLFeatures(const planning::Domain &domain,
                          std::string graph_representation,
                          int iterations,
-                         std::string prune_features,
+                         std::string pruning,
                          bool multiset_hash)
-      : Features("wl", domain, graph_representation, iterations, prune_features, multiset_hash) {}
+      : Features("wl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
@@ -74,8 +73,8 @@ namespace feature_generation {
 
   void WLFeatures::collect_main(const std::vector<graph::Graph> &graphs) {
     // intermediate graph colours during WL and extra memory for WL updates
-    std::vector<int> colours;
-    std::vector<int> colours_tmp;
+    std::vector<std::vector<int>> graph_colours;
+    std::vector<std::vector<int>> graph_colours_tmp;
 
     n_seen_graphs += graphs.size();
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
@@ -85,8 +84,7 @@ namespace feature_generation {
       n_seen_nodes += n_nodes;
       n_seen_edges += n_edges;
 
-      colours = std::vector<int>(n_nodes, 0);
-      colours_tmp = std::vector<int>(n_nodes, 0);
+      std::vector<int> colours(n_nodes, 0);
 
       // init colours
       cur_collecting_layer = 0;
@@ -95,11 +93,58 @@ namespace feature_generation {
         colours[node_i] = col;
         seen_initial_colours.insert(col);
       }
+      graph_colours.push_back(colours);
+      graph_colours_tmp.push_back(std::vector<int>(n_nodes, 0));
+    }
 
-      // main WL loop
-      for (int iteration = 1; iteration < iterations + 1; iteration++) {
-        cur_collecting_layer = iteration;
-        refine(graph, colours, colours_tmp);
+    // main WL loop
+    for (int iteration = 1; iteration < iterations + 1; iteration++) {
+      cur_collecting_layer = iteration;
+
+      int colours_collected_so_far = get_n_features();
+
+      for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
+        const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
+        refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i]);
+      }
+
+      if (pruning == "none") {
+        continue;
+      } else if (pruning == "collapse") {
+        // remove duplicate features based on their column
+
+        // any key not appearing in colour_remap is thrown out
+        std::map<int, int> collect_colour_remap;
+        std::map<int, std::vector<int>> columns;
+
+        for (int colour : layer_to_colours[iteration]) {
+          columns[colour] = std::vector<int>(graphs.size(), 0);
+        }
+        for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
+          for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
+            int colour = graph_colours[graph_i][node_i];
+            if (colour_to_layer[colour] != iteration) {
+              // this occurs for isolated nodes and would cause seg fault below
+              continue;
+            }
+            columns[colour][graph_i]++;
+          }
+        }
+
+        // just select the earliest unique features
+        std::unordered_set<std::vector<int>, int_vector_hasher> unique_features;
+        for (int colour : layer_to_colours[iteration]) {
+          std::vector<int> column = columns[colour];
+          if (unique_features.count(column) == 0) {
+            unique_features.insert(column);
+            collect_colour_remap[colour] = collect_colour_remap.size() + colours_collected_so_far;
+          } else {
+            // throw out because not unique
+            collect_colour_remap[colour] = -1;
+          }
+        }
+
+        reformat_colour_hash(collect_colour_remap);
       }
     }
   }
@@ -140,15 +185,6 @@ namespace feature_generation {
       }
     }
 
-    /* 5. Prune features with colours_to_keep */
-    if (prune_features == "no_prune") {
-      return x0;
-    }
-
-    Embedding x(colours_to_keep.size(), 0);
-    for (size_t i = 0; i < colours_to_keep.size(); i++) {
-      x[i] = x0[colours_to_keep[i]];
-    }
-    return x;
+    return x0;
   }
 }  // namespace feature_generation

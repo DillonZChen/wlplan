@@ -28,6 +28,8 @@ def _get_feature_generators_dict():
         "niwl": NIWLFeatures,
     }
 
+def get_available_pruning_methods():
+    return {"none", "collapse", "collapse_by_layer"}
 
 def get_available_feature_generators():
     return set(_get_feature_generators_dict().keys())
@@ -70,7 +72,7 @@ class Features:
         iterations : int, default=2
             The number of WL iterations to perform.
 
-        prune_features : "collapse", "collapse_by_layer" or None, default=None
+        pruning : "collapse", "collapse_by_layer" or None, default=None
             How to detect and prune duplicate features. If None, no pruning is done.
 
         multiset_hash : bool, default=False
@@ -111,7 +113,7 @@ class Features:
         domain: Optional[Domain],
         graph_representation: Optional[str],
         iterations: int,
-        prune_features: Optional[str],
+        pruning: Optional[str],
         multiset_hash: bool,
         base_class=None,  # Pass the base class dynamically
         **kwargs,
@@ -127,18 +129,18 @@ class Features:
         if graph_representation is None:
             graph_representation = "custom"
 
-        prune_choices = [None, "no_prune", "collapse", "collapse_by_layer"]
-        if prune_features not in prune_choices:
-            raise ValueError(f"prune_features must be one of {prune_choices}")
-        if prune_features is None:
-            prune_features = "no_prune"
+        prune_choices = [None, "none", "collapse", "collapse_by_layer"]
+        if pruning not in prune_choices:
+            raise ValueError(f"pruning must be one of {prune_choices}")
+        if pruning is None:
+            pruning = "none"
 
         base_class.__init__(
             self,
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
         )
 
@@ -159,7 +161,7 @@ class WLFeatures(Features, _WLFeatures):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = None,
+        pruning: Optional[str] = None,
         multiset_hash: bool = True,
         **kwargs,
     ) -> None:
@@ -167,7 +169,7 @@ class WLFeatures(Features, _WLFeatures):
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
             base_class=_WLFeatures,  # Pass the correct base class
             **kwargs,
@@ -184,7 +186,7 @@ class IWLFeatures(Features, _IWLFeatures):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = None,
+        pruning: Optional[str] = None,
         multiset_hash: bool = True,
         **kwargs,
     ) -> None:
@@ -192,7 +194,7 @@ class IWLFeatures(Features, _IWLFeatures):
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
             base_class=_IWLFeatures,  # Pass the correct base class
             **kwargs,
@@ -209,7 +211,7 @@ class NIWLFeatures(Features, _NIWLFeatures):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = None,
+        pruning: Optional[str] = None,
         multiset_hash: bool = True,
         **kwargs,
     ) -> None:
@@ -217,7 +219,7 @@ class NIWLFeatures(Features, _NIWLFeatures):
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
             base_class=_NIWLFeatures,  # Pass the correct base class
             **kwargs,
@@ -234,7 +236,7 @@ class LWL2Features(Features, _LWL2Features):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = None,
+        pruning: Optional[str] = None,
         multiset_hash: bool = True,
         **kwargs,
     ) -> None:
@@ -242,7 +244,7 @@ class LWL2Features(Features, _LWL2Features):
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
             base_class=_LWL2Features,  # Pass the correct base class
             **kwargs,
@@ -259,7 +261,7 @@ class KWL2Features(Features, _KWL2Features):
         domain: Domain,
         graph_representation: Optional[str] = "ilg",
         iterations: int = 2,
-        prune_features: Optional[str] = None,
+        pruning: Optional[str] = None,
         multiset_hash: bool = True,
         **kwargs,
     ) -> None:
@@ -267,7 +269,7 @@ class KWL2Features(Features, _KWL2Features):
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
             base_class=_KWL2Features,  # Pass the correct base class
             **kwargs,
@@ -284,7 +286,7 @@ class CCWLFeatures(Features, _CCWLFeatures):
         domain: Domain,
         graph_representation: Optional[str] = "nilg",
         iterations: int = 2,
-        prune_features: Optional[str] = None,
+        pruning: Optional[str] = None,
         multiset_hash: bool = False,  # NeurIPS-24 experiments used sets
         **kwargs,
     ) -> None:
@@ -294,7 +296,7 @@ class CCWLFeatures(Features, _CCWLFeatures):
             domain=domain,
             graph_representation=graph_representation,
             iterations=iterations,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=multiset_hash,
             base_class=_CCWLFeatures,  # Pass the correct base class
             **kwargs,

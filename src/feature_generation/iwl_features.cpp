@@ -13,25 +13,25 @@ namespace feature_generation {
                            const planning::Domain &domain,
                            std::string graph_representation,
                            int iterations,
-                           std::string prune_features,
+                           std::string pruning,
                            bool multiset_hash)
       : Features(feature_name,
                  domain,
                  graph_representation,
                  iterations,
-                 prune_features,
+                 pruning,
                  multiset_hash) {}
 
   IWLFeatures::IWLFeatures(const planning::Domain &domain,
                            std::string graph_representation,
                            int iterations,
-                           std::string prune_features,
+                           std::string pruning,
                            bool multiset_hash)
       : IWLFeatures("iwl",
                     domain,
                     graph_representation,
                     iterations,
-                    prune_features,
+                    pruning,
                     multiset_hash) {}
 
   IWLFeatures::IWLFeatures(const std::string &filename) : Features(filename) {}
@@ -169,16 +169,7 @@ namespace feature_generation {
       // reset node colour
       graph->change_node_colour(node_i, original_colour);
     }
-
-    /* 5. Prune features with colours_to_keep */
-    if (prune_features == "no_prune") {
-      return x0;
-    }
-
-    Embedding x(colours_to_keep.size(), 0);
-    for (size_t i = 0; i < colours_to_keep.size(); i++) {
-      x[i] = x0[colours_to_keep[i]];
-    }
-    return x;
+    
+    return x0;
   }
 }  // namespace feature_generation

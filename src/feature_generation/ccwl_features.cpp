@@ -12,13 +12,13 @@ namespace feature_generation {
   CCWLFeatures::CCWLFeatures(const planning::Domain &domain,
                              std::string graph_representation,
                              int iterations,
-                             std::string prune_features,
+                             std::string pruning,
                              bool multiset_hash)
       : WLFeatures("ccwl",
                    domain,
                    graph_representation,
                    iterations,
-                   prune_features,
+                   pruning,
                    multiset_hash) {}
 
   CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
@@ -67,19 +67,8 @@ namespace feature_generation {
         }
       }
     }
-
-    /* 5. Prune features with colours_to_keep */
-    if (prune_features == "no_prune") {
-      return x0;
-    }
-
-    int colours_to_keep_size = colours_to_keep.size();
-    Embedding x(colours_to_keep_size * 2, 0);
-    for (int i = 0; i < colours_to_keep_size; i++) {
-      x[i] = x0[colours_to_keep[i]];
-      x[i + colours_to_keep_size] = x0[colours_to_keep[i] + categorical_size];  // [NUMERIC]
-    }
-    return x;
+    
+    return x0;
   }
 
   void CCWLFeatures::set_weights(const std::vector<double> &weights) {

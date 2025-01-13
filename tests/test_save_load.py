@@ -30,7 +30,7 @@ def test_save_load(domain_name, desc):
         domain=domain,
         graph_representation="ilg",
         iterations=4,
-        prune_features=None,
+        pruning=None,
         multiset_hash=config["multiset_hash"],
     )
     feature_generator.collect(dataset)

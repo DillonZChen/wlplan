@@ -39,7 +39,7 @@ def colours_test(domain_name, iterations, Class):
             domain=domain,
             graph_representation="ilg",
             iterations=iterations,
-            prune_features=None,
+            pruning=None,
             multiset_hash=config["multiset_hash"],
         )
         feature_generator.collect(dataset)

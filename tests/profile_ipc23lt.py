@@ -4,8 +4,8 @@ import time
 import numpy as np
 import pytest
 from ipc23lt import DOMAINS, get_dataset
-from util import print_mat
 
+from util import print_mat
 from wlplan.feature_generation import WLFeatures
 
 LOGGER = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ def test_profile(domain_name):
         feature_generator = WLFeatures(
             domain=domain,
             iterations=4,
-            prune_features=None,
+            pruning=None,
             multiset_hash=config["multiset_hash"],
         )
         feature_generator.collect(dataset)

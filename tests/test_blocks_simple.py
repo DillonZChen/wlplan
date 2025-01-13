@@ -132,24 +132,24 @@ PROFILE = False
 PROFILE_REPEATS = 100000
 
 
-def test_prune_features():
+def test_pruning():
     feature_generators = {}
     Xs = {}
-    for prune_features in [None, "collapse", "collapse_by_layer"]:
+    for pruning in [None, "collapse", "collapse_by_layer"]:
         print("=" * 80)
-        print(f"prune_features={prune_features}")
+        print(f"pruning={pruning}")
         feature_generator = WLFeatures(
             domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=False,
         )
         feature_generator.collect(dataset)
         X = np.array(feature_generator.embed(dataset))
         X_unique = np.unique(X, axis=1)
-        feature_generators[prune_features] = feature_generator
-        Xs[prune_features] = X
+        feature_generators[pruning] = feature_generator
+        Xs[pruning] = X
         print(f"{X.shape=}")
         # print(X)
         print(f"{X_unique.shape=}")
@@ -168,15 +168,15 @@ def test_prune_features():
 
 
 def test_repeated_dataset():
-    for prune_features in [None, "collapse", "collapse_by_layer"]:
+    for pruning in [None, "collapse", "collapse_by_layer"]:
         print("=" * 80)
-        print(prune_features)
+        print(pruning)
         column_sizes = set()
         feature_generator = WLFeatures(
             domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=False,
         )
         feature_generator.collect(dataset)
@@ -185,7 +185,7 @@ def test_repeated_dataset():
             domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=False,
         )
         feature_generator_repeated.collect(dataset_repeated)
@@ -203,21 +203,21 @@ def test_repeated_dataset():
 def test_multiset():
     feature_generators = {}
     Xs = {}
-    for prune_features in [None, "collapse", "collapse_by_layer"]:
+    for pruning in [None, "collapse", "collapse_by_layer"]:
         print("=" * 80)
-        print(f"prune_features={prune_features}")
+        print(f"pruning={pruning}")
         feature_generator = WLFeatures(
             domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
-            prune_features=prune_features,
+            pruning=pruning,
             multiset_hash=True,
         )
         feature_generator.collect(dataset)
         X = np.array(feature_generator.embed(dataset))
         X_unique = np.unique(X, axis=1)
-        feature_generators[prune_features] = feature_generator
-        Xs[prune_features] = X
+        feature_generators[pruning] = feature_generator
+        Xs[pruning] = X
         print(f"{X.shape=}")
         # print(X)
         print(f"{X_unique.shape=}")

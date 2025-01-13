@@ -462,6 +462,7 @@ py::class_<feature_generation::Features>(feature_generation_m, "_Features")
   .def("embed", py::overload_cast<const planning::State &>(&feature_generation::Features::embed_state),
         "state"_a)
   .def("get_n_features", &feature_generation::Features::get_n_features)
+  .def("get_layer_to_n_colours", &feature_generation::Features::get_layer_to_n_colours)
   .def("get_seen_counts", &feature_generation::Features::get_seen_counts)
   .def("get_unseen_counts", &feature_generation::Features::get_unseen_counts)
   .def("get_n_seen_graphs", &feature_generation::Features::get_n_seen_graphs)
@@ -470,6 +471,12 @@ py::class_<feature_generation::Features>(feature_generation_m, "_Features")
   .def("get_n_seen_initial_colours", &feature_generation::Features::get_n_seen_initial_colours)
   .def("get_n_seen_refined_colours", &feature_generation::Features::get_n_seen_refined_colours)
   .def("print_init_colours", &feature_generation::Features::print_init_colours)
+  .def("get_feature_name", &feature_generation::Features::get_feature_name)
+  .def("get_graph_representation", &feature_generation::Features::get_graph_representation)
+  .def("get_iterations", &feature_generation::Features::get_iterations)
+  .def("get_pruning", &feature_generation::Features::get_pruning)
+  .def("set_pruning", &feature_generation::Features::set_pruning,
+        "pruning"_a)
   .def("set_weights", &feature_generation::Features::set_weights,
         "weights"_a)
   .def("get_weights", &feature_generation::Features::get_weights)
@@ -484,42 +491,42 @@ py::class_<feature_generation::WLFeatures, feature_generation::Features>(feature
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
-        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
 py::class_<feature_generation::LWL2Features, feature_generation::Features>(feature_generation_m, "_LWL2Features")
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
-        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
 py::class_<feature_generation::KWL2Features, feature_generation::Features>(feature_generation_m, "_KWL2Features")
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
-        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
 py::class_<feature_generation::IWLFeatures, feature_generation::Features>(feature_generation_m, "_IWLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
-        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
 py::class_<feature_generation::NIWLFeatures, feature_generation::IWLFeatures>(feature_generation_m, "_NIWLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
-        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
 py::class_<feature_generation::CCWLFeatures, feature_generation::WLFeatures>(feature_generation_m, "_CCWLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
-        "domain"_a, "graph_representation"_a, "iterations"_a, "prune_features"_a, "multiset_hash"_a)
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
   .def("set_weights", &feature_generation::CCWLFeatures::set_weights,
         "weights"_a)
 ;

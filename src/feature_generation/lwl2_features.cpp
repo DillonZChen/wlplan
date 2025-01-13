@@ -12,9 +12,9 @@ namespace feature_generation {
   LWL2Features::LWL2Features(const planning::Domain &domain,
                              std::string graph_representation,
                              int iterations,
-                             std::string prune_features,
+                             std::string pruning,
                              bool multiset_hash)
-      : Features("2-lwl", domain, graph_representation, iterations, prune_features, multiset_hash) {
+      : Features("2-lwl", domain, graph_representation, iterations, pruning, multiset_hash) {
   }
 
   LWL2Features::LWL2Features(const std::string &filename) : Features(filename) {}
@@ -214,15 +214,6 @@ namespace feature_generation {
       }
     }
 
-    /* 5. Prune features with colours_to_keep */
-    if (prune_features == "no_prune") {
-      return x0;
-    }
-
-    Embedding x(colours_to_keep.size(), 0);
-    for (size_t i = 0; i < colours_to_keep.size(); i++) {
-      x[i] = x0[colours_to_keep[i]];
-    }
-    return x;
+    return x0;
   }
 }  // namespace feature_generation
