@@ -7,6 +7,7 @@ from _wlplan.planning import Domain
 
 __all__ = [
     "get_feature_generator",
+    "get_available_feature_generators",
     "Features",
     "WLFeatures",
     "IWLFeatures",
@@ -15,6 +16,21 @@ __all__ = [
     "KWL2Features",
     "CCWLFeatures",
 ]
+
+
+def _get_feature_generators_dict():
+    return {
+        "wl": WLFeatures,
+        "kwl2": KWL2Features,
+        "lwl2": LWL2Features,
+        "ccwl": CCWLFeatures,
+        "iwl": IWLFeatures,
+        "niwl": NIWLFeatures,
+    }
+
+
+def get_available_feature_generators():
+    return set(_get_feature_generators_dict().keys())
 
 
 def get_feature_generator(feature_algorithm: str, domain: Domain, **kwargs):
@@ -32,21 +48,11 @@ def get_feature_generator(feature_algorithm: str, domain: Domain, **kwargs):
     Raises:
         ValueError: If the specified feature algorithm is unknown.
     """
-    match feature_algorithm:
-        case "wl":
-            return WLFeatures(domain=domain, **kwargs)
-        case "kwl2":
-            return KWL2Features(domain=domain, **kwargs)
-        case "lwl2":
-            return LWL2Features(domain=domain, **kwargs)
-        case "ccwl":
-            return CCWLFeatures(domain=domain, **kwargs)
-        case "iwl":
-            return IWLFeatures(domain=domain, **kwargs)
-        case "niwl":
-            return NIWLFeatures(domain=domain, **kwargs)
-        case _:
-            raise ValueError(f"Unknown feature algorithm: {feature_algorithm}")
+    FGs = _get_feature_generators_dict()
+    if feature_algorithm in FGs:
+        return FGs[feature_algorithm](domain=domain, **kwargs)
+    else:
+        raise ValueError(f"Unknown feature algorithm: {feature_algorithm}")
 
 
 class Features:
