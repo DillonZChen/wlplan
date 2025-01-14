@@ -7,6 +7,7 @@
 #include "../planning/domain.hpp"
 #include "../planning/state.hpp"
 #include "neighbour_container.hpp"
+#include "pruning.hpp"
 
 #include <map>
 #include <memory>

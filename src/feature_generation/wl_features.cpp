@@ -103,14 +103,13 @@ namespace feature_generation {
     for (int iteration = 1; iteration < iterations + 1; iteration++) {
       cur_collecting_layer = iteration;
 
-
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
         const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
         refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i]);
       }
 
-      if (pruning == "collapse") {
-        // remove duplicate features based on their column
+      /* COLLAPSE_LAYER: remove duplicate features greedily every iteration */
+      if (pruning == PruningOptions::COLLAPSE_LAYER) {
 
         std::map<int, int> collect_colour_remap;
         std::map<int, std::vector<int>> columns;
@@ -157,6 +156,19 @@ namespace feature_generation {
         }
 
         reformat_colour_hash(collect_colour_remap);
+      }
+    }
+
+    // check for redundant layers
+    if (pruning == PruningOptions::COLLAPSE_LAYER) {
+      for (int itr = 1; itr < iterations + 1; itr++) {
+        if (layer_to_colours[itr].size() == 0) {
+          int lower_iterations = itr - 1;
+          std::cout << "collapse pruning reduced iterations from " << iterations << " to "
+                    << lower_iterations << std::endl;
+          iterations = lower_iterations;
+          break;
+        }
       }
     }
   }

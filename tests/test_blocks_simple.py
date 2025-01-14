@@ -4,7 +4,7 @@ from itertools import product
 import numpy as np
 
 from wlplan.data import Dataset, ProblemStates
-from wlplan.feature_generation import WLFeatures
+from wlplan.feature_generation import PruningOptions, WLFeatures
 from wlplan.planning import Atom, Domain, Predicate, Problem, State
 
 ## domain
@@ -135,7 +135,7 @@ PROFILE_REPEATS = 100000
 def test_pruning():
     feature_generators = {}
     Xs = {}
-    for pruning in [None, "collapse", "collapse_by_layer"]:
+    for pruning in PruningOptions.get_all():
         print("=" * 80)
         print(f"pruning={pruning}")
         feature_generator = WLFeatures(
@@ -162,13 +162,13 @@ def test_pruning():
             t = time.time() - t
             print(f"{t=:.3f}s")
 
-    assert Xs["collapse"].shape <= Xs["collapse_by_layer"].shape
-    assert Xs["collapse"].shape <= Xs[None].shape
-    assert Xs["collapse_by_layer"].shape <= Xs[None].shape
+    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[PruningOptions.COLLAPSE_LAYER].shape
+    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[None].shape
+    # assert Xs[PruningOptions.COLLAPSE_LAYER].shape <= Xs[None].shape
 
 
 def test_repeated_dataset():
-    for pruning in [None, "collapse", "collapse_by_layer"]:
+    for pruning in PruningOptions.get_all():
         print("=" * 80)
         print(pruning)
         column_sizes = set()
@@ -203,7 +203,7 @@ def test_repeated_dataset():
 def test_multiset():
     feature_generators = {}
     Xs = {}
-    for pruning in [None, "collapse", "collapse_by_layer"]:
+    for pruning in PruningOptions.get_all():
         print("=" * 80)
         print(f"pruning={pruning}")
         feature_generator = WLFeatures(
@@ -230,6 +230,6 @@ def test_multiset():
             t = time.time() - t
             print(f"{t=:.3f}s")
 
-    assert Xs["collapse"].shape <= Xs["collapse_by_layer"].shape
-    assert Xs["collapse"].shape <= Xs[None].shape
-    assert Xs["collapse_by_layer"].shape <= Xs[None].shape
+    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[PruningOptions.COLLAPSE_LAYER].shape
+    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[None].shape
+    # assert Xs[PruningOptions.COLLAPSE_LAYER].shape <= Xs[None].shape

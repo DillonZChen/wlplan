@@ -177,7 +177,7 @@ namespace feature_generation {
   }
 
   void Features::collect(const std::vector<graph::Graph> &graphs) {
-    if (pruning == "collapse" && collapse_pruned) {
+    if (pruning == PruningOptions::COLLAPSE_LAYER && collapse_pruned) {
       std::cout << "collect with collapse pruning can only be called at most once" << std::endl;
       exit(-1);
     }
@@ -186,7 +186,7 @@ namespace feature_generation {
 
     collect_main(graphs);
 
-    if (pruning == "collapse") {
+    if (pruning == PruningOptions::COLLAPSE_LAYER) {
       collapse_pruned = true;
     }
     collected = true;

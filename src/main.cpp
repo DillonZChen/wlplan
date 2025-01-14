@@ -443,6 +443,14 @@ py::class_<graph::NILGGenerator, graph::ILGGenerator>(graph_m, "NILGGenerator")
 // Feature Generation
 //////////////////////////////////////////////////////////////////////////////
 auto feature_generation_m = m.def_submodule("feature_generation");
+auto pruning_m = feature_generation_m.def_submodule("pruning");
+
+py::class_<feature_generation::PruningOptions>(pruning_m, "PruningOptions")
+  .def_readonly_static("NONE", &feature_generation::PruningOptions::NONE)
+  .def_readonly_static("COLLAPSE_ALL", &feature_generation::PruningOptions::COLLAPSE_ALL)
+  .def_readonly_static("COLLAPSE_LAYER", &feature_generation::PruningOptions::COLLAPSE_LAYER)
+  .def_static("get_all", &feature_generation::PruningOptions::get_all)
+;
 
 py::class_<feature_generation::Features>(feature_generation_m, "_Features")
   .def("collect", py::overload_cast<const data::Dataset>(&feature_generation::Features::collect_from_dataset),

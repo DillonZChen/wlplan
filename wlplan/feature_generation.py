@@ -3,6 +3,7 @@ from typing import Optional
 
 from _wlplan.feature_generation import (_CCWLFeatures, _IWLFeatures, _KWL2Features, _LWL2Features,
                                         _NIWLFeatures, _WLFeatures)
+from _wlplan.feature_generation.pruning import PruningOptions
 from _wlplan.planning import Domain
 
 __all__ = [
@@ -28,8 +29,11 @@ def _get_feature_generators_dict():
         "niwl": NIWLFeatures,
     }
 
+def get_available_graph_choices():
+    return [None, "custom", "ilg", "nilg"]
+
 def get_available_pruning_methods():
-    return {"none", "collapse", "collapse_by_layer"}
+    return [None] + PruningOptions.get_all()
 
 def get_available_feature_generators():
     return set(_get_feature_generators_dict().keys())
@@ -66,13 +70,13 @@ class Features:
     ----------
         domain : Domain
 
-        graph_representation : "ilg" or None, default="ilg"
+        graph_representation : str, default="ilg"
             The graph encoding of planning states used. If None, the user can only call class method of classes and not datasets and states.
 
         iterations : int, default=2
             The number of WL iterations to perform.
 
-        pruning : "collapse", "collapse_by_layer" or None, default=None
+        pruning : str, default=None
             How to detect and prune duplicate features. If None, no pruning is done.
 
         multiset_hash : bool, default=False
@@ -123,13 +127,13 @@ class Features:
             base_class.__init__(self, filename=kwargs["filename"])
             return
 
-        graph_choices = [None, "custom", "ilg", "nilg"]
+        graph_choices = get_available_graph_choices()
         if graph_representation not in graph_choices:
             raise ValueError(f"graph_representation must be one of {graph_choices}")
         if graph_representation is None:
             graph_representation = "custom"
 
-        prune_choices = [None, "none", "collapse", "collapse_by_layer"]
+        prune_choices = get_available_pruning_methods()
         if pruning not in prune_choices:
             raise ValueError(f"pruning must be one of {prune_choices}")
         if pruning is None:
