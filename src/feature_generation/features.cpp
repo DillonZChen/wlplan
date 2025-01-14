@@ -1,5 +1,6 @@
 #include "../../include/feature_generation/features.hpp"
 
+#include "../../include/feature_generation/dependency_graph.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
 
@@ -7,6 +8,7 @@
 #include <sstream>
 
 using json = nlohmann::json;
+const int DISTINCT = -1;
 
 namespace feature_generation {
   Features::Features(const std::string feature_name,
@@ -297,6 +299,104 @@ namespace feature_generation {
     }
   }
 
+  inline void log_feature_info(std::vector<int> feature_group, std::vector<int> group_size) {
+    int n_distinct_features = 0;
+    int n_equivalent_features = 0;
+    int n_equivalence_groups = 0;
+    for (const int group : feature_group) {
+      if (group == DISTINCT) {
+        n_distinct_features++;
+      } else if (group_size.at(group) > 1) {
+        n_equivalent_features++;
+      } else {  // (group_size.at(group) <= 1)
+        std::cout << "error: equivalence group has a distinct feature" << std::endl;
+        exit(-1);
+      }
+    }
+    for (const int size : group_size) {
+      if (size > 1) {
+        n_equivalence_groups++;
+      }
+    }
+    std::cout << "  Distinct features: " << n_distinct_features << std::endl;
+    std::cout << "  Equivalent features: " << n_equivalent_features << std::endl;
+    std::cout << "  Equivalence groups: " << n_equivalence_groups << std::endl;
+    std::cout << "  Lower bound features: " << n_distinct_features + n_equivalence_groups
+              << std::endl;
+  }
+
+  void Features::collapse_all_pruning(const std::vector<graph::Graph> &graphs) {
+    std::cout << "Minimising equivalent features..." << std::endl;
+    int n_features = get_n_features();
+    FeatureDependencyGraph fdg = FeatureDependencyGraph(colour_hash);
+
+    // 1. compute equivalent features candidates
+    std::cout << "Computing equivalent feature candidates." << std::endl;
+    collected = true;  // required for embed_graphs
+    std::vector<Embedding> X = embed_graphs(graphs);
+    std::unordered_map<std::vector<int>, int, int_vector_hasher> canonical_group;
+    std::vector<int> group_size(n_features, 0);
+    std::vector<int> feature_group(n_features, 0);
+    for (int colour = 0; colour < n_features; colour++) {
+      std::vector<int> feature;
+      for (size_t j = 0; j < X.size(); j++) {
+        feature.push_back(int(std::round(X[j][colour])));
+      }
+      int group;
+      if (canonical_group.count(feature) == 0) {
+        group = canonical_group.size();
+        canonical_group[feature] = group;
+      } else {  // seen this feature before
+        group = canonical_group.at(feature);
+      }
+      group_size.at(group)++;
+      feature_group.at(colour) = group;
+    }
+
+    // mark distinct features
+    for (int colour = 0; colour < n_features; colour++) {
+      int group = feature_group.at(colour);
+      if (group >= 0 && group_size.at(group) <= 1) {
+        feature_group[colour] = DISTINCT;
+      }
+    }
+    log_feature_info(feature_group, group_size);
+
+    // 2. mark features that cannot be thrown out from highest iteration down
+    std::cout << "Pruning features via dependency graph." << std::endl;
+    for (int itr = iterations; itr >= 0; itr--) {
+      for (const int colour : layer_to_colours.at(itr)) {
+        if (feature_group.at(colour) != DISTINCT) {
+          continue;
+        }
+        for (const int ancestor_colour : fdg.get_bw_edges(colour)) {
+          int ancestor_group = feature_group.at(ancestor_colour);
+          feature_group.at(ancestor_colour) = DISTINCT;
+          if (ancestor_group == DISTINCT) {
+            continue;
+          }
+          group_size.at(ancestor_group)--;
+        }
+      }
+    }
+
+    // remark distinct features
+    for (int colour = 0; colour < n_features; colour++) {
+      int group = feature_group.at(colour);
+      if (group >= 0 && group_size.at(group) <= 1) {
+        feature_group[colour] = DISTINCT;
+      }
+    }
+    log_feature_info(feature_group, group_size);
+
+    // 3. maxsat
+    std::cout << "Solving MaxSAT optimisation." << std::endl;
+    std::cout << "TODO" << std::endl;
+    // TODO
+
+    std::cout << "Equivalent features minimised!" << std::endl;
+  }
+
   /* Prediction functions */
 
   double Features::predict(const std::shared_ptr<graph::Graph> &graph) {
@@ -355,8 +455,8 @@ namespace feature_generation {
     return int_colour_hash;
   }
 
-  std::unordered_map<std::string, int> Features::int_to_str_colour_hash(
-      ColourHash int_colour_hash) const {
+  std::unordered_map<std::string, int>
+  Features::int_to_str_colour_hash(ColourHash int_colour_hash) const {
     std::unordered_map<std::string, int> str_colour_hash;
     for (const auto &pair : int_colour_hash) {
       std::string colour_str = "";

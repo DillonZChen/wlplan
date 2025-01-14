@@ -116,6 +116,7 @@ namespace feature_generation {
     /* Pruning functions */
     void collapse_layer_pruning(int iteration, std::vector<std::vector<int>> &graph_colours);
     void collapse_layer_redundancy_check();
+    void collapse_all_pruning(const std::vector<graph::Graph> &graphs);
 
     /* Prediction functions */
 
