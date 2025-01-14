@@ -153,9 +153,6 @@ namespace feature_generation {
     }
     for (const auto &col : throw_out_hash) {
       reverse_hash.erase(col);
-      if (colour_to_layer.count(col) == 0) {
-        continue;
-      }
       int layer = colour_to_layer[col];
       colour_to_layer.erase(col);
       layer_to_colours[layer].erase(col);

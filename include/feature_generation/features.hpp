@@ -80,7 +80,7 @@ namespace feature_generation {
     // get hashed colour if it exists, and constructs it if it doesn't
     int get_colour_hash(const std::vector<int> &colour);
 
-    // reformat colour hash based on remap input, throwing out colours that are mapped to -1
+    // reformat colour hash based on remap input, throwing out colours that are mapped to UNSEEN
     void reformat_colour_hash(const std::map<int, int> &remap);
 
     // main collection body

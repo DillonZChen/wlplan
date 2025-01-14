@@ -36,7 +36,8 @@ namespace feature_generation {
 
     for (size_t u = 0; u < graph->nodes.size(); u++) {
       // skip unseen colours
-      if (colours[u] == UNSEEN_COLOUR) {
+      int current_colour = colours[u];
+      if (current_colour == UNSEEN_COLOUR) {
         new_colour_compressed = UNSEEN_COLOUR;
         goto end_of_iteration;
       }
@@ -44,17 +45,18 @@ namespace feature_generation {
 
       for (const auto &edge : graph->edges[u]) {
         // skip unseen colours
-        if (colours[edge.second] == UNSEEN_COLOUR) {
+        int neighbour_colour = colours[edge.second];
+        if (neighbour_colour == UNSEEN_COLOUR) {
           new_colour_compressed = UNSEEN_COLOUR;
           goto end_of_iteration;
         }
 
         // add sorted neighbour (colour, edge_label) pair
-        neighbour_container->insert(colours[edge.second], edge.first);
+        neighbour_container->insert(neighbour_colour, edge.first);
       }
 
       // add current colour and sorted neighbours into sorted colour key
-      new_colour = {colours[u]};
+      new_colour = {current_colour};
 
       // TODO this can be optimised by not copying data and creating a hash on neighbour_container
       neighbour_vector = neighbour_container->to_vector();
@@ -101,19 +103,15 @@ namespace feature_generation {
     for (int iteration = 1; iteration < iterations + 1; iteration++) {
       cur_collecting_layer = iteration;
 
-      int colours_collected_so_far = get_n_features();
 
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
         const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
         refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i]);
       }
 
-      if (pruning == "none") {
-        continue;
-      } else if (pruning == "collapse") {
+      if (pruning == "collapse") {
         // remove duplicate features based on their column
 
-        // any key not appearing in colour_remap is thrown out
         std::map<int, int> collect_colour_remap;
         std::map<int, std::vector<int>> columns;
 
@@ -132,12 +130,15 @@ namespace feature_generation {
         }
 
         // just select the earliest unique features
+        int n_colours_prev_itr = colour_hash.size() - layer_to_colours[iteration].size();
+        int kept_colours = 0;
         std::unordered_set<std::vector<int>, int_vector_hasher> unique_features;
         for (int colour : layer_to_colours[iteration]) {
           std::vector<int> column = columns[colour];
           if (unique_features.count(column) == 0) {
             unique_features.insert(column);
-            collect_colour_remap[colour] = collect_colour_remap.size() + colours_collected_so_far;
+            collect_colour_remap[colour] = kept_colours + n_colours_prev_itr;
+            kept_colours++;
           } else {
             // throw out because not unique
             collect_colour_remap[colour] = UNSEEN_COLOUR;
@@ -148,7 +149,8 @@ namespace feature_generation {
         for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
           for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
             int colour = graph_colours[graph_i][node_i];
-            if (collect_colour_remap.count(colour) && collect_colour_remap[colour] == UNSEEN_COLOUR) {
+            if (collect_colour_remap.count(colour) &&
+                collect_colour_remap[colour] == UNSEEN_COLOUR) {
               graph_colours[graph_i][node_i] = UNSEEN_COLOUR;
             }
           }
@@ -165,15 +167,13 @@ namespace feature_generation {
       throw std::runtime_error("WLFeatures::collect() must be called before embedding");
     }
 
-    /* 1. Initialise embedding before pruning */
+    /* 1. Initialise embedding before pruning, and set up memory */
     Embedding x0(colour_hash.size(), 0);
-
-    /* 2. Set up memory for WL updates */
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::vector<int> colours_tmp(n_nodes);
 
-    /* 3. Compute initial colours */
+    /* 2. Compute initial colours */
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       int col = get_colour_hash({graph->nodes[node_i]});
       colours[node_i] = col;
@@ -182,7 +182,7 @@ namespace feature_generation {
       }
     }
 
-    /* 4. Main WL loop */
+    /* 3. Main WL loop */
     int is_seen_colour;
     for (int itr = 0; itr < iterations; itr++) {
       refine(graph, colours, colours_tmp);
