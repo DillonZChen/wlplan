@@ -112,6 +112,10 @@ namespace feature_generation {
     Embedding embed_state(const planning::State &state);
     virtual Embedding embed(const std::shared_ptr<graph::Graph> &graph) = 0;
 
+    /* Pruning functions */
+    void collapse_layer_pruning(int iteration, std::vector<std::vector<int>> &graph_colours);
+    void collapse_layer_redundancy_check();
+
     /* Prediction functions */
 
     double predict(const std::shared_ptr<graph::Graph> &graph);

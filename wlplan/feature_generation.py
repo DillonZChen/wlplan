@@ -29,11 +29,14 @@ def _get_feature_generators_dict():
         "niwl": NIWLFeatures,
     }
 
+
 def get_available_graph_choices():
     return [None, "custom", "ilg", "nilg"]
 
+
 def get_available_pruning_methods():
     return [None] + PruningOptions.get_all()
+
 
 def get_available_feature_generators():
     return set(_get_feature_generators_dict().keys())

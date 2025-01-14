@@ -137,6 +137,8 @@ namespace feature_generation {
   }
 
   void Features::reformat_colour_hash(const std::map<int, int> &remap) {
+    // TODO extend this to work on arbitrary layers, i.e. remap inside keys as well, could be
+    // slower, could be insignificant
     std::vector<std::vector<int>> throw_out_long;
     std::vector<int> throw_out_hash;
     for (const auto &[old_colour, new_colour] : remap) {
@@ -230,6 +232,69 @@ namespace feature_generation {
 
   Embedding Features::embed_state(const planning::State &state) {
     return embed(graph_generator->to_graph(state));
+  }
+
+  /* Pruning functions */
+  void Features::collapse_layer_pruning(int iteration,
+                                        std::vector<std::vector<int>> &graph_colours) {
+
+    std::map<int, int> collect_colour_remap;
+    std::map<int, std::vector<int>> columns;
+    size_t n_graphs = graph_colours.size();
+
+    for (int colour : layer_to_colours[iteration]) {
+      columns[colour] = std::vector<int>(n_graphs, 0);
+    }
+    for (size_t graph_i = 0; graph_i < n_graphs; graph_i++) {
+      for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
+        int colour = graph_colours[graph_i][node_i];
+        if (colour_to_layer[colour] != iteration) {
+          // this occurs for isolated nodes and would cause seg fault below
+          continue;
+        }
+        columns[colour][graph_i]++;
+      }
+    }
+
+    // greedily select first unique features
+    int n_colours_prev_itr = colour_hash.size() - layer_to_colours[iteration].size();
+    int kept_colours = 0;
+    std::unordered_set<std::vector<int>, int_vector_hasher> unique_features;
+    for (int colour : layer_to_colours[iteration]) {
+      std::vector<int> column = columns[colour];
+      if (unique_features.count(column) == 0) {
+        unique_features.insert(column);
+        collect_colour_remap[colour] = kept_colours + n_colours_prev_itr;
+        kept_colours++;
+      } else {
+        // throw out because not unique
+        collect_colour_remap[colour] = UNSEEN_COLOUR;
+      }
+    }
+
+    // map all current thrown out nodes to UNSEEN_COLOUR in the graphs
+    for (size_t graph_i = 0; graph_i < n_graphs; graph_i++) {
+      for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
+        int colour = graph_colours[graph_i][node_i];
+        if (collect_colour_remap.count(colour) && collect_colour_remap[colour] == UNSEEN_COLOUR) {
+          graph_colours[graph_i][node_i] = UNSEEN_COLOUR;
+        }
+      }
+    }
+
+    reformat_colour_hash(collect_colour_remap);
+  }
+
+  void Features::collapse_layer_redundancy_check() {
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      if (layer_to_colours[itr].size() == 0) {
+        int lower_iterations = itr - 1;
+        std::cout << "collapse pruning reduced iterations from " << iterations << " to "
+                  << lower_iterations << std::endl;
+        iterations = lower_iterations;
+        break;
+      }
+    }
   }
 
   /* Prediction functions */
