@@ -73,7 +73,7 @@ namespace feature_generation {
     colours.swap(colours_tmp);
   }
 
-  void WLFeatures::collect_main(const std::vector<graph::Graph> &graphs) {
+  void WLFeatures::collect_impl(const std::vector<graph::Graph> &graphs) {
     // intermediate graph colours during WL and extra memory for WL updates
     std::vector<std::vector<int>> graph_colours;
     std::vector<std::vector<int>> graph_colours_tmp;

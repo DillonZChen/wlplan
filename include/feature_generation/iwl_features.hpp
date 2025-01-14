@@ -31,7 +31,7 @@ namespace feature_generation {
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
-    void collect_main(const std::vector<graph::Graph> &graphs) override;
+    void collect_impl(const std::vector<graph::Graph> &graphs) override;
     void refine(const std::shared_ptr<graph::Graph> &graph,
                 std::vector<int> &colours,
                 std::vector<int> &colours_tmp);

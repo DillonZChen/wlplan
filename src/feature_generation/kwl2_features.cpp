@@ -100,7 +100,7 @@ namespace feature_generation {
     return col;
   }
 
-  void KWL2Features::collect_main(const std::vector<graph::Graph> &graphs) {
+  void KWL2Features::collect_impl(const std::vector<graph::Graph> &graphs) {
     // intermediate graph colours during WL and extra memory for WL updates
     std::vector<int> colours;
     std::vector<int> colours_tmp;

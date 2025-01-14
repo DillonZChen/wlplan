@@ -186,7 +186,7 @@ namespace feature_generation {
 
     collecting = true;
 
-    collect_main(graphs);
+    collect_impl(graphs);
 
     if (pruning == PruningOptions::COLLAPSE_LAYER) {
       collapse_pruned = true;

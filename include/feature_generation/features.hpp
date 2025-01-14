@@ -85,7 +85,7 @@ namespace feature_generation {
     void reformat_colour_hash(const std::map<int, int> &remap);
 
     // main collection body
-    virtual void collect_main(const std::vector<graph::Graph> &graphs) = 0;
+    virtual void collect_impl(const std::vector<graph::Graph> &graphs) = 0;
 
    public:
     Features(const std::string feature_name,

@@ -29,7 +29,7 @@ namespace feature_generation {
                                   int v,
                                   const std::shared_ptr<graph::Graph> &graph,
                                   const std::vector<int> &pair_to_edge_label);
-    void collect_main(const std::vector<graph::Graph> &graphs) override;
+    void collect_impl(const std::vector<graph::Graph> &graphs) override;
     void refine(const std::shared_ptr<graph::Graph> &graph,
                 std::vector<std::set<int>> &pair_to_neighbours,
                 std::vector<int> &colours,
