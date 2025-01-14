@@ -1,10 +1,14 @@
 name: Profile on IPC23LT
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    push:
+      branches:
+          - main
+          - dev
+    pull_request:
+      branches:
+          - main
+          - dev
 
 jobs:
   build:
