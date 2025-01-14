@@ -340,9 +340,9 @@ namespace feature_generation {
   }
 
   // hash type conversion functions
-  std::unordered_map<std::vector<int>, int, int_vector_hasher>
+  ColourHash
   Features::str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const {
-    std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash;
+    ColourHash int_colour_hash;
     for (const auto &pair : str_colour_hash) {
       std::vector<int> colour;
       std::istringstream iss(pair.first);
@@ -356,7 +356,7 @@ namespace feature_generation {
   }
 
   std::unordered_map<std::string, int> Features::int_to_str_colour_hash(
-      std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash) const {
+      ColourHash int_colour_hash) const {
     std::unordered_map<std::string, int> str_colour_hash;
     for (const auto &pair : int_colour_hash) {
       std::string colour_str = "";

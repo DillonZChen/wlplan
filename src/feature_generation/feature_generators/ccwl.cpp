@@ -1,7 +1,7 @@
-#include "../../include/feature_generation/ccwl_features.hpp"
+#include "../../../include/feature_generation/feature_generators/ccwl.hpp"
 
-#include "../../include/graph/graph_generator_factory.hpp"
-#include "../../include/utils/nlohmann/json.hpp"
+#include "../../../include/graph/graph_generator_factory.hpp"
+#include "../../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>
 #include <sstream>

@@ -1,7 +1,7 @@
-#ifndef FEATURE_GENERATION_CCWL_FEATURES_HPP
-#define FEATURE_GENERATION_CCWL_FEATURES_HPP
+#ifndef FEATURE_GENERATION_FEATURE_GENERATORS_CCWL_HPP
+#define FEATURE_GENERATION_FEATURE_GENERATORS_CCWL_HPP
 
-#include "wl_features.hpp"
+#include "wl.hpp"
 
 #include <memory>
 #include <set>
@@ -27,4 +27,4 @@ namespace feature_generation {
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_CCWL_FEATURES_HPP
+#endif  // FEATURE_GENERATION_FEATURE_GENERATORS_CCWL_HPP

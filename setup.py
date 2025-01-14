@@ -7,13 +7,13 @@ from setuptools import setup
 # Read version from wlplan/__version__.py file
 exec(open("wlplan/__version__.py").read())
 
-# Sort input source files if you glob sources to ensure bit-for-bit
-# reproducible builds (https://github.com/pybind/python_example/pull/53)
-files = [glob("src/*.cpp"), glob("src/**/*.cpp")]
+files = [glob("src/*.cpp"), glob("src/**/*.cpp"), glob("src/**/**/*.cpp")]
 
 ext_modules = [
     Pybind11Extension(
         "_wlplan",
+        # Sort input source files if you glob sources to ensure bit-for-bit
+        # reproducible builds (https://github.com/pybind/python_example/pull/53)
         sorted([f for file_group in files for f in file_group]),
         # Example: passing in the version to the compiled code
         define_macros=[("WLPLAN_VERSION", __version__)],

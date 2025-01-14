@@ -1,10 +1,10 @@
 #include "../../include/feature_generation/feature_generator_loader.hpp"
 
-#include "../../include/feature_generation/ccwl_features.hpp"
-#include "../../include/feature_generation/iwl_features.hpp"
-#include "../../include/feature_generation/lwl2_features.hpp"
-#include "../../include/feature_generation/niwl_features.hpp"
-#include "../../include/feature_generation/wl_features.hpp"
+#include "../../include/feature_generation/feature_generators/ccwl.hpp"
+#include "../../include/feature_generation/feature_generators/iwl.hpp"
+#include "../../include/feature_generation/feature_generators/lwl2.hpp"
+#include "../../include/feature_generation/feature_generators/niwl.hpp"
+#include "../../include/feature_generation/feature_generators/wl.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>

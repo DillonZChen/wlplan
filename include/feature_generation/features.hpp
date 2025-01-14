@@ -34,6 +34,7 @@ class int_vector_hasher {
 
 namespace feature_generation {
   using Embedding = std::vector<double>;
+  using ColourHash = std::unordered_map<std::vector<int>, int, int_vector_hasher>;
 
   class Features {
    protected:
@@ -46,7 +47,7 @@ namespace feature_generation {
     bool multiset_hash;
 
     // colouring [saved]
-    std::unordered_map<std::vector<int>, int, int_vector_hasher> colour_hash;
+    ColourHash colour_hash;
     std::unordered_map<int, std::vector<int>> reverse_hash;
     std::unordered_map<int, int> colour_to_layer;
     std::vector<std::set<int>> layer_to_colours;
@@ -141,10 +142,10 @@ namespace feature_generation {
     void set_problem(const planning::Problem &problem);
 
     // conversion between vectors and strings
-    std::unordered_map<std::vector<int>, int, int_vector_hasher>
+    ColourHash
     str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const;
     std::unordered_map<std::string, int> int_to_str_colour_hash(
-        std::unordered_map<std::vector<int>, int, int_vector_hasher> int_colour_hash) const;
+        ColourHash int_colour_hash) const;
 
     // statistics functions
     int get_n_features() const { return colour_hash.size(); }

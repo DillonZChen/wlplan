@@ -1,7 +1,7 @@
-#ifndef FEATURE_GENERATION_KWL2_FEATURES_HPP
-#define FEATURE_GENERATION_KWL2_FEATURES_HPP
+#ifndef FEATURE_GENERATION_FEATURE_GENERATORS_KWL2_HPP
+#define FEATURE_GENERATION_FEATURE_GENERATORS_KWL2_HPP
 
-#include "features.hpp"
+#include "../features.hpp"
 
 #include <memory>
 #include <set>
@@ -36,4 +36,4 @@ namespace feature_generation {
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_KWL2_FEATURES_HPP
+#endif  // FEATURE_GENERATION_FEATURE_GENERATORS_KWL2_HPP

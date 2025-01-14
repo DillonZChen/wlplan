@@ -1,7 +1,7 @@
-#ifndef FEATURE_GENERATION_NIWL_FEATURES_HPP
-#define FEATURE_GENERATION_NIWL_FEATURES_HPP
+#ifndef FEATURE_GENERATION_FEATURE_GENERATORS_NIWL_HPP
+#define FEATURE_GENERATION_FEATURE_GENERATORS_NIWL_HPP
 
-#include "iwl_features.hpp"
+#include "iwl.hpp"
 
 #include <memory>
 #include <string>
@@ -22,4 +22,4 @@ namespace feature_generation {
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_NIWL_FEATURES_HPP
+#endif  // FEATURE_GENERATION_FEATURE_GENERATORS_NIWL_HPP

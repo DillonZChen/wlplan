@@ -1,7 +1,7 @@
-#ifndef FEATURE_GENERATION_WL_FEATURES_HPP
-#define FEATURE_GENERATION_WL_FEATURES_HPP
+#ifndef FEATURE_GENERATION_FEATURE_GENERATORS_WL_HPP
+#define FEATURE_GENERATION_FEATURE_GENERATORS_WL_HPP
 
-#include "features.hpp"
+#include "../features.hpp"
 
 #include <memory>
 #include <string>
@@ -35,4 +35,4 @@ namespace feature_generation {
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_WL_FEATURES_HPP
+#endif  // FEATURE_GENERATION_FEATURE_GENERATORS_WL_HPP

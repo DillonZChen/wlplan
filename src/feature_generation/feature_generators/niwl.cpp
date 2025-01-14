@@ -1,7 +1,7 @@
-#include "../../include/feature_generation/niwl_features.hpp"
+#include "../../../include/feature_generation/feature_generators/niwl.hpp"
 
-#include "../../include/graph/graph_generator_factory.hpp"
-#include "../../include/utils/nlohmann/json.hpp"
+#include "../../../include/graph/graph_generator_factory.hpp"
+#include "../../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>
 #include <sstream>
