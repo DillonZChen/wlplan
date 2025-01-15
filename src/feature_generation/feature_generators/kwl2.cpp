@@ -9,15 +9,29 @@
 using json = nlohmann::json;
 
 namespace feature_generation {
+  KWL2Features::KWL2Features(const std::string wl_name,
+                             const planning::Domain &domain,
+                             std::string graph_representation,
+                             int iterations,
+                             std::string pruning,
+                             bool multiset_hash)
+      : Features(wl_name, domain, graph_representation, iterations, pruning, multiset_hash) {}
+
   KWL2Features::KWL2Features(const planning::Domain &domain,
                              std::string graph_representation,
                              int iterations,
                              std::string pruning,
                              bool multiset_hash)
-      : Features("2-kwl", domain, graph_representation, iterations, pruning, multiset_hash) {
-  }
+      : Features("2-kwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   KWL2Features::KWL2Features(const std::string &filename) : Features(filename) {}
+
+  std::vector<int> KWL2Features::reformat_neighbour_colours(const std::vector<int> &colours,
+                                                            const std::map<int, int> &remap) {
+    std::cout << "not implemented yet" << std::endl;
+    exit(-1);
+    return std::vector<int>();
+  }
 
   int kwl2_pair_to_index_map(int n, int i, int j) {
     // map pair where 0 <= i, j < n to vec index

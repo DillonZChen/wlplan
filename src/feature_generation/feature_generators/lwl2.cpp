@@ -14,10 +14,9 @@ namespace feature_generation {
                              int iterations,
                              std::string pruning,
                              bool multiset_hash)
-      : Features("2-lwl", domain, graph_representation, iterations, pruning, multiset_hash) {
-  }
+      : KWL2Features("2-lwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
-  LWL2Features::LWL2Features(const std::string &filename) : Features(filename) {}
+  LWL2Features::LWL2Features(const std::string &filename) : KWL2Features(filename) {}
 
   int lwl2_pair_to_index_map(int n, int i, int j) {
     // map pair where 0 <= i < j < n to vec index

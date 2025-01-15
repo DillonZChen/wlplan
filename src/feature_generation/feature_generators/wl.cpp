@@ -27,6 +27,19 @@ namespace feature_generation {
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
+  std::vector<int> WLFeatures::reformat_neighbour_colours(const std::vector<int> &colours,
+                                                          const std::map<int, int> &remap) {
+    std::vector<int> new_colours(colours.size());
+    for (size_t i = 0; i < colours.size(); i++) {
+      if (i == 0 || i % 2 == 1) {
+        new_colours[i] = remap.at(colours[i]);
+      } else {
+        new_colours[i] = colours[i];
+      }
+    }
+    return new_colours;
+  }
+
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                           std::vector<int> &colours,
                           std::vector<int> &colours_tmp) {
@@ -58,8 +71,6 @@ namespace feature_generation {
 
       // add current colour and sorted neighbours into sorted colour key
       new_colour = {current_colour};
-
-      // TODO this can be optimised by not copying data and creating a hash on neighbour_container
       neighbour_vector = neighbour_container->to_vector();
 
       new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
@@ -109,17 +120,26 @@ namespace feature_generation {
         refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i]);
       }
 
-      /* COLLAPSE_LAYER: remove duplicate features greedily every iteration */
-      if (pruning == PruningOptions::COLLAPSE_LAYER) {
-        collapse_layer_pruning(iteration, graph_colours);
+      // layer pruning
+      std::vector<int> features_to_prune =
+          features_to_prune_this_iteration(iteration, graph_colours);
+      if (features_to_prune.size() != 0) {
+        std::map<int, int> remap = reformat_colour_hash(features_to_prune);
+        for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
+          for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
+            int col = graph_colours[graph_i][node_i];
+            if (remap.count(col) > 0) {
+              graph_colours[graph_i][node_i] = remap[col];
+            }
+          }
+        }
       }
     }
 
-    if (pruning == PruningOptions::COLLAPSE_LAYER) {
-      collapse_layer_redundancy_check();
-    } else if (pruning == PruningOptions::COLLAPSE_ALL) {
-      collapse_all_pruning(graphs);
-    }
+    // bulk pruning
+    std::vector<int> to_prune = features_to_prune(graph_colours);
+    reformat_colour_hash(to_prune);
+    layer_redundancy_check();
   }
 
   Embedding WLFeatures::embed(const std::shared_ptr<graph::Graph> &graph) {

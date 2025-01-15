@@ -1,7 +1,7 @@
 #ifndef FEATURE_GENERATION_FEATURE_GENERATORS_LWL2_HPP
 #define FEATURE_GENERATION_FEATURE_GENERATORS_LWL2_HPP
 
-#include "../features.hpp"
+#include "kwl2.hpp"
 
 #include <memory>
 #include <set>
@@ -11,7 +11,7 @@
 #define NO_EDGE_COLOUR -1
 
 namespace feature_generation {
-  class LWL2Features : public Features {
+  class LWL2Features : public KWL2Features {
    public:
     LWL2Features(const planning::Domain &domain,
                  std::string graph_representation,
@@ -23,7 +23,7 @@ namespace feature_generation {
 
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
-   private:
+   protected:
     inline int get_initial_colour(int index,
                                   int u,
                                   int v,

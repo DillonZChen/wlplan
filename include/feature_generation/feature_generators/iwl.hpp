@@ -1,7 +1,7 @@
 #ifndef FEATURE_GENERATION_FEATURE_GENERATORS_IWL_HPP
 #define FEATURE_GENERATION_FEATURE_GENERATORS_IWL_HPP
 
-#include "../features.hpp"
+#include "wl.hpp"
 
 #include <memory>
 #include <string>
@@ -11,7 +11,7 @@
 #define INDIVIDUALISE_COLOUR -2147483648
 
 namespace feature_generation {
-  class IWLFeatures : public Features {
+  class IWLFeatures : public WLFeatures {
    public:
     IWLFeatures(const std::string feature_name,
                 const planning::Domain &domain,

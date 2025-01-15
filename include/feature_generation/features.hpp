@@ -33,7 +33,7 @@ class int_vector_hasher {
 };
 
 namespace feature_generation {
-  using Embedding = std::vector<double>;
+  using Embedding = std::vector<int>;
   using ColourHash = std::unordered_map<std::vector<int>, int, int_vector_hasher>;
 
   class Features {
@@ -48,7 +48,6 @@ namespace feature_generation {
 
     // colouring [saved]
     ColourHash colour_hash;
-    std::unordered_map<int, std::vector<int>> reverse_hash;
     std::unordered_map<int, int> colour_to_layer;
     std::vector<std::set<int>> layer_to_colours;
 
@@ -82,8 +81,10 @@ namespace feature_generation {
     // get hashed colour if it exists, and constructs it if it doesn't
     int get_colour_hash(const std::vector<int> &colour);
 
-    // reformat colour hash based on remap input, throwing out colours that are mapped to UNSEEN
-    void reformat_colour_hash(const std::map<int, int> &remap);
+    // reformat colour hash based on colours to throw out
+    std::map<int, int> reformat_colour_hash(const std::vector<int> &to_prune);
+    virtual std::vector<int> reformat_neighbour_colours(const std::vector<int> &colours,
+                                                        const std::map<int, int> &remap) = 0;
 
     // main collection body
     virtual void collect_impl(const std::vector<graph::Graph> &graphs) = 0;
@@ -105,6 +106,7 @@ namespace feature_generation {
     // collect training colours
     void collect_from_dataset(const data::Dataset dataset);
     void collect(const std::vector<graph::Graph> &graphs);
+    void layer_redundancy_check();
 
     // embedding assumes training is done, and returns a feature matrix X
     std::vector<Embedding> embed_dataset(const data::Dataset &dataset);
@@ -114,9 +116,14 @@ namespace feature_generation {
     virtual Embedding embed(const std::shared_ptr<graph::Graph> &graph) = 0;
 
     /* Pruning functions */
-    void collapse_layer_pruning(int iteration, std::vector<std::vector<int>> &graph_colours);
-    void collapse_layer_redundancy_check();
-    void collapse_all_pruning(const std::vector<graph::Graph> &graphs);
+
+    std::vector<int> features_to_prune_this_iteration(int iteration,
+                                                      std::vector<std::vector<int>> &cur_colours);
+    std::vector<int> features_to_prune(std::vector<Embedding> X);
+
+    std::vector<int> greedy_iteration_pruner(int iteration,
+                                             std::vector<std::vector<int>> &cur_colours);
+    std::vector<int> greedy_all_pruner(std::vector<Embedding> X);
 
     /* Prediction functions */
 
@@ -127,14 +134,21 @@ namespace feature_generation {
     void set_weights(const std::vector<double> &weights);
     std::vector<double> get_weights() const;
 
-    /* Configuration functions */
+    /* Getter functions */
+
     std::string get_feature_name() const { return feature_name; }
+    std::shared_ptr<planning::Domain> get_domain() const { return domain; }
     std::string get_graph_representation() const { return graph_representation; }
     int get_iterations() const { return iterations; }
     std::string get_pruning() { return pruning; }
     void set_pruning(const std::string &pruning) { this->pruning = pruning; }
+    std::set<int> get_iteration_colours(int iteration) const {
+      return layer_to_colours.at(iteration);
+    }
+    ColourHash get_colour_hash() { return colour_hash; }
 
     /* Util functions */
+
     // get string representation of WL colours agnostic to the number of collected colours
     std::string get_string_representation(const Embedding &embedding);
     std::string get_string_representation(const planning::State &state);
@@ -143,10 +157,8 @@ namespace feature_generation {
     void set_problem(const planning::Problem &problem);
 
     // conversion between vectors and strings
-    ColourHash
-    str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const;
-    std::unordered_map<std::string, int> int_to_str_colour_hash(
-        ColourHash int_colour_hash) const;
+    ColourHash str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const;
+    std::unordered_map<std::string, int> int_to_str_colour_hash(ColourHash int_colour_hash) const;
 
     // statistics functions
     int get_n_features() const { return colour_hash.size(); }
@@ -159,8 +171,6 @@ namespace feature_generation {
     int get_n_seen_refined_colours() const { return (int)colour_hash.size(); }
     std::vector<long> get_layer_to_n_colours() const;
     void print_init_colours() const;
-
-    std::shared_ptr<planning::Domain> get_domain() const { return domain; }
 
     void save(const std::string &filename);
   };

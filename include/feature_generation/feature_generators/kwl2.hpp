@@ -13,6 +13,13 @@
 namespace feature_generation {
   class KWL2Features : public Features {
    public:
+    KWL2Features(const std::string wl_name,
+                 const planning::Domain &domain,
+                 std::string graph_representation,
+                 int iterations,
+                 std::string pruning,
+                 bool multiset_hash);
+
     KWL2Features(const planning::Domain &domain,
                  std::string graph_representation,
                  int iterations,
@@ -23,7 +30,9 @@ namespace feature_generation {
 
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
-   private:
+   protected:
+    std::vector<int> reformat_neighbour_colours(const std::vector<int> &colours,
+                                                const std::map<int, int> &remap);
     inline int get_initial_colour(int index,
                                   int u,
                                   int v,

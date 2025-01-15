@@ -28,6 +28,8 @@ namespace feature_generation {
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
+    std::vector<int> reformat_neighbour_colours(const std::vector<int> &colours,
+                                                const std::map<int, int> &remap);
     void collect_impl(const std::vector<graph::Graph> &graphs) override;
     void refine(const std::shared_ptr<graph::Graph> &graph,
                 std::vector<int> &colours,

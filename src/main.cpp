@@ -6,6 +6,7 @@
 #include "../include/feature_generation/feature_generators/niwl.hpp"
 #include "../include/feature_generation/feature_generators/wl.hpp"
 #include "../include/feature_generation/features.hpp"
+#include "../include/feature_generation/pruning/pruning_options.hpp"
 #include "../include/graph/ilg_generator.hpp"
 #include "../include/graph/nilg_generator.hpp"
 #include "../include/planning/atom.hpp"

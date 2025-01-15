@@ -15,7 +15,7 @@ namespace feature_generation {
                            int iterations,
                            std::string pruning,
                            bool multiset_hash)
-      : Features(feature_name,
+      : WLFeatures(feature_name,
                  domain,
                  graph_representation,
                  iterations,
@@ -34,7 +34,7 @@ namespace feature_generation {
                     pruning,
                     multiset_hash) {}
 
-  IWLFeatures::IWLFeatures(const std::string &filename) : Features(filename) {}
+  IWLFeatures::IWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
   void IWLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                            std::vector<int> &colours,
@@ -65,8 +65,6 @@ namespace feature_generation {
 
       // add current colour and sorted neighbours into sorted colour key
       new_colour = {colours[u]};
-
-      // TODO this can be optimised by not copying data and creating a hash on neighbour_container
       neighbour_vector = neighbour_container->to_vector();
 
       new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
@@ -129,7 +127,7 @@ namespace feature_generation {
       throw std::runtime_error("IWLFeatures::collect() must be called before embedding");
     }
 
-    /* 1. Initialise embedding before pruning */
+    /* 1. Initialise embedding */
     Embedding x0(colour_hash.size(), 0);
 
     /* 2. Set up memory for WL updates */
