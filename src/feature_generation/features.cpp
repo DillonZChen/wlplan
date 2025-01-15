@@ -1,6 +1,7 @@
 #include "../../include/feature_generation/features.hpp"
 
 #include "../../include/feature_generation/dependency_graph.hpp"
+#include "../../include/feature_generation/pruning/maxsat.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
 
@@ -391,8 +392,48 @@ namespace feature_generation {
 
     // 3. maxsat
     std::cout << "Solving MaxSAT optimisation." << std::endl;
-    std::cout << "TODO" << std::endl;
-    // TODO
+    // get groups
+    std::map<int, std::vector<int>> group_to_features;
+    std::vector<int> variables;
+    for (int colour = 0; colour < n_features; colour++) {
+      int group = feature_group.at(colour);
+      if (group != DISTINCT) {
+        if (group_to_features.count(group) == 0) {
+          group_to_features[group] = std::vector<int>();
+        }
+        group_to_features[group].push_back(colour);
+        variables.push_back(colour);
+      }
+    }
+
+    // encode
+    std::vector<MaxSatClause> clauses;
+
+    // variable=T indicates feature to be thrown out
+    // equivalently, ~variable=T indicates feature to be kept
+    for (const int variable : variables) {
+      clauses.push_back(MaxSatClause({variable}, {false}, 1, false));
+    }
+
+    // a thrown out variable forces children to be thrown out
+    // i.e., variable => child_1 & ... & child_n which is equivalent to
+    // (~variable | child_1) & ... & (~variable | child_n)
+    for (const int variable : variables) {
+      for (const int child : fdg.get_fw_edges(variable)) {
+        clauses.push_back(MaxSatClause({variable, child}, {true, false}, 0, true));
+      }
+    }
+
+    // keep one feature from each equivalence group
+    for (const auto &[group, features] : group_to_features) {
+      std::vector<bool> negated(features.size(), true);
+      clauses.push_back(MaxSatClause(features, negated, 0, true));
+    }
+
+    MaxSatProblem max_sat_problem = MaxSatProblem(clauses);
+    std::cout << max_sat_problem.to_string() << std::endl;
+
+    std::cout << "TODO solve the problem" << std::endl;
 
     std::cout << "Equivalent features minimised!" << std::endl;
   }

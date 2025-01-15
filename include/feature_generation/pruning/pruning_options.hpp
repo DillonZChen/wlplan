@@ -1,5 +1,5 @@
-#ifndef FEATURE_GENERATION_PRUNING_HPP
-#define FEATURE_GENERATION_PRUNING_HPP
+#ifndef FEATURE_GENERATION_PRUNING_PRUNING_OPTIONS_HPP
+#define FEATURE_GENERATION_PRUNING_PRUNING_OPTIONS_HPP
 
 #include <string>
 #include <vector>
@@ -15,4 +15,4 @@ namespace feature_generation {
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_PRUNING_HPP
+#endif  // FEATURE_GENERATION_PRUNING_PRUNING_OPTIONS_HPP

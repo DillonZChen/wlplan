@@ -1,4 +1,4 @@
-#include "../../include/feature_generation/pruning.hpp"
+#include "../../../include/feature_generation/pruning/pruning_options.hpp"
 
 namespace feature_generation {
   const std::string PruningOptions::NONE = "none";
