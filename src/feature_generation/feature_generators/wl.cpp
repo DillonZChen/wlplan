@@ -29,12 +29,17 @@ namespace feature_generation {
 
   std::vector<int> WLFeatures::reformat_neighbour_colours(const std::vector<int> &colours,
                                                           const std::map<int, int> &remap) {
+    // check neighbour_container for definitions
     std::vector<int> new_colours(colours.size());
-    for (size_t i = 0; i < colours.size(); i++) {
-      if (i == 0 || i % 2 == 1) {
-        new_colours[i] = remap.at(colours[i]);
+
+    // colours should always show up in remap by their construction
+    new_colours[0] = remap.at(colours[0]);
+    for (size_t i = 1; i < colours.size(); i++) {
+      int colour = colours[i];
+      if ((multiset_hash && (i % 3 == 2)) || (!multiset_hash && (i % 2 == 0))) {
+        new_colours[i] = remap.at(colour);
       } else {
-        new_colours[i] = colours[i];
+        new_colours[i] = colour;
       }
     }
     return new_colours;
@@ -90,7 +95,10 @@ namespace feature_generation {
     std::vector<std::vector<int>> graph_colours;
     std::vector<std::vector<int>> graph_colours_tmp;
 
+    // init colours
     n_seen_graphs += graphs.size();
+    cur_collecting_layer = 0;
+    std::cout << "collecting iteration " << cur_collecting_layer << std::endl;
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       int n_nodes = graph->nodes.size();
@@ -99,9 +107,6 @@ namespace feature_generation {
       n_seen_edges += n_edges;
 
       std::vector<int> colours(n_nodes, 0);
-
-      // init colours
-      cur_collecting_layer = 0;
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         int col = get_colour_hash({graph->nodes[node_i]});
         colours[node_i] = col;
@@ -114,6 +119,7 @@ namespace feature_generation {
     // main WL loop
     for (int iteration = 1; iteration < iterations + 1; iteration++) {
       cur_collecting_layer = iteration;
+      std::cout << "collecting iteration " << cur_collecting_layer << std::endl;
 
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
         const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
@@ -121,15 +127,16 @@ namespace feature_generation {
       }
 
       // layer pruning
-      std::vector<int> features_to_prune =
-          features_to_prune_this_iteration(iteration, graph_colours);
-      if (features_to_prune.size() != 0) {
-        std::map<int, int> remap = reformat_colour_hash(features_to_prune);
+      std::set<int> to_prune = features_to_prune_this_iteration(iteration, graph_colours);
+      if (to_prune.size() != 0) {
+        std::map<int, int> remap = reformat_colour_hash(to_prune);
         for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
           for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
             int col = graph_colours[graph_i][node_i];
             if (remap.count(col) > 0) {
               graph_colours[graph_i][node_i] = remap[col];
+            } else {
+              graph_colours[graph_i][node_i] = UNSEEN_COLOUR;
             }
           }
         }
@@ -137,8 +144,10 @@ namespace feature_generation {
     }
 
     // bulk pruning
-    std::vector<int> to_prune = features_to_prune(graph_colours);
-    reformat_colour_hash(to_prune);
+    std::set<int> to_prune = features_to_prune(graphs);
+    if (to_prune.size() != 0) {
+      reformat_colour_hash(to_prune);
+    }
     layer_redundancy_check();
   }
 

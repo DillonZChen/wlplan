@@ -14,6 +14,12 @@
 
 using json = nlohmann::json;
 
+#define debug_hash(k, v)                                                                           \
+  for (const int i : k) {                                                                          \
+    std::cout << i << ".";                                                                         \
+  }                                                                                                \
+  std::cout << " : " << v << std::endl;
+
 namespace feature_generation {
   Features::Features(const std::string feature_name,
                      const planning::Domain &domain,
@@ -40,6 +46,10 @@ namespace feature_generation {
     n_seen_nodes = 0;
     n_seen_edges = 0;
     seen_initial_colours = std::set<int>();
+    init_layer_to_colours();
+  }
+
+  void Features::init_layer_to_colours() {
     // plus 1 because zeroth iteration is also included
     layer_to_colours = std::vector<std::set<int>>(iterations + 1, std::set<int>());
   }
@@ -137,39 +147,87 @@ namespace feature_generation {
       colour_hash[colour] = hash;
       colour_to_layer[hash] = cur_collecting_layer;
       layer_to_colours[cur_collecting_layer].insert(hash);
+
+      // debug_hash(colour, hash);
     }
     return colour_hash[colour];
   }
 
-  std::map<int, int> Features::reformat_colour_hash(const std::vector<int> &to_prune) {
-    if (to_prune.size() == 0) {
-      return std::map<int, int>();
-    }
+  std::map<int, int> Features::reformat_colour_hash(const std::set<int> &to_prune) {
     // TODO can be optimised if we have layer information for colours
 
     // remap values
     std::map<int, int> remap;
     std::vector<std::pair<std::vector<int>, int>> new_hash_vec;
-    std::set<int> to_prune_set(to_prune.begin(), to_prune.end());
+    std::unordered_map<int, int> new_colour_layer;
+
+    // layer 0 colours (init colours) should remain consistent
     for (const auto &[key, val] : colour_hash) {
-      if (to_prune_set.count(val) > 0) {
+      int layer = colour_to_layer[val];
+      if (seen_initial_colours.count(val) == 0) {
+        if (layer == 0) {
+          std::cout << "error: encountered refined colour with layer = " << layer << std::endl;
+          exit(-1);
+        }
+        continue;
+      } else {
+        if (layer != 0) {
+          std::cout << "error: encountered initial colour with layer = " << layer << std::endl;
+          exit(-1);
+        }
+        // keep the same for initial colours
+        new_hash_vec.push_back(std::make_pair(key, val));
+        new_colour_layer[val] = layer;
+        remap[val] = val;
+      }
+    }
+
+    // deal with layer 1+ colours
+    for (const auto &[key, val] : colour_hash) {
+      if (seen_initial_colours.count(val) > 0 || to_prune.count(val) > 0) {
         continue;
       }
       int new_val = (int)new_hash_vec.size();
       remap[val] = new_val;
       new_hash_vec.push_back(std::make_pair(key, new_val));
+      new_colour_layer[new_val] = colour_to_layer[val];
     }
+
+    // // debug
+    // std::cout << "initial_colours" << std::endl;
+    // for (const int i : seen_initial_colours) {
+    //   std::cout << i << std::endl;
+    // }
+    // std::cout << "to_prune" << std::endl;
+    // for (const int i : to_prune) {
+    //   std::cout << i << std::endl;
+    // }
+    // std::cout << "remap" << std::endl;
+    // for (const auto &[key, val] : remap) {
+    //   std::cout << key << " -> " << val << std::endl;
+    // }
 
     // remap keys
     ColourHash new_colour_hash;
     for (size_t i = 0; i < new_hash_vec.size(); i++) {
       std::vector<int> key = new_hash_vec[i].first;
       int val = new_hash_vec[i].second;
-      key = reformat_neighbour_colours(key, remap);
+      if (new_colour_layer[val] > 0) {
+        debug_hash(key, val);
+        key = reformat_neighbour_colours(key, remap);
+      }
       new_colour_hash[key] = val;
     }
 
+    // remap hash
     colour_hash = new_colour_hash;
+
+    // remap colours
+    colour_to_layer = new_colour_layer;
+    init_layer_to_colours();
+    for (const auto &[key, val] : colour_hash) {
+      layer_to_colours[colour_to_layer[val]].insert(val);
+    }
 
     return remap;
   }

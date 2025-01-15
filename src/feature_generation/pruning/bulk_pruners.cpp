@@ -5,11 +5,13 @@ const int DISTINCT = -1;
 
 namespace feature_generation {
 
-  std::vector<int> Features::features_to_prune(std::vector<Embedding> X) {
+  std::set<int> Features::features_to_prune(const std::vector<graph::Graph> &graphs) {
     if (pruning == PruningOptions::COLLAPSE_ALL) {
+      collected = true;
+      std::vector<Embedding> X = embed_graphs(graphs);
       return greedy_all_pruner(X);
     } else {
-      return std::vector<int>();
+      return std::set<int>();
     }
   }
 
@@ -39,7 +41,7 @@ namespace feature_generation {
               << std::endl;
   }
 
-  std::vector<int> Features::greedy_all_pruner(std::vector<Embedding> X) {
+  std::set<int> Features::greedy_all_pruner(std::vector<Embedding> X) {
     std::cout << "Minimising equivalent features..." << std::endl;
     FeatureDependencyGraph fdg = FeatureDependencyGraph(colour_hash);
 
@@ -109,6 +111,6 @@ namespace feature_generation {
 
     std::cout << "Equivalent features minimised!" << std::endl;
 
-    return std::vector<int>();
+    return std::set<int>();
   }
 }  // namespace feature_generation

@@ -2,20 +2,20 @@
 
 namespace feature_generation {
 
-  std::vector<int>
+  std::set<int>
   Features::features_to_prune_this_iteration(int iteration,
                                              std::vector<std::vector<int>> &cur_colours) {
     if (pruning == PruningOptions::COLLAPSE_LAYER) {
       return greedy_iteration_pruner(iteration, cur_colours);
     } else {
-      return std::vector<int>();
+      return std::set<int>();
     }
   }
 
-  std::vector<int> Features::greedy_iteration_pruner(int iteration,
+  std::set<int> Features::greedy_iteration_pruner(int iteration,
                                                      std::vector<std::vector<int>> &cur_colours) {
     std::set<int> colours = get_iteration_colours(iteration);
-    std::vector<int> features_to_prune;
+    std::set<int> features_to_prune;
 
     std::map<int, std::vector<int>> columns;
     size_t n_graphs = cur_colours.size();
@@ -42,7 +42,7 @@ namespace feature_generation {
         unique_features.insert(column);
       } else {
         // throw out because not unique
-        features_to_prune.push_back(colour);
+        features_to_prune.insert(colour);
       }
     }
 

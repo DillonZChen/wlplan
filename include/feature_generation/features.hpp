@@ -82,7 +82,8 @@ namespace feature_generation {
     int get_colour_hash(const std::vector<int> &colour);
 
     // reformat colour hash based on colours to throw out
-    std::map<int, int> reformat_colour_hash(const std::vector<int> &to_prune);
+    void init_layer_to_colours();
+    std::map<int, int> reformat_colour_hash(const std::set<int> &to_prune);
     virtual std::vector<int> reformat_neighbour_colours(const std::vector<int> &colours,
                                                         const std::map<int, int> &remap) = 0;
 
@@ -117,13 +118,13 @@ namespace feature_generation {
 
     /* Pruning functions */
 
-    std::vector<int> features_to_prune_this_iteration(int iteration,
+    std::set<int> features_to_prune_this_iteration(int iteration,
                                                       std::vector<std::vector<int>> &cur_colours);
-    std::vector<int> features_to_prune(std::vector<Embedding> X);
+    std::set<int> features_to_prune(const std::vector<graph::Graph> &graphs);
 
-    std::vector<int> greedy_iteration_pruner(int iteration,
+    std::set<int> greedy_iteration_pruner(int iteration,
                                              std::vector<std::vector<int>> &cur_colours);
-    std::vector<int> greedy_all_pruner(std::vector<Embedding> X);
+    std::set<int> greedy_all_pruner(std::vector<Embedding> X);
 
     /* Prediction functions */
 

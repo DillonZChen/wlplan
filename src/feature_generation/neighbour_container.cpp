@@ -27,14 +27,14 @@ namespace feature_generation {
     std::string str = "";
     if (multiset_hash) {
       for (const auto &kv : neighbours_mset) {
-        str += "." + std::to_string(kv.first.first);
-        str += "." + std::to_string(kv.first.second);
+        str += "." + std::to_string(kv.first.first);  // edge label
+        str += "." + std::to_string(kv.first.second);  // node colour
         str += "." + std::to_string(kv.second);  // count in multiset
       }
     } else {
       for (const auto &kv : neighbours_set) {
-        str += "." + std::to_string(kv.first);
-        str += "." + std::to_string(kv.second);
+        str += "." + std::to_string(kv.first);  // edge label
+        str += "." + std::to_string(kv.second);  // node colour
       }
     }
     return str;
@@ -44,14 +44,14 @@ namespace feature_generation {
     std::vector<int> vec;
     if (multiset_hash) {
       for (const auto &kv : neighbours_mset) {
-        vec.push_back(kv.first.first);
-        vec.push_back(kv.first.second);
-        vec.push_back(kv.second);  // count in multiset
+        vec.push_back(kv.first.first);  // edge label i % 3 == 1
+        vec.push_back(kv.first.second);  // node colour i % 3 == 2
+        vec.push_back(kv.second);  // count in multiset i % 3 == 0
       }
     } else {
       for (const auto &kv : neighbours_set) {
-        vec.push_back(kv.first);
-        vec.push_back(kv.second);
+        vec.push_back(kv.first);  // edge label
+        vec.push_back(kv.second);  // node colour
       }
     }
     return vec;
