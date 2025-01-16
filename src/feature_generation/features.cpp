@@ -1,6 +1,6 @@
 #include "../../include/feature_generation/features.hpp"
 
-#include "../../include/feature_generation/pruning/maxsat.hpp"
+#include "../../include/feature_generation/maxsat.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
 

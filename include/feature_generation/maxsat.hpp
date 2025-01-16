@@ -1,5 +1,5 @@
-#ifndef FEATURE_GENERATION_PRUNING_MAXSAT_HPP
-#define FEATURE_GENERATION_PRUNING_MAXSAT_HPP
+#ifndef FEATURE_GENERATION_MAXSAT_HPP
+#define FEATURE_GENERATION_MAXSAT_HPP
 
 #include <map>
 #include <set>
@@ -41,4 +41,4 @@ namespace feature_generation {
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_PRUNING_MAXSAT_HPP
+#endif  // FEATURE_GENERATION_MAXSAT_HPP

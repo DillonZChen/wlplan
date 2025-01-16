@@ -6,7 +6,7 @@
 #include "../include/feature_generation/feature_generators/niwl.hpp"
 #include "../include/feature_generation/feature_generators/wl.hpp"
 #include "../include/feature_generation/features.hpp"
-#include "../include/feature_generation/pruning/pruning_options.hpp"
+#include "../include/feature_generation/pruning_options.hpp"
 #include "../include/graph/ilg_generator.hpp"
 #include "../include/graph/nilg_generator.hpp"
 #include "../include/planning/atom.hpp"
@@ -444,9 +444,8 @@ py::class_<graph::NILGGenerator, graph::ILGGenerator>(graph_m, "NILGGenerator")
 // Feature Generation
 //////////////////////////////////////////////////////////////////////////////
 auto feature_generation_m = m.def_submodule("feature_generation");
-auto pruning_m = feature_generation_m.def_submodule("pruning");
 
-py::class_<feature_generation::PruningOptions>(pruning_m, "PruningOptions")
+py::class_<feature_generation::PruningOptions>(feature_generation_m, "PruningOptions")
   .def_readonly_static("NONE", &feature_generation::PruningOptions::NONE)
   .def_readonly_static("COLLAPSE_ALL", &feature_generation::PruningOptions::COLLAPSE_ALL)
   .def_readonly_static("COLLAPSE_LAYER", &feature_generation::PruningOptions::COLLAPSE_LAYER)

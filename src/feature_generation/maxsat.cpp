@@ -1,4 +1,4 @@
-#include "../../../include/feature_generation/pruning/maxsat.hpp"
+#include "../../include/feature_generation/maxsat.hpp"
 
 #include <chrono>
 #include <iostream>

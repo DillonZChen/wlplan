@@ -1,5 +1,5 @@
 #include "../../../include/feature_generation/features.hpp"
-#include "../../../include/feature_generation/pruning/maxsat.hpp"
+#include "../../../include/feature_generation/maxsat.hpp"
 
 const int DISTINCT = -1;
 
