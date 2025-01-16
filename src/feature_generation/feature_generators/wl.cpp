@@ -27,22 +27,15 @@ namespace feature_generation {
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
-  std::vector<int> WLFeatures::reformat_neighbour_colours(const std::vector<int> &colours,
-                                                          const std::map<int, int> &remap) {
-    // check neighbour_container for definitions
-    std::vector<int> new_colours(colours.size());
-
-    // colours should always show up in remap by their construction
-    new_colours[0] = remap.at(colours[0]);
+  std::vector<int> WLFeatures::get_neighbour_colour_indices(const std::vector<int> &colours) {
+    std::vector<int> ret = {0};
     for (size_t i = 1; i < colours.size(); i++) {
-      int colour = colours[i];
+      // see neighbour container
       if ((multiset_hash && (i % 3 == 2)) || (!multiset_hash && (i % 2 == 0))) {
-        new_colours[i] = remap.at(colour);
-      } else {
-        new_colours[i] = colour;
+        ret.push_back(i);
       }
     }
-    return new_colours;
+    return ret;
   }
 
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
@@ -129,7 +122,7 @@ namespace feature_generation {
       // layer pruning
       std::set<int> to_prune = features_to_prune_this_iteration(iteration, graph_colours);
       if (to_prune.size() != 0) {
-        std::map<int, int> remap = reformat_colour_hash(to_prune);
+        std::map<int, int> remap = remap_colour_hash(to_prune);
         for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
           for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
             int col = graph_colours[graph_i][node_i];
@@ -146,7 +139,7 @@ namespace feature_generation {
     // bulk pruning
     std::set<int> to_prune = features_to_prune(graphs);
     if (to_prune.size() != 0) {
-      reformat_colour_hash(to_prune);
+      remap_colour_hash(to_prune);
     }
     layer_redundancy_check();
   }

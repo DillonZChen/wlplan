@@ -1,6 +1,5 @@
 #include "../../include/feature_generation/features.hpp"
 
-#include "../../include/feature_generation/dependency_graph.hpp"
 #include "../../include/feature_generation/pruning/maxsat.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
@@ -13,12 +12,6 @@
 #include <thread>
 
 using json = nlohmann::json;
-
-#define debug_hash(k, v)                                                                           \
-  for (const int i : k) {                                                                          \
-    std::cout << i << ".";                                                                         \
-  }                                                                                                \
-  std::cout << " : " << v << std::endl;
 
 namespace feature_generation {
   Features::Features(const std::string feature_name,
@@ -147,15 +140,23 @@ namespace feature_generation {
       colour_hash[colour] = hash;
       colour_to_layer[hash] = cur_collecting_layer;
       layer_to_colours[cur_collecting_layer].insert(hash);
-
-      // debug_hash(colour, hash);
     }
     return colour_hash[colour];
   }
 
-  std::map<int, int> Features::reformat_colour_hash(const std::set<int> &to_prune) {
-    // TODO can be optimised if we have layer information for colours
+  std::vector<int> Features::remap_neighbour_colours(const std::vector<int> &colours,
+                                                     const std::map<int, int> &remap) {
+    // make new_colours a copy of colours
+    std::vector<int> new_colours = colours;
 
+    // colours should always show up in remap by their construction
+    for (const int i : get_neighbour_colour_indices(colours)) {
+      new_colours[i] = remap.at(colours[i]);
+    }
+    return new_colours;
+  }
+
+  std::map<int, int> Features::remap_colour_hash(const std::set<int> &to_prune) {
     // remap values
     std::map<int, int> remap;
     std::vector<std::pair<std::vector<int>, int>> new_hash_vec;
@@ -193,6 +194,7 @@ namespace feature_generation {
       new_colour_layer[new_val] = colour_to_layer[val];
     }
 
+    //////////////////////////////////////////
     // // debug
     // std::cout << "initial_colours" << std::endl;
     // for (const int i : seen_initial_colours) {
@@ -206,6 +208,7 @@ namespace feature_generation {
     // for (const auto &[key, val] : remap) {
     //   std::cout << key << " -> " << val << std::endl;
     // }
+    //////////////////////////////////////////
 
     // remap keys
     ColourHash new_colour_hash;
@@ -213,8 +216,7 @@ namespace feature_generation {
       std::vector<int> key = new_hash_vec[i].first;
       int val = new_hash_vec[i].second;
       if (new_colour_layer[val] > 0) {
-        debug_hash(key, val);
-        key = reformat_neighbour_colours(key, remap);
+        key = remap_neighbour_colours(key, remap);
       }
       new_colour_hash[key] = val;
     }

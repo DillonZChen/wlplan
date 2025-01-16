@@ -1,5 +1,5 @@
-#include "../../../include/feature_generation/dependency_graph.hpp"
 #include "../../../include/feature_generation/features.hpp"
+#include "../../../include/feature_generation/pruning/maxsat.hpp"
 
 const int DISTINCT = -1;
 
@@ -9,7 +9,7 @@ namespace feature_generation {
     if (pruning == PruningOptions::COLLAPSE_ALL) {
       collected = true;
       std::vector<Embedding> X = embed_graphs(graphs);
-      return greedy_all_pruner(X);
+      return maxsat_bulk_pruner(X);
     } else {
       return std::set<int>();
     }
@@ -41,14 +41,37 @@ namespace feature_generation {
               << std::endl;
   }
 
-  std::set<int> Features::greedy_all_pruner(std::vector<Embedding> X) {
+  inline void mark_distinct_features(std::vector<int> &feature_group,
+                                     std::vector<int> &group_size) {
+    for (size_t colour = 0; colour < feature_group.size(); colour++) {
+      int group = feature_group.at(colour);
+      if (group >= 0 && group_size.at(group) <= 1) {
+        feature_group[colour] = DISTINCT;
+      }
+    }
+  }
+
+  std::set<int> Features::maxsat_bulk_pruner(std::vector<Embedding> X) {
     std::cout << "Minimising equivalent features..." << std::endl;
-    FeatureDependencyGraph fdg = FeatureDependencyGraph(colour_hash);
+
+    // 0. construct feature dependency graph
+    int n_features = X.at(0).size();
+    std::vector<std::vector<int>> edges_fw =
+        std::vector<std::vector<int>>(n_features, std::vector<int>());
+    std::vector<std::vector<int>> edges_bw =
+        std::vector<std::vector<int>>(n_features, std::vector<int>());
+    for (const auto &[neighbours, colour] : colour_hash) {  // std::vector<int>, int
+      std::vector<int> indices = get_neighbour_colour_indices(neighbours);
+      for (const int i : indices) {
+        int ancestor = neighbours[i];
+        edges_fw.at(ancestor).push_back(colour);
+        edges_bw.at(colour).push_back(ancestor);
+      }
+    }
 
     // 1. compute equivalent features candidates
     std::cout << "Computing equivalent feature candidates." << std::endl;
     std::unordered_map<std::vector<int>, int, int_vector_hasher> canonical_group;
-    int n_features = X.at(0).size();
     std::vector<int> group_size(n_features, 0);
     std::vector<int> feature_group(n_features, 0);
     for (int colour = 0; colour < n_features; colour++) {
@@ -67,13 +90,7 @@ namespace feature_generation {
       feature_group.at(colour) = group;
     }
 
-    // mark distinct features
-    for (int colour = 0; colour < n_features; colour++) {
-      int group = feature_group.at(colour);
-      if (group >= 0 && group_size.at(group) <= 1) {
-        feature_group[colour] = DISTINCT;
-      }
-    }
+    mark_distinct_features(feature_group, group_size);
     log_feature_info(feature_group, group_size);
 
     // 2. mark features that cannot be thrown out from highest iteration down
@@ -83,7 +100,7 @@ namespace feature_generation {
         if (feature_group.at(colour) != DISTINCT) {
           continue;
         }
-        for (const int ancestor_colour : fdg.get_bw_edges(colour)) {
+        for (const int ancestor_colour : edges_bw.at(colour)) {
           int ancestor_group = feature_group.at(ancestor_colour);
           feature_group.at(ancestor_colour) = DISTINCT;
           if (ancestor_group == DISTINCT) {
@@ -94,23 +111,70 @@ namespace feature_generation {
       }
     }
 
-    // remark distinct features
+    mark_distinct_features(feature_group, group_size);
+    log_feature_info(feature_group, group_size);
+
+    // 3. maxsat
+    std::cout << "Encoding MaxSAT." << std::endl;
+
+    // get groups
+    std::map<int, std::vector<int>> group_to_features;
+    std::vector<int> variables;
     for (int colour = 0; colour < n_features; colour++) {
       int group = feature_group.at(colour);
-      if (group >= 0 && group_size.at(group) <= 1) {
-        feature_group[colour] = DISTINCT;
+      if (group != DISTINCT) {
+        if (group_to_features.count(group) == 0) {
+          group_to_features[group] = std::vector<int>();
+        }
+        group_to_features[group].push_back(colour);
+        variables.push_back(colour);
       }
     }
-    log_feature_info(feature_group, group_size);
 
-    // 3. greedy pruning
-    std::cout << "Greedy pruning." << std::endl;
+    std::vector<MaxSatClause> clauses;
 
-    std::cout << "TODO implement" << std::endl;
-    log_feature_info(feature_group, group_size);
+    // variable=T indicates feature to be thrown out
+    // equivalently, ~variable=T indicates feature to be kept
+    for (const int variable : variables) {
+      clauses.push_back(MaxSatClause({variable}, {false}, 1, false));
+    }
+
+    // a thrown out variable forces children to be thrown out
+    // i.e., variable => child_1 & ... & child_n which is equivalent to
+    // (~variable | child_1) & ... & (~variable | child_n)
+    for (const int variable : variables) {
+      for (const int child : edges_fw.at(variable)) {
+        clauses.push_back(MaxSatClause({variable, child}, {true, false}, 0, true));
+      }
+    }
+
+    // keep one feature from each equivalence group
+    for (const auto &[group, features] : group_to_features) {
+      std::vector<bool> negated(features.size(), true);
+      clauses.push_back(MaxSatClause(features, negated, 0, true));
+    }
+
+    // solve
+    MaxSatProblem max_sat_problem = MaxSatProblem(clauses);
+
+    // time the solver
+    std::map<int, int> solution = max_sat_problem.solve();
+
+    std::set<int> to_prune;
+    int n_to_keep = 0;
+
+    for (const auto &[colour, value] : solution) {
+      if (value == 1) {
+        to_prune.insert(colour);
+      } else {
+        n_to_keep++;
+      }
+    }
 
     std::cout << "Equivalent features minimised!" << std::endl;
+    std::cout << "  Features kept: " << n_to_keep << std::endl;
+    std::cout << "  Features pruned: " << to_prune.size() << std::endl;
 
-    return std::set<int>();
+    return to_prune;
   }
 }  // namespace feature_generation

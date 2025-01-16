@@ -31,8 +31,7 @@ namespace feature_generation {
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
-    std::vector<int> reformat_neighbour_colours(const std::vector<int> &colours,
-                                                const std::map<int, int> &remap);
+    std::vector<int> get_neighbour_colour_indices(const std::vector<int> &colours);
     inline int get_initial_colour(int index,
                                   int u,
                                   int v,

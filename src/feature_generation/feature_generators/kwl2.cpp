@@ -26,8 +26,7 @@ namespace feature_generation {
 
   KWL2Features::KWL2Features(const std::string &filename) : Features(filename) {}
 
-  std::vector<int> KWL2Features::reformat_neighbour_colours(const std::vector<int> &colours,
-                                                            const std::map<int, int> &remap) {
+  std::vector<int> KWL2Features::get_neighbour_colour_indices(const std::vector<int> &colours) {
     std::cout << "not implemented yet" << std::endl;
     exit(-1);
     return std::vector<int>();

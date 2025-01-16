@@ -38,5 +38,6 @@ setup(
     install_requires=[
         "networkx>=3.0",
         "pddl==0.4.1",
+        "python-sat==1.8.dev14",
     ],
 )

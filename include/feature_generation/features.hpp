@@ -20,6 +20,17 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #define UNSEEN_COLOUR -1
 
+#define debug_hash(k, v)                                                                           \
+  for (const int i : k) {                                                                          \
+    std::cout << i << ".";                                                                         \
+  }                                                                                                \
+  std::cout << " : " << v << std::endl;
+#define debug_vec(k)                                                                               \
+  for (const int i : k) {                                                                          \
+    std::cout << i << ".";                                                                         \
+  }                                                                                                \
+  std::cout << std::endl;
+
 class int_vector_hasher {
  public:
   // https://stackoverflow.com/a/27216842
@@ -83,9 +94,10 @@ namespace feature_generation {
 
     // reformat colour hash based on colours to throw out
     void init_layer_to_colours();
-    std::map<int, int> reformat_colour_hash(const std::set<int> &to_prune);
-    virtual std::vector<int> reformat_neighbour_colours(const std::vector<int> &colours,
-                                                        const std::map<int, int> &remap) = 0;
+    std::map<int, int> remap_colour_hash(const std::set<int> &to_prune);
+    virtual std::vector<int> get_neighbour_colour_indices(const std::vector<int> &colours) = 0;
+    std::vector<int> remap_neighbour_colours(const std::vector<int> &colours,
+                                             const std::map<int, int> &remap);
 
     // main collection body
     virtual void collect_impl(const std::vector<graph::Graph> &graphs) = 0;
@@ -119,12 +131,12 @@ namespace feature_generation {
     /* Pruning functions */
 
     std::set<int> features_to_prune_this_iteration(int iteration,
-                                                      std::vector<std::vector<int>> &cur_colours);
+                                                   std::vector<std::vector<int>> &cur_colours);
     std::set<int> features_to_prune(const std::vector<graph::Graph> &graphs);
 
     std::set<int> greedy_iteration_pruner(int iteration,
-                                             std::vector<std::vector<int>> &cur_colours);
-    std::set<int> greedy_all_pruner(std::vector<Embedding> X);
+                                          std::vector<std::vector<int>> &cur_colours);
+    std::set<int> maxsat_bulk_pruner(std::vector<Embedding> X);
 
     /* Prediction functions */
 

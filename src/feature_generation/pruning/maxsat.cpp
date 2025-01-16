@@ -1,6 +1,18 @@
 #include "../../../include/feature_generation/pruning/maxsat.hpp"
 
 #include <iostream>
+#include <pybind11/embed.h>
+#include <pybind11/functional.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/typing.h>
+
+namespace py = pybind11;
+
+using std::chrono::duration;
+using std::chrono::duration_cast;
+using std::chrono::high_resolution_clock;
+using std::chrono::milliseconds;
 
 namespace feature_generation {
   MaxSatClause::MaxSatClause(const std::vector<int> &variables,
@@ -16,33 +28,116 @@ namespace feature_generation {
       exit(-1);
     }
     if (variables.size() != negated.size()) {
-      std::cout << "error: variables and negated in MaxSatClause should have the same size!" << std::endl;
+      std::cout << "error: variables and negated in MaxSatClause should have the same size!"
+                << std::endl;
       exit(-1);
     }
+    for (int i = 0; i < variables.size(); i++) {
+      if (variables[i] < 1) {
+        std::cout << "error: variables in MaxSatClause should be strictly positive!" << std::endl;
+        exit(-1);
+      }
+    }
+  }
+
+  std::string MaxSatClause::to_string(std::string hard_header) const {
+    std::string ret = "";
+    if (hard) {
+      ret += hard_header + " ";
+    } else {
+      ret += std::to_string(weight) + " ";
+    }
+    for (int i = 0; i < size(); i++) {
+      if (negated[i]) {
+        ret += "-";
+      }
+      ret += std::to_string(variables[i]) + " ";
+    }
+    ret += "0";
+    return ret;
   }
 
   MaxSatProblem::MaxSatProblem(const std::vector<MaxSatClause> &clauses) : clauses(clauses) {
-    // preprocess
+    for (const MaxSatClause &clause : clauses) {
+      for (int variable : clause.variables) {
+        variables.insert(variable);
+      }
+    }
   }
 
   std::string MaxSatProblem::to_string() {
-    std::string ret = "";
+    // older wcnf version
+    // https://maxsat-evaluations.github.io/2021/rules.html#input
+
+    int max_variable = 0;
     for (const MaxSatClause &clause : clauses) {
-      std::string clause_string = "";
-      if (clause.hard) {
-        clause_string += "h ";
-      } else {
-        clause_string += std::to_string(clause.weight) + " ";
+      for (int variable : clause.variables) {
+        max_variable = std::max(max_variable, variable);
       }
-      for (int i = 0; i < clause.size(); i++) {
-        if (clause.negated[i]) {
-          clause_string += "-";
-        }
-        clause_string += std::to_string(clause.variables[i]) + " ";
-      }
-      clause_string += "0";
-      ret += clause_string + "\n";
+    }
+    std::string top_value = std::to_string(get_n_variables() + 1);
+
+    std::string ret = "p wcnf ";
+    ret += std::to_string(max_variable) + " ";
+    ret += std::to_string(clauses.size()) + " ";
+    ret += top_value + "\n";
+    std::cout << "  Variables: " << get_n_variables() << std::endl;
+    std::cout << "  Clauses: " << clauses.size() << std::endl;
+    std::cout << "  Max variable name: " << max_variable << std::endl;
+    for (const MaxSatClause &clause : clauses) {
+      ret += clause.to_string(top_value) + "\n";
     }
     return ret;
+
+    // // 2022 wcnf version
+    // // https://maxsat-evaluations.github.io/2022/rules.html#input
+    // std::string ret = "";
+    // for (const MaxSatClause &clause : clauses) {
+    //   ret += clause.to_string("h") + "\n";
+    // }
+    // return ret;
+  }
+
+  std::map<int, int> MaxSatProblem::call_solver() {
+
+    std::string maxsat_wcnf_string = to_string();
+    py::object pysat_rc2 = py::module::import("pysat.examples.rc2").attr("RC2");
+    py::object pysat_wcnf = py::module::import("pysat.formula").attr("WCNF");
+    py::dict kwargs;
+    kwargs["from_string"] = maxsat_wcnf_string;
+    py::object wncf = pysat_wcnf(**kwargs);
+    py::object rc2 = pysat_rc2(wncf);
+
+    std::cout << "Solving MaxSAT with RC2." << std::endl;
+    auto t1 = high_resolution_clock::now();
+    py::list pylist_solution = rc2.attr("compute")();
+    auto t2 = high_resolution_clock::now();
+    duration<double, std::milli> ms_double = t2 - t1;
+    py::int_ cost = rc2.attr("cost");
+    std::cout << "MaxSAT solved!" << std::endl;
+    std::cout << "  Solving time: " << ms_double.count() / 1000 << "s\n";
+    std::cout << "  Solution cost: " << cost.cast<int>() << std::endl;
+
+    std::vector<int> solution_vector = py::cast<std::vector<int>>(pylist_solution);
+    std::map<int, int> solution;
+    for (const int value : solution_vector) {
+      int variable = std::abs(value);
+      if (variables.count(variable) == 0) {
+        continue;
+      }
+      solution[variable] = (value > 0);
+    }
+    return solution;
+  }
+
+  std::map<int, int> MaxSatProblem::solve() {
+    if (Py_IsInitialized() == 0) {
+      // interpreter is not running
+      py::scoped_interpreter guard{};
+      return call_solver();
+    } else {
+      // interpreter is running (e.g. Python calling wlplan)
+      return call_solver();
+    }
   }
 }  // namespace feature_generation
