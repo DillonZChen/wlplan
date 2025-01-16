@@ -1,13 +1,16 @@
 #include "../../../include/feature_generation/pruning/maxsat.hpp"
 
+#include <chrono>
 #include <iostream>
+
+#ifndef NOPYTHON
 #include <pybind11/embed.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/typing.h>
-
 namespace py = pybind11;
+#endif
 
 using std::chrono::duration;
 using std::chrono::duration_cast;
@@ -32,7 +35,7 @@ namespace feature_generation {
                 << std::endl;
       exit(-1);
     }
-    for (int i = 0; i < variables.size(); i++) {
+    for (size_t i = 0; i < variables.size(); i++) {
       if (variables[i] < 1) {
         std::cout << "error: variables in MaxSatClause should be strictly positive!" << std::endl;
         exit(-1);
@@ -99,6 +102,7 @@ namespace feature_generation {
   }
 
   std::map<int, int> MaxSatProblem::call_solver() {
+#ifndef NOPYTHON
 
     std::string maxsat_wcnf_string = to_string();
     py::object pysat_rc2 = py::module::import("pysat.examples.rc2").attr("RC2");
@@ -128,9 +132,15 @@ namespace feature_generation {
       solution[variable] = (value > 0);
     }
     return solution;
+#else
+    std::cout << "error: MaxSAT feature pruning is not supported in the C++ interface."
+              << std::endl;
+    exit(-1);
+#endif
   }
 
   std::map<int, int> MaxSatProblem::solve() {
+#ifndef NOPYTHON
     if (Py_IsInitialized() == 0) {
       // interpreter is not running
       py::scoped_interpreter guard{};
@@ -139,5 +149,10 @@ namespace feature_generation {
       // interpreter is running (e.g. Python calling wlplan)
       return call_solver();
     }
+#else
+    std::cout << "error: MaxSAT feature pruning is not supported in the C++ interface."
+              << std::endl;
+    exit(-1);
+#endif
   }
 }  // namespace feature_generation

@@ -8,10 +8,10 @@ include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -fPIC -O3 -DNDEBUG -fomit-frame-pointer")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -fPIC -O3 -DNDEBUG -DNOPYTHON -fomit-frame-pointer")
 
 # Gather source files
-# Do NOT glob src/main.cpp because that is only for creating Python bindings and requires pybind11
+# Do NOT glob src/main.cpp because that is only for creating Python bindings
 file(GLOB_RECURSE SRC_FILES "src/**/*.cpp")
 
 # Define the library target
