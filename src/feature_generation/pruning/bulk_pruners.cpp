@@ -64,6 +64,7 @@ namespace feature_generation {
       std::vector<int> indices = get_neighbour_colour_indices(neighbours);
       for (const int i : indices) {
         int ancestor = neighbours[i];
+        // std::cout << "FDG " << ancestor << " ~> " << colour << std::endl;
         edges_fw.at(ancestor).push_back(colour);
         edges_bw.at(colour).push_back(ancestor);
       }
@@ -119,7 +120,7 @@ namespace feature_generation {
 
     // get groups
     std::map<int, std::vector<int>> group_to_features;
-    std::vector<int> variables;
+    std::set<int> variables;
     for (int colour = 0; colour < n_features; colour++) {
       int group = feature_group.at(colour);
       if (group != DISTINCT) {
@@ -127,7 +128,7 @@ namespace feature_generation {
           group_to_features[group] = std::vector<int>();
         }
         group_to_features[group].push_back(colour);
-        variables.push_back(colour);
+        variables.insert(colour);
       }
     }
 
@@ -142,9 +143,12 @@ namespace feature_generation {
     // a thrown out variable forces children to be thrown out
     // i.e., variable => child_1 & ... & child_n which is equivalent to
     // (~variable | child_1) & ... & (~variable | child_n)
-    for (const int variable : variables) {
-      for (const int child : edges_fw.at(variable)) {
-        clauses.push_back(MaxSatClause({variable, child}, {true, false}, 0, true));
+    for (const int ancestor : variables) {
+      for (const int child : edges_fw.at(ancestor)) {
+        if (variables.count(child) == 0) {
+          continue;
+        }
+        clauses.push_back(MaxSatClause({ancestor, child}, {true, false}, 0, true));
       }
     }
 

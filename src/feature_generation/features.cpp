@@ -149,6 +149,8 @@ namespace feature_generation {
     // make new_colours a copy of colours
     std::vector<int> new_colours = colours;
 
+    debug_vec(colours);
+
     // colours should always show up in remap by their construction
     for (const int i : get_neighbour_colour_indices(colours)) {
       new_colours[i] = remap.at(colours[i]);
@@ -195,18 +197,22 @@ namespace feature_generation {
     }
 
     //////////////////////////////////////////
-    // // debug
+    // // DEBUG
     // std::cout << "initial_colours" << std::endl;
     // for (const int i : seen_initial_colours) {
-    //   std::cout << i << std::endl;
+    //   std::cout << "INITIAL " << i << std::endl;
+    // }
+    // std::cout << "old_hash" << std::endl;
+    // for (const auto &[key, val] : colour_hash) {
+    //   std::cout << "HASH "; debug_hash(key, val);
     // }
     // std::cout << "to_prune" << std::endl;
     // for (const int i : to_prune) {
-    //   std::cout << i << std::endl;
+    //   std::cout << "PRUNE " << i << std::endl;
     // }
     // std::cout << "remap" << std::endl;
     // for (const auto &[key, val] : remap) {
-    //   std::cout << key << " -> " << val << std::endl;
+    //   std::cout << "REMAP " << key << " -> " << val << std::endl;
     // }
     //////////////////////////////////////////
 

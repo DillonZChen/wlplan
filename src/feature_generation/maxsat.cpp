@@ -78,7 +78,7 @@ namespace feature_generation {
         max_variable = std::max(max_variable, variable);
       }
     }
-    std::string top_value = std::to_string(get_n_variables() + 1);
+    std::string top_value = std::to_string(max_variable);
 
     std::string ret = "p wcnf ";
     ret += std::to_string(max_variable) + " ";
@@ -105,6 +105,9 @@ namespace feature_generation {
 #ifndef NOPYTHON
 
     std::string maxsat_wcnf_string = to_string();
+
+    // std::cout << maxsat_wcnf_string << std::endl;  // DEBUG
+
     py::object pysat_rc2 = py::module::import("pysat.examples.rc2").attr("RC2");
     py::object pysat_wcnf = py::module::import("pysat.formula").attr("WCNF");
     py::dict kwargs;
