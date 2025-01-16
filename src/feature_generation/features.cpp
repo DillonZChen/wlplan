@@ -149,7 +149,7 @@ namespace feature_generation {
     // make new_colours a copy of colours
     std::vector<int> new_colours = colours;
 
-    debug_vec(colours);
+    // debug_vec(colours);  // DEBUG
 
     // colours should always show up in remap by their construction
     for (const int i : get_neighbour_colour_indices(colours)) {
@@ -197,7 +197,7 @@ namespace feature_generation {
     }
 
     //////////////////////////////////////////
-    // // DEBUG
+    // DEBUG
     // std::cout << "initial_colours" << std::endl;
     // for (const int i : seen_initial_colours) {
     //   std::cout << "INITIAL " << i << std::endl;
