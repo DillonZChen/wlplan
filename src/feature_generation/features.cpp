@@ -189,16 +189,14 @@ namespace feature_generation {
 
     // deal with layer 1+ colours
     for (int iteration = 1; iteration < iterations + 1; iteration++) {
-      for (const int i : layer_to_colours[iteration]) {
-        for (const auto &[key, val] : colour_hash) {  // this can be optimised
-          if (colour_to_layer[val] != iteration || to_prune.count(val) > 0) {
-            continue;
-          }
-          int new_val = (int)new_hash_vec.size();
-          remap[val] = new_val;
-          new_hash_vec.push_back(std::make_pair(key, new_val));
-          new_colour_layer[new_val] = colour_to_layer[val];
+      for (const auto &[key, val] : colour_hash) {  // this can be optimised
+        if (colour_to_layer[val] != iteration || to_prune.count(val) > 0) {
+          continue;
         }
+        int new_val = (int)new_hash_vec.size();
+        remap[val] = new_val;
+        new_hash_vec.push_back(std::make_pair(key, new_val));
+        new_colour_layer[new_val] = colour_to_layer[val];
       }
     }
 
