@@ -14,12 +14,7 @@ namespace feature_generation {
                              int iterations,
                              std::string pruning,
                              bool multiset_hash)
-      : WLFeatures("ccwl",
-                   domain,
-                   graph_representation,
-                   iterations,
-                   pruning,
-                   multiset_hash) {}
+      : WLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
@@ -44,18 +39,20 @@ namespace feature_generation {
 
     /* 3. Compute initial colours */
     int col;
+    int is_seen_colour;
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       col = get_colour_hash({graph->nodes[node_i]});
       colours[node_i] = col;
-      if (col != UNSEEN_COLOUR) {
+      is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
+      seen_colour_statistics[is_seen_colour][0]++;
+      if (is_seen_colour) {
         x0[col]++;
         x0[col + categorical_size] += graph->node_values[node_i];  // [NUMERIC]
       }
     }
 
     /* 4. Main WL loop */
-    int is_seen_colour;
-    for (int itr = 0; itr < iterations; itr++) {
+    for (int itr = 1; itr < iterations + 1; itr++) {
       refine(graph, colours, colours_tmp);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         col = colours[node_i];
@@ -67,7 +64,7 @@ namespace feature_generation {
         }
       }
     }
-    
+
     return x0;
   }
 

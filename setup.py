@@ -10,7 +10,7 @@ exec(open("wlplan/__version__.py").read())
 # Compiler flags
 COMPILER_FLAGS = [
     "-O3",
-    # "-DDEBUG",
+    # "-DDEBUGMODE",
 ]
 
 files = [glob("src/*.cpp"), glob("src/**/*.cpp"), glob("src/**/**/*.cpp")]

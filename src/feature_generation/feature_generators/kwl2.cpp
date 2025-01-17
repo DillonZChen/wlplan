@@ -172,27 +172,25 @@ namespace feature_generation {
     std::vector<int> pair_to_edge_label = get_kwl2_pair_to_edge_label(graph);
 
     /* 3. Compute initial colours */
+    int is_seen_colour;
     for (int u = 0; u < n_nodes; u++) {
       for (int v = 0; v < n_nodes; v++) {
         int index = kwl2_pair_to_index_map(n_nodes, u, v);
         int col = get_initial_colour(index, u, v, graph, pair_to_edge_label);
         colours[index] = col;
-        if (col != UNSEEN_COLOUR) {
-          x0[col]++;
-        }
+        is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
+        seen_colour_statistics[is_seen_colour][0]++;
+        x0[col] += is_seen_colour;
       }
     }
 
     /* 4. Main WL loop */
-    int is_seen_colour;
-    for (int itr = 0; itr < iterations; itr++) {
+    for (int itr = 1; itr < iterations + 1; itr++) {
       refine(graph, colours, colours_tmp);
       for (const int col : colours) {
         is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
         seen_colour_statistics[is_seen_colour][itr]++;
-        if (is_seen_colour) {
-          x0[col]++;
-        }
+        x0[col] += is_seen_colour;
       }
     }
 

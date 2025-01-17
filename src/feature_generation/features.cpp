@@ -32,7 +32,7 @@ namespace feature_generation {
     pruned = false;
     collecting = false;
     neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
-    seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
+    seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations + 1, 0));
     store_weights = false;
 
     n_seen_graphs = 0;
@@ -149,7 +149,7 @@ namespace feature_generation {
     // make new_colours a copy of colours
     std::vector<int> new_colours = colours;
 
-#ifdef DEBUG
+#ifdef DEBUGMODE
     debug_vec(colours);
 #endif
 
@@ -188,18 +188,22 @@ namespace feature_generation {
     }
 
     // deal with layer 1+ colours
-    for (const auto &[key, val] : colour_hash) {
-      if (seen_initial_colours.count(val) > 0 || to_prune.count(val) > 0) {
-        continue;
+    for (int iteration = 1; iteration < iterations + 1; iteration++) {
+      for (const int i : layer_to_colours[iteration]) {
+        for (const auto &[key, val] : colour_hash) {  // this can be optimised
+          if (colour_to_layer[val] != iteration || to_prune.count(val) > 0) {
+            continue;
+          }
+          int new_val = (int)new_hash_vec.size();
+          remap[val] = new_val;
+          new_hash_vec.push_back(std::make_pair(key, new_val));
+          new_colour_layer[new_val] = colour_to_layer[val];
+        }
       }
-      int new_val = (int)new_hash_vec.size();
-      remap[val] = new_val;
-      new_hash_vec.push_back(std::make_pair(key, new_val));
-      new_colour_layer[new_val] = colour_to_layer[val];
     }
 
     //////////////////////////////////////////
-#ifdef DEBUG
+#ifdef DEBUGMODE
     std::cout << "initial_colours" << std::endl;
     for (const int i : seen_initial_colours) {
       std::cout << "INITIAL " << i << std::endl;

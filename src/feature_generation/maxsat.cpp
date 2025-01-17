@@ -106,7 +106,7 @@ namespace feature_generation {
 
     std::string maxsat_wcnf_string = to_string();
 
-#ifdef DEBUG
+#ifdef DEBUGMODE
     std::cout << maxsat_wcnf_string << std::endl;
 #endif
 

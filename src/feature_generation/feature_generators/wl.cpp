@@ -141,24 +141,22 @@ namespace feature_generation {
     std::vector<int> colours_tmp(n_nodes);
 
     /* 2. Compute initial colours */
+    int is_seen_colour;
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       int col = get_colour_hash({graph->nodes[node_i]});
       colours[node_i] = col;
-      if (col != UNSEEN_COLOUR) {
-        x0[col]++;
-      }
+      is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
+      seen_colour_statistics[is_seen_colour][0]++;
+      x0[col] += is_seen_colour;
     }
 
     /* 3. Main WL loop */
-    int is_seen_colour;
-    for (int itr = 0; itr < iterations; itr++) {
+    for (int itr = 1; itr < iterations + 1; itr++) {
       refine(graph, colours, colours_tmp);
       for (const int col : colours) {
         is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
         seen_colour_statistics[is_seen_colour][itr]++;
-        if (is_seen_colour) {
-          x0[col]++;
-        }
+        x0[col] += is_seen_colour;
       }
     }
 

@@ -15,24 +15,15 @@ namespace feature_generation {
                            int iterations,
                            std::string pruning,
                            bool multiset_hash)
-      : WLFeatures(feature_name,
-                 domain,
-                 graph_representation,
-                 iterations,
-                 pruning,
-                 multiset_hash) {}
+      : WLFeatures(feature_name, domain, graph_representation, iterations, pruning, multiset_hash) {
+  }
 
   IWLFeatures::IWLFeatures(const planning::Domain &domain,
                            std::string graph_representation,
                            int iterations,
                            std::string pruning,
                            bool multiset_hash)
-      : IWLFeatures("iwl",
-                    domain,
-                    graph_representation,
-                    iterations,
-                    pruning,
-                    multiset_hash) {}
+      : IWLFeatures("iwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   IWLFeatures::IWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
@@ -143,31 +134,29 @@ namespace feature_generation {
       graph->change_node_colour(node_i, INDIVIDUALISE_COLOUR);
 
       /* 3. Compute initial colours */
+      int is_seen_colour;
       for (int u = 0; u < n_nodes; u++) {
         int col = get_colour_hash({graph->nodes[u]});
         colours[u] = col;
-        if (col != UNSEEN_COLOUR) {
-          x0[col]++;
-        }
+        is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
+        seen_colour_statistics[is_seen_colour][0]++;
+        x0[col] += is_seen_colour;
       }
 
       /* 4. Main WL loop */
-      int is_seen_colour;
-      for (int itr = 0; itr < iterations; itr++) {
+      for (int itr = 1; itr < iterations + 1; itr++) {
         refine(graph, colours, colours_tmp);
         for (const int col : colours) {
           is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
           seen_colour_statistics[is_seen_colour][itr]++;
-          if (is_seen_colour) {
-            x0[col]++;
-          }
+        x0[col] += is_seen_colour;
         }
       }
 
       // reset node colour
       graph->change_node_colour(node_i, original_colour);
     }
-    
+
     return x0;
   }
 }  // namespace feature_generation

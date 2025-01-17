@@ -65,8 +65,6 @@ namespace feature_generation {
       group_size.erase(group);
     }
 
-    std::cout << "changed: " << changed << ". candidates: " << prune_candidates.size() << std::endl;
-
     return changed;
   }
 
@@ -85,7 +83,7 @@ namespace feature_generation {
         int ancestor = neighbours[i];
         edges_fw.at(ancestor).push_back(colour);
         edges_bw.at(colour).push_back(ancestor);
-#ifdef DEBUG
+#ifdef DEBUGMODE
         std::cout << "FDG " << ancestor << " -> " << colour << std::endl;
 #endif
       }
@@ -149,6 +147,7 @@ namespace feature_generation {
       }
 
       changed += mark_distinct_features(prune_candidates, feature_group, group_size);
+      std::cout << "changed: " << changed << ". candidates: " << prune_candidates.size() << std::endl;
       if (changed == 0) {
         break;
       }
