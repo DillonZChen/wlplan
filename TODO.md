@@ -1,3 +1,8 @@
 - remapping is very brittle as it relies on `get_neighbour_colours`
-  - this function depends on neighbour container (colour indices, as well as sorting) which depends on `multiset_hash` flag and the WL feature generation algorithm being used
-  - `bulk_pruner` also uses this function but assumes WL feature generation only, i.e. each tuple only gives one node
+  - Why?
+    - this function depends on neighbour container (colour indices, as well as sorting) which depends on `multiset_hash` flag and the WL feature generator (FG) algorithm being used
+    - `bulk_pruner` also uses this function but assumes WL FG only, i.e. each tuple only gives one node
+  - Plan
+    - I think the best way to handle this is to make an abstract NeighbourContainer class which takes as input `multiset_hash`. 
+    - It should be constructed factory-like based on the FG but does not take in the FG object
+- One other thing to think about is how to make FG configurations not easily modifiable, e.g. by introducing an Configuration class with all private variables
