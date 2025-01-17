@@ -19,9 +19,10 @@ FD_COLOURS = {
     # "spanner": 350,
     # "transport": 3787,
 }
+DOMAINS = sorted(FD_COLOURS.keys())
 
 
-def colours_test(domain_name, iterations, Class):
+def colours_test(domain_name: str, iterations: int, Class, pruning: str = None):
     logging.info(f"L={iterations}")
     
     n_features = {}
@@ -34,13 +35,16 @@ def colours_test(domain_name, iterations, Class):
     }
 
     for desc, config in configs.items():
-        domain, dataset, _ = get_dataset(domain_name, keep_statics=config["keep_statics"])
+        keep_statics = config["keep_statics"]
+        multiset_hash = config["multiset_hash"]
+        logging.info(f"{keep_statics=}, {multiset_hash=}")
+        domain, dataset, _ = get_dataset(domain_name, keep_statics=keep_statics)
         feature_generator = Class(
             domain=domain,
             graph_representation="ilg",
             iterations=iterations,
-            pruning=None,
-            multiset_hash=config["multiset_hash"],
+            pruning=pruning,
+            multiset_hash=multiset_hash,
         )
         feature_generator.collect(dataset)
         X = np.array(feature_generator.embed(dataset)).astype(float)

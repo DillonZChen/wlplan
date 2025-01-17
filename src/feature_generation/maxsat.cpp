@@ -106,7 +106,9 @@ namespace feature_generation {
 
     std::string maxsat_wcnf_string = to_string();
 
-    // std::cout << maxsat_wcnf_string << std::endl;  // DEBUG
+#ifdef DEBUG
+    std::cout << maxsat_wcnf_string << std::endl;
+#endif
 
     py::object pysat_rc2 = py::module::import("pysat.examples.rc2").attr("RC2");
     py::object pysat_wcnf = py::module::import("pysat.formula").attr("WCNF");

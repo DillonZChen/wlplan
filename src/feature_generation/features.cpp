@@ -29,7 +29,7 @@ namespace feature_generation {
     this->domain = std::make_shared<planning::Domain>(domain);
     graph_generator = graph::create_graph_generator(graph_representation, domain);
     collected = false;
-    collapse_pruned = false;
+    pruned = false;
     collecting = false;
     neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
     seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
@@ -149,7 +149,9 @@ namespace feature_generation {
     // make new_colours a copy of colours
     std::vector<int> new_colours = colours;
 
-    // debug_vec(colours);  // DEBUG
+#ifdef DEBUG
+    debug_vec(colours);
+#endif
 
     // colours should always show up in remap by their construction
     for (const int i : get_neighbour_colour_indices(colours)) {
@@ -197,23 +199,25 @@ namespace feature_generation {
     }
 
     //////////////////////////////////////////
-    // DEBUG
-    // std::cout << "initial_colours" << std::endl;
-    // for (const int i : seen_initial_colours) {
-    //   std::cout << "INITIAL " << i << std::endl;
-    // }
-    // std::cout << "old_hash" << std::endl;
-    // for (const auto &[key, val] : colour_hash) {
-    //   std::cout << "HASH "; debug_hash(key, val);
-    // }
-    // std::cout << "to_prune" << std::endl;
-    // for (const int i : to_prune) {
-    //   std::cout << "PRUNE " << i << std::endl;
-    // }
-    // std::cout << "remap" << std::endl;
-    // for (const auto &[key, val] : remap) {
-    //   std::cout << "REMAP " << key << " -> " << val << std::endl;
-    // }
+#ifdef DEBUG
+    std::cout << "initial_colours" << std::endl;
+    for (const int i : seen_initial_colours) {
+      std::cout << "INITIAL " << i << std::endl;
+    }
+    std::cout << "old_hash" << std::endl;
+    for (const auto &[key, val] : colour_hash) {
+      std::cout << "HASH ";
+      debug_hash(key, val);
+    }
+    std::cout << "to_prune" << std::endl;
+    for (const int i : to_prune) {
+      std::cout << "PRUNE " << i << std::endl;
+    }
+    std::cout << "remap" << std::endl;
+    for (const auto &[key, val] : remap) {
+      std::cout << "REMAP " << key << " -> " << val << std::endl;
+    }
+#endif
     //////////////////////////////////////////
 
     // remap keys
@@ -267,8 +271,8 @@ namespace feature_generation {
   }
 
   void Features::collect(const std::vector<graph::Graph> &graphs) {
-    if (pruning == PruningOptions::COLLAPSE_LAYER && collapse_pruned) {
-      std::cout << "collect with collapse pruning can only be called at most once" << std::endl;
+    if (pruning != PruningOptions::NONE && pruned) {
+      std::cout << "collect with pruning can only be called at most once" << std::endl;
       exit(-1);
     }
 
@@ -276,8 +280,8 @@ namespace feature_generation {
 
     collect_impl(graphs);
 
-    if (pruning == PruningOptions::COLLAPSE_LAYER) {
-      collapse_pruned = true;
+    if (pruning == PruningOptions::NONE) {
+      pruned = true;
     }
     collected = true;
     collecting = false;

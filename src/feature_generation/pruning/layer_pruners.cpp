@@ -2,18 +2,35 @@
 
 namespace feature_generation {
 
-  std::set<int>
-  Features::features_to_prune_this_iteration(int iteration,
-                                             std::vector<std::vector<int>> &cur_colours) {
+  void Features::prune_this_iteration(int iteration,
+                                      const std::vector<graph::Graph> &graphs,
+                                      std::vector<std::vector<int>> &cur_colours) {
+    std::set<int> to_prune;
     if (pruning == PruningOptions::COLLAPSE_LAYER) {
-      return greedy_iteration_pruner(iteration, cur_colours);
+      to_prune = prune_collapse_layer(iteration, cur_colours);
+    } else if (pruning == PruningOptions::COLLAPSE_LAYER_X) {
+      to_prune = prune_collapse_layer_x(iteration, graphs, cur_colours);
     } else {
-      return std::set<int>();
+      to_prune = std::set<int>();
+    }
+
+    if (to_prune.size() != 0) {
+      std::map<int, int> remap = remap_colour_hash(to_prune);
+      for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
+        for (size_t node_i = 0; node_i < cur_colours[graph_i].size(); node_i++) {
+          int col = cur_colours[graph_i][node_i];
+          if (remap.count(col) > 0) {
+            cur_colours[graph_i][node_i] = remap[col];
+          } else {
+            cur_colours[graph_i][node_i] = UNSEEN_COLOUR;
+          }
+        }
+      }
     }
   }
 
-  std::set<int> Features::greedy_iteration_pruner(int iteration,
-                                                     std::vector<std::vector<int>> &cur_colours) {
+  std::set<int> Features::prune_collapse_layer(int iteration,
+                                               std::vector<std::vector<int>> &cur_colours) {
     std::set<int> colours = get_iteration_colours(iteration);
     std::set<int> features_to_prune;
 
@@ -45,6 +62,14 @@ namespace feature_generation {
         features_to_prune.insert(colour);
       }
     }
+
+    return features_to_prune;
+  }
+
+  std::set<int> Features::prune_collapse_layer_x(int iteration,
+                                                 const std::vector<graph::Graph> &graphs,
+                                                 std::vector<std::vector<int>> &cur_colours) {
+    std::set<int> features_to_prune;
 
     return features_to_prune;
   }

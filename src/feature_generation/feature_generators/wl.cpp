@@ -120,27 +120,11 @@ namespace feature_generation {
       }
 
       // layer pruning
-      std::set<int> to_prune = features_to_prune_this_iteration(iteration, graph_colours);
-      if (to_prune.size() != 0) {
-        std::map<int, int> remap = remap_colour_hash(to_prune);
-        for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
-          for (size_t node_i = 0; node_i < graph_colours[graph_i].size(); node_i++) {
-            int col = graph_colours[graph_i][node_i];
-            if (remap.count(col) > 0) {
-              graph_colours[graph_i][node_i] = remap[col];
-            } else {
-              graph_colours[graph_i][node_i] = UNSEEN_COLOUR;
-            }
-          }
-        }
-      }
+      prune_this_iteration(iteration, graphs, graph_colours);
     }
 
     // bulk pruning
-    std::set<int> to_prune = features_to_prune(graphs);
-    if (to_prune.size() != 0) {
-      remap_colour_hash(to_prune);
-    }
+    prune_bulk(graphs);
     layer_redundancy_check();
   }
 

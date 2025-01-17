@@ -33,10 +33,17 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
+      - name: Pass tests
+        run: |
+          python -m pip install -r tests/test-requirements.txt
+          pytest tests/check_not_debug.py
+          pytest
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine auditwheel pybind11-stubgen
+
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}

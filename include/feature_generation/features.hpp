@@ -70,7 +70,7 @@ namespace feature_generation {
     std::shared_ptr<planning::Domain> domain;
     std::shared_ptr<graph::GraphGenerator> graph_generator;
     bool collected;
-    bool collapse_pruned;
+    bool pruned;
     bool collecting;
     int cur_collecting_layer;
     std::shared_ptr<NeighbourContainer> neighbour_container;
@@ -130,13 +130,16 @@ namespace feature_generation {
 
     /* Pruning functions */
 
-    std::set<int> features_to_prune_this_iteration(int iteration,
-                                                   std::vector<std::vector<int>> &cur_colours);
-    std::set<int> features_to_prune(const std::vector<graph::Graph> &graphs);
+    void prune_this_iteration(int iteration,
+                              const std::vector<graph::Graph> &graphs,
+                              std::vector<std::vector<int>> &cur_colours);
+    void prune_bulk(const std::vector<graph::Graph> &graphs);
 
-    std::set<int> greedy_iteration_pruner(int iteration,
-                                          std::vector<std::vector<int>> &cur_colours);
-    std::set<int> maxsat_bulk_pruner(std::vector<Embedding> X);
+    std::set<int> prune_collapse_layer(int iteration, std::vector<std::vector<int>> &cur_colours);
+    std::set<int> prune_collapse_layer_x(int iteration,
+                                         const std::vector<graph::Graph> &graphs,
+                                         std::vector<std::vector<int>> &cur_colours);
+    std::set<int> prune_maxsat(std::vector<Embedding> X);
 
     /* Prediction functions */
 
