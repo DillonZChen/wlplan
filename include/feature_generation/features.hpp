@@ -190,7 +190,7 @@ namespace feature_generation {
     int get_n_seen_nodes() const { return n_seen_nodes; }
     int get_n_seen_edges() const { return n_seen_edges; }
     int get_n_seen_initial_colours() const { return seen_initial_colours.size(); }
-    int get_n_seen_refined_colours() const { return (int)colour_hash.size(); }
+    int get_n_seen_refined_colours() const { return get_n_features(); }
     std::vector<long> get_layer_to_n_colours() const;
     void print_init_colours() const;
 
