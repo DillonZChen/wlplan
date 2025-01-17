@@ -28,7 +28,8 @@ namespace feature_generation {
   void LWL2Features::refine(const std::shared_ptr<graph::Graph> &graph,
                             std::vector<std::set<int>> &pair_to_neighbours,
                             std::vector<int> &colours,
-                            std::vector<int> &colours_tmp) {
+                            std::vector<int> &colours_tmp,
+                            int iteration) {
     // memory for storing string and hashed int representation of colours
     std::vector<int> new_colour;
     std::vector<int> neighbour_vector;
@@ -74,7 +75,7 @@ namespace feature_generation {
         new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
 
         // hash seen colours
-        new_colour_compressed = get_colour_hash(new_colour);
+        new_colour_compressed = get_colour_hash(new_colour, iteration);
 
       end_of_iteration:
         colours_tmp[index] = new_colour_compressed;
@@ -124,7 +125,7 @@ namespace feature_generation {
     int u_col = graph->nodes[u];
     int v_col = graph->nodes[v];
     int e_col = pair_to_edge_label[index];
-    int col = get_colour_hash({std::min(u_col, v_col), std::max(u_col, v_col), e_col});
+    int col = get_colour_hash({std::min(u_col, v_col), std::max(u_col, v_col), e_col}, 0);
     return col;
   }
 
@@ -152,7 +153,6 @@ namespace feature_generation {
       std::vector<std::set<int>> pair_to_neighbours = get_lwl2_pair_to_neighbours(graph);
 
       // init colours
-      cur_collecting_layer = 0;
       for (int u = 0; u < n_nodes; u++) {
         for (int v = u + 1; v < n_nodes; v++) {
           int index = lwl2_pair_to_index_map(n_nodes, u, v);
@@ -164,8 +164,7 @@ namespace feature_generation {
 
       // main WL loop
       for (int iteration = 1; iteration < iterations + 1; iteration++) {
-        cur_collecting_layer = iteration;
-        refine(graph, pair_to_neighbours, colours, colours_tmp);
+        refine(graph, pair_to_neighbours, colours, colours_tmp, iteration);
       }
     }
   }
@@ -177,7 +176,7 @@ namespace feature_generation {
     }
 
     /* 1. Initialise embedding before pruning */
-    Embedding x0(colour_hash.size(), 0);
+    Embedding x0(get_n_features(), 0);
 
     /* 2. Set up memory for WL updates */
     int n_nodes = graph->nodes.size();
@@ -189,25 +188,20 @@ namespace feature_generation {
     std::vector<std::set<int>> pair_to_neighbours = get_lwl2_pair_to_neighbours(graph);
 
     /* 3. Compute initial colours */
-    int is_seen_colour;
     for (int u = 0; u < n_nodes; u++) {
       for (int v = u + 1; v < n_nodes; v++) {
         int index = lwl2_pair_to_index_map(n_nodes, u, v);
         int col = get_initial_colour(index, u, v, graph, pair_to_edge_label);
         colours[index] = col;
-        is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-        seen_colour_statistics[is_seen_colour][0]++;
-        x0[col] += is_seen_colour;
+        add_colour_to_x(col, 0, x0);
       }
     }
 
     /* 4. Main WL loop */
     for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, pair_to_neighbours, colours, colours_tmp);
+      refine(graph, pair_to_neighbours, colours, colours_tmp, itr);
       for (const int col : colours) {
-        is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-        seen_colour_statistics[is_seen_colour][itr]++;
-        x0[col] += is_seen_colour;
+        add_colour_to_x(col, itr, x0);
       }
     }
 

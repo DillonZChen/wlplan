@@ -12,7 +12,7 @@ def test_not_debug():
     found_debug = False
     for line in setup_script.split("\n"):
         toks = line.split("#")
-        if len(toks) > 0 and "-DDEBUGMODE" in toks[0]:
+        if len(toks) > 0 and "_DEBUG = True" in toks[0]:
             found_debug = True
             break
 

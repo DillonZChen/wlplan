@@ -29,7 +29,7 @@ namespace feature_generation {
     // To change this to max, we just need to replace += occurrences with std::max.
 
     /* 1. Initialise embedding before pruning */
-    int categorical_size = colour_hash.size();
+    int categorical_size = get_n_features();
     Embedding x0(categorical_size * 2, 0);
 
     /* 2. Set up memory for WL updates */
@@ -41,7 +41,7 @@ namespace feature_generation {
     int col;
     int is_seen_colour;
     for (int node_i = 0; node_i < n_nodes; node_i++) {
-      col = get_colour_hash({graph->nodes[node_i]});
+      col = get_colour_hash({graph->nodes[node_i]}, 0);
       colours[node_i] = col;
       is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
       seen_colour_statistics[is_seen_colour][0]++;
@@ -53,7 +53,7 @@ namespace feature_generation {
 
     /* 4. Main WL loop */
     for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, colours, colours_tmp);
+      refine(graph, colours, colours_tmp, itr);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         col = colours[node_i];
         is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction

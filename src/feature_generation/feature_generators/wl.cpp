@@ -27,12 +27,19 @@ namespace feature_generation {
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
-  std::vector<int> WLFeatures::get_neighbour_colour_indices(const std::vector<int> &colours) {
-    std::vector<int> ret = {0};
-    for (size_t i = 1; i < colours.size(); i++) {
-      // see neighbour container
-      if ((multiset_hash && (i % 3 == 2)) || (!multiset_hash && (i % 2 == 0))) {
-        ret.push_back(i);
+  std::vector<std::pair<int, int>>
+  WLFeatures::get_neighbour_colours(const std::vector<int> &colours) {
+    std::vector<std::pair<int, int>> ret;
+    if (multiset_hash) {
+      for (size_t i = 1; i < colours.size(); i += 3) {
+        int occurrences = colours[i + 2];
+        for (int j = 0; j < occurrences; j++) {
+          ret.push_back(std::make_pair(colours[i + 1], colours[i]));
+        }
+      }
+    } else {
+      for (size_t i = 1; i < colours.size(); i += 2) {
+        ret.push_back(std::make_pair(colours[i + 1], colours[i]));
       }
     }
     return ret;
@@ -40,7 +47,8 @@ namespace feature_generation {
 
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                           std::vector<int> &colours,
-                          std::vector<int> &colours_tmp) {
+                          std::vector<int> &colours_tmp,
+                          int iteration) {
     // memory for storing string and hashed int representation of colours
     std::vector<int> new_colour;
     std::vector<int> neighbour_vector;
@@ -74,7 +82,7 @@ namespace feature_generation {
       new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
 
       // hash seen colours
-      new_colour_compressed = get_colour_hash(new_colour);
+      new_colour_compressed = get_colour_hash(new_colour, iteration);
 
     end_of_iteration:
       colours_tmp[u] = new_colour_compressed;
@@ -90,8 +98,7 @@ namespace feature_generation {
 
     // init colours
     n_seen_graphs += graphs.size();
-    cur_collecting_layer = 0;
-    std::cout << "collecting iteration " << cur_collecting_layer << std::endl;
+    std::cout << "collecting iteration 0" << std::endl;
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       int n_nodes = graph->nodes.size();
@@ -101,7 +108,7 @@ namespace feature_generation {
 
       std::vector<int> colours(n_nodes, 0);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
-        int col = get_colour_hash({graph->nodes[node_i]});
+        int col = get_colour_hash({graph->nodes[node_i]}, 0);
         colours[node_i] = col;
         seen_initial_colours.insert(col);
       }
@@ -111,12 +118,11 @@ namespace feature_generation {
 
     // main WL loop
     for (int iteration = 1; iteration < iterations + 1; iteration++) {
-      cur_collecting_layer = iteration;
-      std::cout << "collecting iteration " << cur_collecting_layer << std::endl;
+      std::cout << "collecting iteration " << iteration << std::endl;
 
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
         const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
-        refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i]);
+        refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i], iteration);
       }
 
       // layer pruning
@@ -135,28 +141,23 @@ namespace feature_generation {
     }
 
     /* 1. Initialise embedding before pruning, and set up memory */
-    Embedding x0(colour_hash.size(), 0);
+    Embedding x0(get_n_features(), 0);
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::vector<int> colours_tmp(n_nodes);
 
     /* 2. Compute initial colours */
-    int is_seen_colour;
     for (int node_i = 0; node_i < n_nodes; node_i++) {
-      int col = get_colour_hash({graph->nodes[node_i]});
+      int col = get_colour_hash({graph->nodes[node_i]}, 0);
       colours[node_i] = col;
-      is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-      seen_colour_statistics[is_seen_colour][0]++;
-      x0[col] += is_seen_colour;
+      add_colour_to_x(col, 0, x0);
     }
 
     /* 3. Main WL loop */
     for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, colours, colours_tmp);
+      refine(graph, colours, colours_tmp, itr);
       for (const int col : colours) {
-        is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-        seen_colour_statistics[is_seen_colour][itr]++;
-        x0[col] += is_seen_colour;
+        add_colour_to_x(col, itr, x0);
       }
     }
 

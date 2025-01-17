@@ -1,0 +1,3 @@
+- remapping is very brittle as it relies on `get_neighbour_colours`
+  - this function depends on neighbour container (colour indices, as well as sorting) which depends on `multiset_hash` flag and the WL feature generation algorithm being used
+  - `bulk_pruner` also uses this function but assumes WL feature generation only, i.e. each tuple only gives one node

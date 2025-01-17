@@ -28,11 +28,12 @@ namespace feature_generation {
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
-    std::vector<int> get_neighbour_colour_indices(const std::vector<int> &colours);
+    std::vector<std::pair<int, int>> get_neighbour_colours(const std::vector<int> &colours);
     void collect_impl(const std::vector<graph::Graph> &graphs) override;
     void refine(const std::shared_ptr<graph::Graph> &graph,
                 std::vector<int> &colours,
-                std::vector<int> &colours_tmp);
+                std::vector<int> &colours_tmp,
+                int iteration);
   };
 }  // namespace feature_generation
 

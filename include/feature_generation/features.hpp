@@ -45,7 +45,8 @@ class int_vector_hasher {
 
 namespace feature_generation {
   using Embedding = std::vector<int>;
-  using ColourHash = std::unordered_map<std::vector<int>, int, int_vector_hasher>;
+  using VecColourHash = std::vector<std::unordered_map<std::vector<int>, int, int_vector_hasher>>;
+  using StrColourHash = std::vector<std::unordered_map<std::string, int>>;
 
   class Features {
    protected:
@@ -58,7 +59,7 @@ namespace feature_generation {
     bool multiset_hash;
 
     // colouring [saved]
-    ColourHash colour_hash;
+    VecColourHash colour_hash;
     std::unordered_map<int, int> colour_to_layer;
     std::vector<std::set<int>> layer_to_colours;
 
@@ -72,7 +73,6 @@ namespace feature_generation {
     bool collected;
     bool pruned;
     bool collecting;
-    int cur_collecting_layer;
     std::shared_ptr<NeighbourContainer> neighbour_container;
 
     // runtime statistics; int is faster than long but could cause overflow
@@ -90,12 +90,16 @@ namespace feature_generation {
     std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);
 
     // get hashed colour if it exists, and constructs it if it doesn't
-    int get_colour_hash(const std::vector<int> &colour);
+    int get_colour_hash(const std::vector<int> &colour, const int iteration);
 
     // reformat colour hash based on colours to throw out
-    void init_layer_to_colours();
+    VecColourHash new_colour_hash() const;
+    std::vector<std::set<int>> new_layer_to_colours() const;
     std::map<int, int> remap_colour_hash(const std::set<int> &to_prune);
-    virtual std::vector<int> get_neighbour_colour_indices(const std::vector<int> &colours) = 0;
+
+    // TODO redesign this with neighbour container
+    virtual std::vector<std::pair<int, int>>
+    get_neighbour_colours(const std::vector<int> &colours) = 0;
     std::vector<int> remap_neighbour_colours(const std::vector<int> &colours,
                                              const std::map<int, int> &remap);
 
@@ -127,6 +131,8 @@ namespace feature_generation {
     Embedding embed_graph(const graph::Graph &graph);
     Embedding embed_state(const planning::State &state);
     virtual Embedding embed(const std::shared_ptr<graph::Graph> &graph) = 0;
+
+    void add_colour_to_x(int colour, int iteration, std::vector<int> &x);
 
     /* Pruning functions */
 
@@ -161,7 +167,7 @@ namespace feature_generation {
     std::set<int> get_iteration_colours(int iteration) const {
       return layer_to_colours.at(iteration);
     }
-    ColourHash get_colour_hash() { return colour_hash; }
+    VecColourHash get_colour_hash() { return colour_hash; }
 
     /* Util functions */
 
@@ -173,11 +179,11 @@ namespace feature_generation {
     void set_problem(const planning::Problem &problem);
 
     // conversion between vectors and strings
-    ColourHash str_to_int_colour_hash(std::unordered_map<std::string, int> str_colour_hash) const;
-    std::unordered_map<std::string, int> int_to_str_colour_hash(ColourHash int_colour_hash) const;
+    VecColourHash str_to_int_colour_hash(StrColourHash str_colour_hash) const;
+    StrColourHash int_to_str_colour_hash(VecColourHash int_colour_hash) const;
 
     // statistics functions
-    int get_n_features() const { return colour_hash.size(); }
+    int get_n_features() const;
     std::vector<long> get_seen_counts() const { return seen_colour_statistics[1]; };
     std::vector<long> get_unseen_counts() const { return seen_colour_statistics[0]; };
     int get_n_seen_graphs() const { return n_seen_graphs; }

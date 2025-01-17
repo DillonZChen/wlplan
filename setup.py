@@ -7,11 +7,14 @@ from setuptools import setup
 # Read version from wlplan/__version__.py file
 exec(open("wlplan/__version__.py").read())
 
+# Debug mode
+_DEBUG = False
+
 # Compiler flags
-COMPILER_FLAGS = [
-    "-O3",
-    # "-DDEBUGMODE",
-]
+if _DEBUG:
+    COMPILER_FLAGS = ["-O0", "-g", "-DDEBUGMODE"]
+else:
+    COMPILER_FLAGS = ["-O3"]
 
 files = [glob("src/*.cpp"), glob("src/**/*.cpp"), glob("src/**/**/*.cpp")]
 

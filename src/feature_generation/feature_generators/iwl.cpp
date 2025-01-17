@@ -29,7 +29,8 @@ namespace feature_generation {
 
   void IWLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                            std::vector<int> &colours,
-                           std::vector<int> &colours_tmp) {
+                           std::vector<int> &colours_tmp,
+                           int iteration) {
     // memory for storing string and hashed int representation of colours
     std::vector<int> new_colour;
     std::vector<int> neighbour_vector;
@@ -61,7 +62,7 @@ namespace feature_generation {
       new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
 
       // hash seen colours
-      new_colour_compressed = get_colour_hash(new_colour);
+      new_colour_compressed = get_colour_hash(new_colour, iteration);
 
     end_of_iteration:
       colours_tmp[u] = new_colour_compressed;
@@ -93,17 +94,15 @@ namespace feature_generation {
         graph->change_node_colour(node_i, INDIVIDUALISE_COLOUR);
 
         // init colours
-        cur_collecting_layer = 0;
         for (int u = 0; u < n_nodes; u++) {
-          int col = get_colour_hash({graph->nodes[u]});
+          int col = get_colour_hash({graph->nodes[u]}, 0);
           colours[u] = col;
           seen_initial_colours.insert(col);
         }
 
         // main WL loop
         for (int iteration = 1; iteration < iterations + 1; iteration++) {
-          cur_collecting_layer = iteration;
-          refine(graph, colours, colours_tmp);
+          refine(graph, colours, colours_tmp, iteration);
         }
 
         // reset node colour
@@ -119,7 +118,7 @@ namespace feature_generation {
     }
 
     /* 1. Initialise embedding */
-    Embedding x0(colour_hash.size(), 0);
+    Embedding x0(get_n_features(), 0);
 
     /* 2. Set up memory for WL updates */
     int n_nodes = graph->nodes.size();
@@ -134,22 +133,17 @@ namespace feature_generation {
       graph->change_node_colour(node_i, INDIVIDUALISE_COLOUR);
 
       /* 3. Compute initial colours */
-      int is_seen_colour;
       for (int u = 0; u < n_nodes; u++) {
-        int col = get_colour_hash({graph->nodes[u]});
+        int col = get_colour_hash({graph->nodes[u]}, 0);
         colours[u] = col;
-        is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-        seen_colour_statistics[is_seen_colour][0]++;
-        x0[col] += is_seen_colour;
+        add_colour_to_x(col, 0, x0);
       }
 
       /* 4. Main WL loop */
       for (int itr = 1; itr < iterations + 1; itr++) {
-        refine(graph, colours, colours_tmp);
+        refine(graph, colours, colours_tmp, itr);
         for (const int col : colours) {
-          is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-          seen_colour_statistics[is_seen_colour][itr]++;
-        x0[col] += is_seen_colour;
+          add_colour_to_x(col, itr, x0);
         }
       }
 

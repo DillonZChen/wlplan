@@ -73,21 +73,27 @@ namespace feature_generation {
 
     // 0. construct feature dependency graph
     int n_features = X.at(0).size();
-    std::vector<std::vector<int>> edges_fw =
-        std::vector<std::vector<int>>(n_features, std::vector<int>());
-    std::vector<std::vector<int>> edges_bw =
-        std::vector<std::vector<int>>(n_features, std::vector<int>());
-    for (const auto &[neighbours, colour] : colour_hash) {  // std::vector<int>, int
-      std::vector<int> indices = get_neighbour_colour_indices(neighbours);
-      for (const int i : indices) {
-        int ancestor = neighbours[i];
-        edges_fw.at(ancestor).push_back(colour);
-        edges_bw.at(colour).push_back(ancestor);
-#ifdef DEBUGMODE
-        std::cout << "FDG " << ancestor << " -> " << colour << std::endl;
-#endif
+    std::vector<std::set<int>> edges_fw = std::vector<std::set<int>>(n_features, std::set<int>());
+    std::vector<std::set<int>> edges_bw = std::vector<std::set<int>>(n_features, std::set<int>());
+
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      for (const auto &[neighbours, colour] : colour_hash[itr]) {  // std::vector<int>, int
+        edges_fw.at(neighbours[0]).insert(colour);
+        edges_bw.at(colour).insert(neighbours[0]);
+        for (const auto &[ancestor, _] : get_neighbour_colours(neighbours)) {
+          edges_fw.at(ancestor).insert(colour);
+          edges_bw.at(colour).insert(ancestor);
+        }
       }
     }
+
+#ifdef DEBUGMODE
+    for (int colour = 0; colour < n_features; colour++) {
+      for (const int child : edges_fw.at(colour)) {
+        std::cout << "FDG " << colour << " -> " << child << std::endl;
+      }
+    }
+#endif
 
     // 1. compute equivalent features candidates
     std::cout << "Computing equivalent feature candidates." << std::endl;
@@ -147,7 +153,8 @@ namespace feature_generation {
       }
 
       changed += mark_distinct_features(prune_candidates, feature_group, group_size);
-      std::cout << "changed: " << changed << ". candidates: " << prune_candidates.size() << std::endl;
+      std::cout << "changed: " << changed << ". candidates: " << prune_candidates.size()
+                << std::endl;
       if (changed == 0) {
         break;
       }
