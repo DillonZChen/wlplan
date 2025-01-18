@@ -1,6 +1,7 @@
 #include "../../include/feature_generation/features.hpp"
 
 #include "../../include/feature_generation/maxsat.hpp"
+#include "../../include/feature_generation/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
 
@@ -43,11 +44,18 @@ namespace feature_generation {
     graph_generator = graph::create_graph_generator(graph_representation, *domain);
     seen_colour_statistics =
         std::vector<std::vector<long>>(2, std::vector<long>(iterations + 1, 0));
-    init_neighbour_container();
+
+    // We use a factory style method here instead of a virtual function as this is called
+    // from a constructor, from which virtual functions are not allowed to be called.
+    if (std::set<std::string>({"wl", "ccwl", "iwl", "niwl"}).count(feature_name)) {
+      neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
+    } else {
+      std::cout << "error: neighbour container not yet implemented for feature_name="
+                << feature_name << std::endl;
+    }
   }
 
   std::vector<std::set<int>> Features::new_layer_to_colours() const {
-    // plus 1 because zeroth iteration is also included
     return std::vector<std::set<int>>(iterations + 1, std::set<int>());
   }
 

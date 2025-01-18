@@ -94,9 +94,6 @@ namespace feature_generation {
     // common init for initialisation and loading from file
     void initialise_variables();
 
-    // neighbour container initialisation depends on feature generator
-    virtual void init_neighbour_container() = 0;
-
     // main collection body
     virtual void collect_impl(const std::vector<graph::Graph> &graphs) = 0;
 

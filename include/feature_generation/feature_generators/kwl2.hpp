@@ -31,7 +31,6 @@ namespace feature_generation {
     Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
-    void init_neighbour_container() override;
     inline int get_initial_colour(int index,
                                   int u,
                                   int v,

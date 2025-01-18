@@ -26,10 +26,6 @@ namespace feature_generation {
 
   KWL2Features::KWL2Features(const std::string &filename) : Features(filename) {}
 
-  void KWL2Features::init_neighbour_container() {
-    std::cout << "error: KWL2Features neighbour container not implemented yet" << std::endl;
-  }
-
   int kwl2_pair_to_index_map(int n, int i, int j) {
     // map pair where 0 <= i, j < n to vec index
     return i * n + j;

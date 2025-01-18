@@ -1,6 +1,5 @@
 #include "../../../include/feature_generation/feature_generators/wl.hpp"
 
-#include "../../../include/feature_generation/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../../include/graph/graph_generator_factory.hpp"
 #include "../../../include/utils/nlohmann/json.hpp"
 
@@ -27,10 +26,6 @@ namespace feature_generation {
       : Features("wl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
-
-  void WLFeatures::init_neighbour_container() {
-    neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
-  }
 
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                           std::vector<int> &colours,
