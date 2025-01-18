@@ -28,6 +28,8 @@ namespace feature_generation {
         iterations(iterations),
         pruning(pruning),
         multiset_hash(multiset_hash) {
+    check_valid_configuration();
+
     this->domain = std::make_shared<planning::Domain>(domain);
 
     collected = false;
@@ -39,6 +41,17 @@ namespace feature_generation {
     layer_to_colours = new_layer_to_colours();
 
     initialise_variables();
+  }
+
+  void Features::check_valid_configuration() {
+    // check pruning support
+    if (pruning == PruningOptions::COLLAPSE_LAYER &&
+        !std::set<std::string>({"wl"}).count(feature_name)) {
+      std::cout << "WARNING: pruning option `" << pruning << "`"
+                << " not yet supported for feature option `" << feature_name << "`. "
+                << "Defaulting to no layer pruning." << std::endl;
+      exit(-1);
+    }
   }
 
   void Features::initialise_variables() {
@@ -53,7 +66,7 @@ namespace feature_generation {
     } else if (std::set<std::string>({"2-kwl", "2-lwl"}).count(feature_name)) {
       neighbour_container = std::make_shared<WL2NeighbourContainer>(multiset_hash);
     } else {
-      std::cout << "error: neighbour container not yet implemented for feature_name="
+      std::cout << "ERROR: neighbour container not yet implemented for feature_name="
                 << feature_name << std::endl;
     }
   }
@@ -179,26 +192,12 @@ namespace feature_generation {
         iterations + 1, std::vector<std::pair<std::vector<int>, int>>());
     std::unordered_map<int, int> new_colour_layer;
 
-    // layer 0 colours are the same
-    for (const auto &[key, val] : colour_hash[0]) {
-      new_hash_vec[0].push_back(std::make_pair(key, val));
-      new_colour_layer[val] = colour_to_layer[val];
-      remap[val] = val;
-    }
-
-    // deal with layer 1+ colours
-    for (int itr = 1; itr < iterations + 1; itr++) {
+    for (int itr = 0; itr < iterations + 1; itr++) {
       for (const auto &[key, val] : colour_hash.at(itr)) {
         if (to_prune.count(val) > 0) {
           continue;
         }
-
-        // new value is size of new hash + number of layer 0 colours
-        int new_val = 0;
-        for (size_t i = 0; i < new_hash_vec.size(); i++) {
-          new_val += new_hash_vec[i].size();
-        }
-
+        int new_val = remap.size();
         remap[val] = new_val;
         new_hash_vec[itr].push_back(std::make_pair(key, new_val));
         new_colour_layer[new_val] = colour_to_layer[val];
@@ -207,18 +206,15 @@ namespace feature_generation {
 
     //////////////////////////////////////////
 #ifdef DEBUGMODE
-    std::cout << "old_hash" << std::endl;
     for (int itr = 1; itr < iterations + 1; itr++) {
       for (const auto &[key, val] : colour_hash[itr]) {
         std::cout << "HASH_ITR " << itr << " HASH ";
         debug_hash(key, val);
       }
     }
-    std::cout << "to_prune" << std::endl;
     for (const int i : to_prune) {
       std::cout << "PRUNE " << i << std::endl;
     }
-    std::cout << "remap" << std::endl;
     for (const auto &[key, val] : remap) {
       std::cout << "REMAP " << key << " -> " << val << " LAYER: " << new_colour_layer[val]
                 << std::endl;
@@ -229,7 +225,15 @@ namespace feature_generation {
     // remap keys
     VecColourHash new_hash(iterations + 1,
                            std::unordered_map<std::vector<int>, int, int_vector_hasher>());
-    new_hash[0] = colour_hash[0];
+
+    // layer 0 keeps same keys because they are from graph init node colours
+    for (size_t i = 0; i < new_hash_vec[0].size(); i++) {
+      std::vector<int> key = new_hash_vec[0][i].first;
+      int val = new_hash_vec[0][i].second;
+      new_hash[0][key] = val;
+    }
+
+    // other layers (>=1) remap keys
     for (int itr = 1; itr < iterations + 1; itr++) {
       for (size_t i = 0; i < new_hash_vec[itr].size(); i++) {
         std::vector<int> key = new_hash_vec[itr][i].first;
@@ -243,14 +247,16 @@ namespace feature_generation {
 
     // remap hash
     colour_hash = new_hash;
-
-    // remap colours
     colour_to_layer = new_colour_layer;
     layer_to_colours = new_layer_to_colours();
     for (int itr = 0; itr < iterations + 1; itr++) {
       for (const auto &[key, val] : colour_hash[itr]) {
         if (colour_to_layer[val] != itr) {
-          std::cout << "error: colour layers not preserved during remap" << std::endl;
+          std::cout << "ERROR: colour layers not preserved during remap. " << std::endl;
+          std::cout << "old layer: " << itr << std::endl;
+          std::cout << "new layer: " << colour_to_layer[val] << std::endl;
+          debug_hash(key, val);
+          std::cout << "Exiting." << std::endl;
           exit(-1);
         }
         layer_to_colours[itr].insert(val);
@@ -295,6 +301,10 @@ namespace feature_generation {
     collecting = true;
 
     collect_impl(graphs);
+
+    // bulk pruning
+    prune_bulk(graphs);
+    layer_redundancy_check();
 
     collected = true;
     collecting = false;
@@ -343,7 +353,7 @@ namespace feature_generation {
     return embed(graph_generator->to_graph(state));
   }
 
-  void Features::add_colour_to_x(int col, int itr, std::vector<int> &x) {
+  void Features::add_colour_to_x(int col, int itr, Embedding &x) {
     bool is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
     seen_colour_statistics[is_seen_colour][itr]++;
     if (is_seen_colour) {

@@ -29,7 +29,7 @@ namespace feature_generation {
     int n_equivalence_groups = group_size.size();
     for (const auto &[group, size] : group_size) {
       if (size <= 1) {
-        std::cout << "error: equivalence groups should have size > 1" << std::endl;
+        std::cout << "ERROR: equivalence groups should have size > 1" << std::endl;
       }
     }
     std::cout << "Distinct features: " << n_distinct_features << std::endl;
@@ -188,7 +188,7 @@ namespace feature_generation {
     for (const int ancestor : prune_candidates) {
       for (const int child : edges_fw.at(ancestor)) {
         if (!prune_candidates.count(child)) {
-          std::cout << "error: child of prune candidate is not a candidate" << std::endl;
+          std::cout << "ERROR: child of prune candidate is not a candidate" << std::endl;
           exit(-1);
         }
         clauses.push_back(MaxSatClause({ancestor, child}, {true, false}, 0, true));

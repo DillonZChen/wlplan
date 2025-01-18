@@ -44,7 +44,7 @@ class int_vector_hasher {
 };
 
 namespace feature_generation {
-  using Embedding = std::vector<int>;
+  using Embedding = std::vector<double>;
   using VecColourHash = std::vector<std::unordered_map<std::vector<int>, int, int_vector_hasher>>;
   using StrColourHash = std::vector<std::unordered_map<std::string, int>>;
 
@@ -91,6 +91,9 @@ namespace feature_generation {
     std::vector<std::set<int>> new_layer_to_colours() const;
     std::map<int, int> remap_colour_hash(const std::set<int> &to_prune);
 
+    // check if configuration is valid
+    void check_valid_configuration();
+
     // common init for initialisation and loading from file
     void initialise_variables();
 
@@ -123,7 +126,7 @@ namespace feature_generation {
     Embedding embed_state(const planning::State &state);
     virtual Embedding embed(const std::shared_ptr<graph::Graph> &graph) = 0;
 
-    void add_colour_to_x(int colour, int iteration, std::vector<int> &x);
+    void add_colour_to_x(int colour, int iteration, Embedding &x);
 
     /* Pruning functions */
 

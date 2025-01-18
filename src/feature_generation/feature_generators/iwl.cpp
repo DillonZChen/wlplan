@@ -76,6 +76,7 @@ namespace feature_generation {
     std::vector<int> colours;
     std::vector<int> colours_tmp;
 
+    // init colours
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       int n_nodes = graph->nodes.size();
@@ -85,13 +86,12 @@ namespace feature_generation {
         colours = std::vector<int>(n_nodes, 0);
         colours_tmp = std::vector<int>(n_nodes, 0);
 
-        // individualise node
-        const int original_colour = graph->nodes[node_i];
-        graph->change_node_colour(node_i, INDIVIDUALISE_COLOUR);
-
-        // init colours
         for (int u = 0; u < n_nodes; u++) {
-          int col = get_colour_hash({graph->nodes[u]}, 0);
+          std::vector<int> colour_key = {graph->nodes[u]};
+          if (u == node_i) {
+            colour_key.push_back(INDIVIDUALISE_COLOUR);
+          }
+          int col = get_colour_hash(colour_key, 0);
           colours[u] = col;
         }
 
@@ -99,9 +99,6 @@ namespace feature_generation {
         for (int iteration = 1; iteration < iterations + 1; iteration++) {
           refine(graph, colours, colours_tmp, iteration);
         }
-
-        // reset node colour
-        graph->change_node_colour(node_i, original_colour);
       }
     }
   }
@@ -123,14 +120,13 @@ namespace feature_generation {
       std::vector<int> colours(n_nodes);
       std::vector<int> colours_tmp(n_nodes);
 
-      // individualise node
-      const int original_colour = graph->nodes[node_i];
-      graph->change_node_colour(node_i, INDIVIDUALISE_COLOUR);
-
       /* 3. Compute initial colours */
       for (int u = 0; u < n_nodes; u++) {
-        int col = get_colour_hash({graph->nodes[u]}, 0);
-        colours[u] = col;
+        std::vector<int> colour_key = {graph->nodes[u]};
+        if (u == node_i) {
+          colour_key.push_back(INDIVIDUALISE_COLOUR);
+        }
+        int col = get_colour_hash(colour_key, 0);
         add_colour_to_x(col, 0, x0);
       }
 
@@ -141,9 +137,6 @@ namespace feature_generation {
           add_colour_to_x(col, itr, x0);
         }
       }
-
-      // reset node colour
-      graph->change_node_colour(node_i, original_colour);
     }
 
     return x0;

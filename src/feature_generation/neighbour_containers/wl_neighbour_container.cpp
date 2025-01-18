@@ -55,7 +55,7 @@ namespace feature_generation {
     }
 
     if (colours.size() % inc != 1) {
-      std::cout << "error: key " << to_string(colours) << " has size() % " << inc
+      std::cout << "ERROR: key " << to_string(colours) << " has size() % " << inc
                 << " != 1 for multiset_hash=" << multiset_hash << std::endl;
       exit(-1);
     }

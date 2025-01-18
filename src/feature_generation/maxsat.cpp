@@ -24,20 +24,20 @@ namespace feature_generation {
                              const bool hard)
       : variables(variables), negated(negated), weight(weight), hard(hard) {
     if (hard && weight != 0) {
-      std::cout << "error: hard MaxSAT clauses should have 0 weight!" << std::endl;
+      std::cout << "ERROR: hard MaxSAT clauses should have 0 weight!" << std::endl;
       exit(-1);
     } else if (!hard && weight < 1) {
-      std::cout << "error: soft MaxSAT clauses should have weight >= 1!" << std::endl;
+      std::cout << "ERROR: soft MaxSAT clauses should have weight >= 1!" << std::endl;
       exit(-1);
     }
     if (variables.size() != negated.size()) {
-      std::cout << "error: variables and negated in MaxSatClause should have the same size!"
+      std::cout << "ERROR: variables and negated in MaxSatClause should have the same size!"
                 << std::endl;
       exit(-1);
     }
     for (size_t i = 0; i < variables.size(); i++) {
       if (variables[i] < 1) {
-        std::cout << "error: variables in MaxSatClause should be strictly positive!" << std::endl;
+        std::cout << "ERROR: variables in MaxSatClause should be strictly positive!" << std::endl;
         exit(-1);
       }
     }
@@ -138,7 +138,7 @@ namespace feature_generation {
     }
     return solution;
 #else
-    std::cout << "error: MaxSAT feature pruning is not supported in the C++ interface."
+    std::cout << "ERROR: MaxSAT feature pruning is not supported in the C++ interface."
               << std::endl;
     exit(-1);
 #endif
@@ -155,7 +155,7 @@ namespace feature_generation {
       return call_solver();
     }
 #else
-    std::cout << "error: MaxSAT feature pruning is not supported in the C++ interface."
+    std::cout << "ERROR: MaxSAT feature pruning is not supported in the C++ interface."
               << std::endl;
     exit(-1);
 #endif

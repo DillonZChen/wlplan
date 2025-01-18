@@ -105,10 +105,6 @@ namespace feature_generation {
       // layer pruning
       prune_this_iteration(iteration, graphs, graph_colours);
     }
-
-    // bulk pruning
-    prune_bulk(graphs);
-    layer_redundancy_check();
   }
 
   Embedding WLFeatures::embed(const std::shared_ptr<graph::Graph> &graph) {
