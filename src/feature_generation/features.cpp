@@ -1,6 +1,7 @@
 #include "../../include/feature_generation/features.hpp"
 
 #include "../../include/feature_generation/maxsat.hpp"
+#include "../../include/feature_generation/neighbour_containers/wl2_neighbour_container.hpp"
 #include "../../include/feature_generation/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
@@ -49,6 +50,8 @@ namespace feature_generation {
     // from a constructor, from which virtual functions are not allowed to be called.
     if (std::set<std::string>({"wl", "ccwl", "iwl", "niwl"}).count(feature_name)) {
       neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
+    } else if (std::set<std::string>({"2-kwl", "2-lwl"}).count(feature_name)) {
+      neighbour_container = std::make_shared<WL2NeighbourContainer>(multiset_hash);
     } else {
       std::cout << "error: neighbour container not yet implemented for feature_name="
                 << feature_name << std::endl;
