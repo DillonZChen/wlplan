@@ -26,11 +26,8 @@ namespace feature_generation {
 
   KWL2Features::KWL2Features(const std::string &filename) : Features(filename) {}
 
-  std::vector<std::pair<int, int>>
-  KWL2Features::get_neighbour_colours(const std::vector<int> &colours) {
-    std::cout << "not implemented yet" << std::endl;
-    exit(-1);
-    return std::vector<std::pair<int, int>>();
+  void KWL2Features::init_neighbour_container() {
+    std::cout << "error: KWL2Features neighbour container not implemented yet" << std::endl;
   }
 
   int kwl2_pair_to_index_map(int n, int i, int j) {
@@ -120,14 +117,10 @@ namespace feature_generation {
     std::vector<int> colours;
     std::vector<int> colours_tmp;
 
-    n_seen_graphs += graphs.size();
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       auto edges = graph->edges;
       int n_nodes = graph->nodes.size();
-      int n_edges = graph->get_n_edges();
-      n_seen_nodes += n_nodes;
-      n_seen_edges += n_edges;
 
       int n_pairs = get_n_kwl2_pairs(n_nodes);
 
@@ -143,7 +136,6 @@ namespace feature_generation {
           int index = kwl2_pair_to_index_map(n_nodes, u, v);
           int col = get_initial_colour(index, u, v, graph, pair_to_edge_label);
           colours[index] = col;
-          seen_initial_colours.insert(col);
         }
       }
 

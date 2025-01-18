@@ -70,23 +70,17 @@ namespace feature_generation {
     // helper variables
     std::shared_ptr<planning::Domain> domain;
     std::shared_ptr<graph::GraphGenerator> graph_generator;
-    bool collected;
-    bool pruned;
-    bool collecting;
     std::shared_ptr<NeighbourContainer> neighbour_container;
+    bool collected;
+    bool collecting;
+    bool pruned;
 
     // runtime statistics; int is faster than long but could cause overflow
     // [i][j] denotes seen count if i=1, and unseen count if i=0
     // for iteration j = 0, ..., iterations - 1
     std::vector<std::vector<long>> seen_colour_statistics;
 
-    // training statistics
-    int n_seen_graphs;
-    int n_seen_nodes;
-    int n_seen_edges;
-    std::set<int> seen_initial_colours;
-
-    // convert to ILG
+    // convert states to graphs
     std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);
 
     // get hashed colour if it exists, and constructs it if it doesn't
@@ -97,11 +91,11 @@ namespace feature_generation {
     std::vector<std::set<int>> new_layer_to_colours() const;
     std::map<int, int> remap_colour_hash(const std::set<int> &to_prune);
 
-    // TODO redesign this with neighbour container
-    virtual std::vector<std::pair<int, int>>
-    get_neighbour_colours(const std::vector<int> &colours) = 0;
-    std::vector<int> remap_neighbour_colours(const std::vector<int> &colours,
-                                             const std::map<int, int> &remap);
+    // common init for initialisation and loading from file
+    void initialise_variables();
+
+    // neighbour container initialisation depends on feature generator
+    virtual void init_neighbour_container() = 0;
 
     // main collection body
     virtual void collect_impl(const std::vector<graph::Graph> &graphs) = 0;
@@ -186,11 +180,6 @@ namespace feature_generation {
     int get_n_features() const;
     std::vector<long> get_seen_counts() const { return seen_colour_statistics[1]; };
     std::vector<long> get_unseen_counts() const { return seen_colour_statistics[0]; };
-    int get_n_seen_graphs() const { return n_seen_graphs; }
-    int get_n_seen_nodes() const { return n_seen_nodes; }
-    int get_n_seen_edges() const { return n_seen_edges; }
-    int get_n_seen_initial_colours() const { return seen_initial_colours.size(); }
-    int get_n_seen_refined_colours() const { return get_n_features(); }
     std::vector<long> get_layer_to_n_colours() const;
     void print_init_colours() const;
 

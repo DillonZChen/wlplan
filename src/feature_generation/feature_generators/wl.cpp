@@ -1,5 +1,6 @@
 #include "../../../include/feature_generation/feature_generators/wl.hpp"
 
+#include "../../../include/feature_generation/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../../include/graph/graph_generator_factory.hpp"
 #include "../../../include/utils/nlohmann/json.hpp"
 
@@ -27,22 +28,8 @@ namespace feature_generation {
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
-  std::vector<std::pair<int, int>>
-  WLFeatures::get_neighbour_colours(const std::vector<int> &colours) {
-    std::vector<std::pair<int, int>> ret;
-    if (multiset_hash) {
-      for (size_t i = 1; i < colours.size(); i += 3) {
-        int occurrences = colours[i + 2];
-        for (int j = 0; j < occurrences; j++) {
-          ret.push_back(std::make_pair(colours[i + 1], colours[i]));
-        }
-      }
-    } else {
-      for (size_t i = 1; i < colours.size(); i += 2) {
-        ret.push_back(std::make_pair(colours[i + 1], colours[i]));
-      }
-    }
-    return ret;
+  void WLFeatures::init_neighbour_container() {
+    neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
   }
 
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
@@ -97,20 +84,15 @@ namespace feature_generation {
     std::vector<std::vector<int>> graph_colours_tmp;
 
     // init colours
-    n_seen_graphs += graphs.size();
     std::cout << "collecting iteration 0" << std::endl;
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       int n_nodes = graph->nodes.size();
-      int n_edges = graph->get_n_edges();
-      n_seen_nodes += n_nodes;
-      n_seen_edges += n_edges;
 
       std::vector<int> colours(n_nodes, 0);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         int col = get_colour_hash({graph->nodes[node_i]}, 0);
         colours[node_i] = col;
-        seen_initial_colours.insert(col);
       }
       graph_colours.push_back(colours);
       graph_colours_tmp.push_back(std::vector<int>(n_nodes, 0));

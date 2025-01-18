@@ -27,22 +27,23 @@ namespace feature_generation {
         pruning(pruning),
         multiset_hash(multiset_hash) {
     this->domain = std::make_shared<planning::Domain>(domain);
-    graph_generator = graph::create_graph_generator(graph_representation, domain);
-    collected = false;
-    pruned = false;
-    collecting = false;
-    neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
-    seen_colour_statistics =
-        std::vector<std::vector<long>>(2, std::vector<long>(iterations + 1, 0));
-    store_weights = false;
 
-    n_seen_graphs = 0;
-    n_seen_nodes = 0;
-    n_seen_edges = 0;
-    seen_initial_colours = std::set<int>();
+    collected = false;
+    collecting = false;
+    pruned = false;
+    store_weights = false;
 
     colour_hash = new_colour_hash();
     layer_to_colours = new_layer_to_colours();
+
+    initialise_variables();
+  }
+
+  void Features::initialise_variables() {
+    graph_generator = graph::create_graph_generator(graph_representation, *domain);
+    seen_colour_statistics =
+        std::vector<std::vector<long>>(2, std::vector<long>(iterations + 1, 0));
+    init_neighbour_container();
   }
 
   std::vector<std::set<int>> Features::new_layer_to_colours() const {
@@ -126,12 +127,12 @@ namespace feature_generation {
       store_weights = false;
     }
 
-    // initialise other variables
-    graph_generator = graph::create_graph_generator(graph_representation, *domain);
-    collected = true;  // assume generator already collected colours
+    // initialise other variables (assume collection already done)
+    collected = true;
     collecting = false;
-    neighbour_container = std::make_shared<NeighbourContainer>(multiset_hash);
-    seen_colour_statistics = std::vector<std::vector<long>>(2, std::vector<long>(iterations, 0));
+    pruned = true;
+
+    initialise_variables();
   }
 
   void Features::set_problem(const planning::Problem &problem) {
@@ -158,29 +159,6 @@ namespace feature_generation {
       layer_to_colours[iteration].insert(hash);
     }
     return colour_hash[iteration][colour];
-  }
-
-  std::vector<int> Features::remap_neighbour_colours(const std::vector<int> &colours,
-                                                     const std::map<int, int> &remap) {
-    // make new_colours a copy of colours
-    neighbour_container->clear();
-
-#ifdef DEBUGMODE
-    std::cout << "REMAPPING ";
-    debug_vec(colours);
-#endif
-
-    // colours should always show up in remap by their construction
-    for (const auto &[node_colour, edge_label] : get_neighbour_colours(colours)) {
-      neighbour_container->insert(remap.at(node_colour), edge_label);
-    }
-
-    std::vector<int> new_colours = {remap.at(colours[0])};
-    for (const int i : neighbour_container->to_vector()) {
-      new_colours.push_back(i);
-    }
-
-    return new_colours;
   }
 
   std::map<int, int> Features::remap_colour_hash(const std::set<int> &to_prune) {
@@ -218,10 +196,6 @@ namespace feature_generation {
 
     //////////////////////////////////////////
 #ifdef DEBUGMODE
-    std::cout << "initial_colours" << std::endl;
-    for (const int i : seen_initial_colours) {
-      std::cout << "INITIAL " << i << std::endl;
-    }
     std::cout << "old_hash" << std::endl;
     for (int itr = 1; itr < iterations + 1; itr++) {
       for (const auto &[key, val] : colour_hash[itr]) {
@@ -250,7 +224,7 @@ namespace feature_generation {
         std::vector<int> key = new_hash_vec[itr][i].first;
         int val = new_hash_vec[itr][i].second;
         if (new_colour_layer[val] > 0) {
-          key = remap_neighbour_colours(key, remap);
+          key = neighbour_container->remap(key, remap);
         }
         new_hash[itr][key] = val;
       }
@@ -311,11 +285,9 @@ namespace feature_generation {
 
     collect_impl(graphs);
 
-    if (pruning == PruningOptions::NONE) {
-      pruned = true;
-    }
     collected = true;
     collecting = false;
+    pruned = true;
 
     // check features have been collected
     if (get_n_features() == 0) {

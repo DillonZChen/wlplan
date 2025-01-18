@@ -76,13 +76,9 @@ namespace feature_generation {
     std::vector<int> colours;
     std::vector<int> colours_tmp;
 
-    n_seen_graphs += graphs.size();
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       int n_nodes = graph->nodes.size();
-      int n_edges = graph->get_n_edges();
-      n_seen_nodes += n_nodes;
-      n_seen_edges += n_edges;
 
       // individualisation for each node
       for (int node_i = 0; node_i < n_nodes; node_i++) {
@@ -97,7 +93,6 @@ namespace feature_generation {
         for (int u = 0; u < n_nodes; u++) {
           int col = get_colour_hash({graph->nodes[u]}, 0);
           colours[u] = col;
-          seen_initial_colours.insert(col);
         }
 
         // main WL loop

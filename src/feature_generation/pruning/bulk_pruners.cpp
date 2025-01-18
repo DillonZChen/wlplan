@@ -77,10 +77,9 @@ namespace feature_generation {
     std::vector<std::set<int>> edges_bw = std::vector<std::set<int>>(n_features, std::set<int>());
 
     for (int itr = 1; itr < iterations + 1; itr++) {
-      for (const auto &[neighbours, colour] : colour_hash[itr]) {  // std::vector<int>, int
-        edges_fw.at(neighbours[0]).insert(colour);
-        edges_bw.at(colour).insert(neighbours[0]);
-        for (const auto &[ancestor, _] : get_neighbour_colours(neighbours)) {
+      // neighbours: std::vector<int>; colour: int
+      for (const auto &[neighbours, colour] : colour_hash[itr]) {
+        for (const int ancestor : neighbour_container->get_neighbour_colours(neighbours)) {
           edges_fw.at(ancestor).insert(colour);
           edges_bw.at(colour).insert(ancestor);
         }
