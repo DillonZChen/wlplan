@@ -62,6 +62,8 @@ namespace graph {
     int get_n_nodes() const;
     int get_n_edges() const;
 
+    std::set<int> get_nodes_set() const;
+
     std::string to_string() const;
 
     // set to false when directly modifying the base graph to prevent excessive memory usage

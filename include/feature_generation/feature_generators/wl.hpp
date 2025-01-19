@@ -30,6 +30,7 @@ namespace feature_generation {
    protected:
     void collect_impl(const std::vector<graph::Graph> &graphs) override;
     void refine(const std::shared_ptr<graph::Graph> &graph,
+                std::set<int> &nodes,
                 std::vector<int> &colours,
                 std::vector<int> &colours_tmp,
                 int iteration);

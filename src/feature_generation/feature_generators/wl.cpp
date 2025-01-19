@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <queue>
+#include <set>
 #include <sstream>
 
 using json = nlohmann::json;
@@ -28,6 +29,7 @@ namespace feature_generation {
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
+                          std::set<int> &nodes,
                           std::vector<int> &colours,
                           std::vector<int> &colours_tmp,
                           int iteration) {
@@ -36,11 +38,14 @@ namespace feature_generation {
     std::vector<int> neighbour_vector;
     int new_colour_compressed;
 
-    for (size_t u = 0; u < graph->nodes.size(); u++) {
+    std::vector<int> nodes_to_discard;
+
+    for (const int u : nodes) {
       // skip unseen colours
       int current_colour = colours[u];
       if (current_colour == UNSEEN_COLOUR) {
         new_colour_compressed = UNSEEN_COLOUR;
+        nodes_to_discard.push_back(u);
         goto end_of_iteration;
       }
       neighbour_container->clear();
@@ -50,6 +55,7 @@ namespace feature_generation {
         int neighbour_colour = colours[edge.second];
         if (neighbour_colour == UNSEEN_COLOUR) {
           new_colour_compressed = UNSEEN_COLOUR;
+          nodes_to_discard.push_back(u);
           goto end_of_iteration;
         }
 
@@ -70,6 +76,11 @@ namespace feature_generation {
       colours_tmp[u] = new_colour_compressed;
     }
 
+    // discard nodes
+    for (const int u : nodes_to_discard) {
+      nodes.erase(u);
+    }
+
     colours.swap(colours_tmp);
   }
 
@@ -79,7 +90,7 @@ namespace feature_generation {
     std::vector<std::vector<int>> graph_colours_tmp;
 
     // init colours
-    std::cout << "collecting iteration 0" << std::endl;
+    log_iteration(0);
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
       int n_nodes = graph->nodes.size();
@@ -94,16 +105,16 @@ namespace feature_generation {
     }
 
     // main WL loop
-    for (int iteration = 1; iteration < iterations + 1; iteration++) {
-      std::cout << "collecting iteration " << iteration << std::endl;
-
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      log_iteration(itr);
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
         const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
-        refine(graph, graph_colours[graph_i], graph_colours_tmp[graph_i], iteration);
+        std::set<int> nodes = graph->get_nodes_set();
+        refine(graph, nodes, graph_colours[graph_i], graph_colours_tmp[graph_i], itr);
       }
 
       // layer pruning
-      prune_this_iteration(iteration, graphs, graph_colours);
+      prune_this_iteration(itr, graphs, graph_colours);
     }
   }
 
@@ -118,9 +129,10 @@ namespace feature_generation {
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::vector<int> colours_tmp(n_nodes);
+    std::set<int> nodes = graph->get_nodes_set();
 
     /* 2. Compute initial colours */
-    for (int node_i = 0; node_i < n_nodes; node_i++) {
+    for (const int node_i : nodes) {
       int col = get_colour_hash({graph->nodes[node_i]}, 0);
       colours[node_i] = col;
       add_colour_to_x(col, 0, x0);
@@ -128,7 +140,7 @@ namespace feature_generation {
 
     /* 3. Main WL loop */
     for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, colours, colours_tmp, itr);
+      refine(graph, nodes, colours, colours_tmp, itr);
       for (const int col : colours) {
         add_colour_to_x(col, itr, x0);
       }

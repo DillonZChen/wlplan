@@ -28,16 +28,15 @@ namespace feature_generation {
     // We use a sum function for the pool operator as described in the ccWL algorithm.
     // To change this to max, we just need to replace += occurrences with std::max.
 
-    /* 1. Initialise embedding before pruning */
+    /* 1. Initialise embedding before pruning, and set up memory */
     int categorical_size = get_n_features();
     Embedding x0(categorical_size * 2, 0);
-
-    /* 2. Set up memory for WL updates */
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::vector<int> colours_tmp(n_nodes);
+    std::set<int> nodes = graph->get_nodes_set();
 
-    /* 3. Compute initial colours */
+    /* 2. Compute initial colours */
     int col;
     int is_seen_colour;
     for (int node_i = 0; node_i < n_nodes; node_i++) {
@@ -51,9 +50,9 @@ namespace feature_generation {
       }
     }
 
-    /* 4. Main WL loop */
+    /* 3. Main WL loop */
     for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, colours, colours_tmp, itr);
+      refine(graph, nodes, colours, colours_tmp, itr);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         col = colours[node_i];
         is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction

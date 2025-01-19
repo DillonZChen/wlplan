@@ -46,8 +46,16 @@ namespace feature_generation {
 
   void Features::check_valid_configuration() {
     // check pruning support
-    if (pruning == PruningOptions::COLLAPSE_LAYER &&
-        !std::set<std::string>({"wl"}).count(feature_name)) {
+    if (std::set<std::string>({
+                                  PruningOptions::COLLAPSE_LAYER,
+                                  PruningOptions::COLLAPSE_LAYER_X,
+                              })
+            .count(pruning) &&
+        !std::set<std::string>({
+                                   "wl",
+                                   "2-lwl",
+                               })
+             .count(feature_name)) {
       std::cout << "WARNING: pruning option `" << pruning << "`"
                 << " not yet supported for feature option `" << feature_name << "`. "
                 << "Defaulting to no layer pruning." << std::endl;
@@ -305,6 +313,8 @@ namespace feature_generation {
 
     collect_impl(graphs);
 
+    std::cout << "[complete]" << std::endl;
+
     // bulk pruning
     prune_bulk(graphs);
     layer_redundancy_check();
@@ -315,7 +325,7 @@ namespace feature_generation {
 
     // check features have been collected
     if (get_n_features() == 0) {
-      throw std::runtime_error("No features have been collected.");
+      std::cout << "WARNING: no features have been collected" << std::endl;
     }
   }
 
@@ -362,6 +372,32 @@ namespace feature_generation {
     if (is_seen_colour) {
       x[col]++;
     }
+  }
+
+  /* Pruning functions (see pruning/ source files for specific implementations) */
+
+  std::map<int, int> Features::get_equivalence_groups(const std::vector<Embedding> &X) {
+    std::map<int, int> feature_group;
+    int n_features = X[0].size();
+    std::unordered_map<std::vector<int>, int, int_vector_hasher> canonical_group;
+    for (int colour = 0; colour < n_features; colour++) {
+      std::vector<int> feature;
+      for (size_t j = 0; j < X.size(); j++) {
+        feature.push_back(X[j][colour]);
+      }
+
+      int group;
+      if (canonical_group.count(feature) == 0) {  // new feature
+        group = canonical_group.size();
+        canonical_group[feature] = group;
+      } else {  // seen this feature before
+        group = canonical_group.at(feature);
+      }
+
+      feature_group[colour] = group;
+    }
+
+    return feature_group;
   }
 
   /* Prediction functions */

@@ -113,6 +113,14 @@ namespace graph {
     return ret;
   }
 
+  std::set<int> Graph::get_nodes_set() const {
+    std::set<int> ret;
+    for (size_t u = 0; u < nodes.size(); u++) {
+      ret.insert(u);
+    }
+    return ret;
+  }
+
   std::string Graph::to_string() const {
     std::string ret = "<Graph with " + std::to_string(nodes.size()) + " nodes and " +
                       std::to_string(get_n_edges()) + " edges>";

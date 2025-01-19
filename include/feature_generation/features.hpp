@@ -130,6 +130,8 @@ namespace feature_generation {
 
     /* Pruning functions */
 
+    // output maps equivalent features to the same group
+    std::map<int, int> get_equivalence_groups(const std::vector<Embedding> &X);
     void prune_this_iteration(int iteration,
                               const std::vector<graph::Graph> &graphs,
                               std::vector<std::vector<int>> &cur_colours);
@@ -164,6 +166,10 @@ namespace feature_generation {
     VecColourHash get_colour_hash() { return colour_hash; }
 
     /* Util functions */
+
+    void log_iteration(int iteration) const {
+      std::cout << "[Iteration " << iteration << "]\nCollecting." << std::endl;
+    };
 
     // get string representation of WL colours agnostic to the number of collected colours
     std::string get_string_representation(const Embedding &embedding);

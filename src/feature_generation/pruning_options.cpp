@@ -13,7 +13,4 @@ namespace feature_generation {
         COLLAPSE_LAYER_X,
     };
   }
-  const bool PruningOptions::is_layer_pruning(const std::string &pruning_option) {
-    return pruning_option == COLLAPSE_LAYER || pruning_option == COLLAPSE_LAYER_X;
-  }
 }  // namespace feature_generation

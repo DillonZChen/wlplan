@@ -131,19 +131,17 @@ namespace feature_generation {
 
   void LWL2Features::collect_impl(const std::vector<graph::Graph> &graphs) {
     // intermediate graph colours during WL and extra memory for WL updates
-    std::vector<int> colours;
-    std::vector<int> colours_tmp;
+    std::vector<std::vector<int>> graph_colours;
+    std::vector<std::vector<int>> graph_colours_tmp;
 
+    // init colours
+    log_iteration(0);
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
       const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
-      auto edges = graph->edges;
       int n_nodes = graph->nodes.size();
-
       int n_pairs = get_n_lwl2_pairs(n_nodes);
 
-      // intermediate colours
-      colours = std::vector<int>(n_pairs, 0);
-      colours_tmp = std::vector<int>(n_pairs, 0);
+      std::vector<int> colours(n_pairs, 0);
 
       std::vector<int> pair_to_edge_label = get_lwl2_pair_to_edge_label(graph);
       std::vector<std::set<int>> pair_to_neighbours = get_lwl2_pair_to_neighbours(graph);
@@ -157,10 +155,21 @@ namespace feature_generation {
         }
       }
 
-      // main WL loop
-      for (int iteration = 1; iteration < iterations + 1; iteration++) {
-        refine(graph, pair_to_neighbours, colours, colours_tmp, iteration);
+      graph_colours.push_back(colours);
+      graph_colours_tmp.push_back(std::vector<int>(n_pairs, 0));
+    }
+
+    // main WL loop
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      log_iteration(itr);
+      for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
+        const auto graph = std::make_shared<graph::Graph>(graphs[graph_i]);
+        std::vector<std::set<int>> pair_to_neighbours = get_lwl2_pair_to_neighbours(graph);
+        refine(graph, pair_to_neighbours, graph_colours[graph_i], graph_colours_tmp[graph_i], itr);
       }
+
+      // layer pruning
+      prune_this_iteration(itr, graphs, graph_colours);
     }
   }
 

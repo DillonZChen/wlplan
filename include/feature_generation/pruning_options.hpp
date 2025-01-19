@@ -13,7 +13,6 @@ namespace feature_generation {
     static const std::string COLLAPSE_LAYER_X;
 
     static const std::vector<std::string> get_all();
-    static const bool is_layer_pruning(const std::string &pruning_option);
   };
 }  // namespace feature_generation
 

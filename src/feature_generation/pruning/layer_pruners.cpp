@@ -15,6 +15,7 @@ namespace feature_generation {
     }
 
     if (to_prune.size() != 0) {
+      std::cout << "Pruning " << to_prune.size() << " features." << std::endl;
       std::map<int, int> remap = remap_colour_hash(to_prune);
       for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
         for (size_t node_i = 0; node_i < cur_colours[graph_i].size(); node_i++) {
@@ -69,7 +70,39 @@ namespace feature_generation {
   std::set<int> Features::prune_collapse_layer_x(int iteration,
                                                  const std::vector<graph::Graph> &graphs,
                                                  std::vector<std::vector<int>> &cur_colours) {
+    int original_iterations = iterations;
+    iterations = iteration;
+    collecting = false;
+    collected = true;
+
     std::set<int> features_to_prune;
+    std::vector<Embedding> X = embed_graphs(graphs);
+    std::map<int, int> feature_group = get_equivalence_groups(X);
+    std::map<int, std::vector<int>> group_to_features;
+    for (const auto &[colour, group] : feature_group) {
+      if (group_to_features.count(group) == 0) {
+        group_to_features[group] = std::vector<int>();
+      }
+      group_to_features[group].push_back(colour);
+    }
+    for (const auto &[_, features] : group_to_features) {
+      if (features.size() == 1) {
+        continue;
+      }
+      bool canonicalised = false;
+      for (int feature : features) {
+        if (!canonicalised) {
+          canonicalised = true;
+          continue;
+        } else if (colour_to_layer[feature] == iteration) {
+          features_to_prune.insert(feature);
+        }
+      }
+    }
+
+    collecting = true;
+    collected = false;
+    iterations = original_iterations;
 
     return features_to_prune;
   }

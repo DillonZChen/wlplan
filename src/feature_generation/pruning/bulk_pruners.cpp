@@ -74,28 +74,13 @@ namespace feature_generation {
 
     // 1. compute equivalent features candidates
     std::cout << "Computing equivalent feature candidates." << std::endl;
-    std::unordered_map<std::vector<int>, int, int_vector_hasher> canonical_group;
+    std::map<int, int> feature_group = get_equivalence_groups(X);
     std::map<int, int> group_size;
-    std::map<int, int> feature_group;
-    for (int colour = 0; colour < n_features; colour++) {
-      std::vector<int> feature;
-      for (size_t j = 0; j < X.size(); j++) {
-        feature.push_back(X[j][colour]);
-      }
-
-      int group;
-      if (canonical_group.count(feature) == 0) {  // new feature
-        group = canonical_group.size();
-        canonical_group[feature] = group;
-      } else {  // seen this feature before
-        group = canonical_group.at(feature);
-      }
-
+    for (const auto &[_, group] : feature_group) {
       if (group_size.count(group) == 0) {
         group_size[group] = 0;
       }
-      group_size.at(group)++;
-      feature_group[colour] = group;
+      group_size[group]++;
     }
 
     mark_distinct_features(feature_group, group_size);
@@ -125,8 +110,7 @@ namespace feature_generation {
       }
 
       changed += mark_distinct_features(feature_group, group_size);
-      std::cout << "changed: " << changed << ". candidates: " << feature_group.size()
-                << std::endl;
+      std::cout << "changed: " << changed << ". candidates: " << feature_group.size() << std::endl;
       if (changed == 0) {
         break;
       }
