@@ -1,5 +1,5 @@
-#ifndef FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_WL2_NEIGHBOUR_CONTAINER_HPP
-#define FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_WL2_NEIGHBOUR_CONTAINER_HPP
+#ifndef FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_KWL2_NEIGHBOUR_CONTAINER_HPP
+#define FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_KWL2_NEIGHBOUR_CONTAINER_HPP
 
 #include "wl_neighbour_container.hpp"
 
@@ -8,7 +8,7 @@
 #include <utility>
 
 namespace feature_generation {
-  class WL2NeighbourContainer : public WLNeighbourContainer {
+  class KWL2NeighbourContainer : public WLNeighbourContainer {
     // We use the same keys as relational WL: (multi)set of <node_colour, edge_label> pairs
     // Since these are int-int pairs, we can reuse the same WL code for the 2-WL variants:
     // - for lwl2, these are {col0, col1}, but in implementation we sort so col0 <= col1
@@ -16,10 +16,11 @@ namespace feature_generation {
     // The only difference in this class is getting neighbour colours for pruning
 
    public:
-    WL2NeighbourContainer(bool multiset_hash);
+    KWL2NeighbourContainer(bool multiset_hash);
 
     std::vector<int> get_neighbour_colours(const std::vector<int> &colours) const override;
+    std::vector<int> remap(const std::vector<int> &input, const std::map<int, int> &remap) override;
   };
 }  // namespace feature_generation
 
-#endif  // FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_WL2_NEIGHBOUR_CONTAINER_HPP
+#endif  // FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_KWL2_NEIGHBOUR_CONTAINER_HPP

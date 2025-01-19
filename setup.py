@@ -8,7 +8,7 @@ from setuptools import setup
 exec(open("wlplan/__version__.py").read())
 
 # Debug mode
-_DEBUG = True
+_DEBUG = False
 
 # Compiler flags
 if _DEBUG:

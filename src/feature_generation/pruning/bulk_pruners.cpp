@@ -178,18 +178,15 @@ namespace feature_generation {
     std::map<int, int> solution = max_sat_problem.solve();
 
     std::set<int> to_prune;
-    int n_to_keep = 0;
 
     for (const auto &[colour, value] : solution) {
       if (value == 1) {
         to_prune.insert(colour);
-      } else {
-        n_to_keep++;
       }
     }
 
     std::cout << "Equivalent features minimised!" << std::endl;
-    std::cout << "  Features kept: " << n_to_keep << std::endl;
+    std::cout << "  Features kept: " << n_features - to_prune.size() << std::endl;
     std::cout << "  Features pruned: " << to_prune.size() << std::endl;
 
     return to_prune;

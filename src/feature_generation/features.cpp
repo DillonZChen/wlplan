@@ -1,7 +1,8 @@
 #include "../../include/feature_generation/features.hpp"
 
 #include "../../include/feature_generation/maxsat.hpp"
-#include "../../include/feature_generation/neighbour_containers/wl2_neighbour_container.hpp"
+#include "../../include/feature_generation/neighbour_containers/kwl2_neighbour_container.hpp"
+#include "../../include/feature_generation/neighbour_containers/lwl2_neighbour_container.hpp"
 #include "../../include/feature_generation/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../include/graph/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
@@ -63,8 +64,10 @@ namespace feature_generation {
     // from a constructor, from which virtual functions are not allowed to be called.
     if (std::set<std::string>({"wl", "ccwl", "iwl", "niwl"}).count(feature_name)) {
       neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
-    } else if (std::set<std::string>({"2-kwl", "2-lwl"}).count(feature_name)) {
-      neighbour_container = std::make_shared<WL2NeighbourContainer>(multiset_hash);
+    } else if (feature_name == "2-kwl") {
+      neighbour_container = std::make_shared<KWL2NeighbourContainer>(multiset_hash);
+    } else if (feature_name == "2-lwl") {
+      neighbour_container = std::make_shared<LWL2NeighbourContainer>(multiset_hash);
     } else {
       std::cout << "ERROR: neighbour container not yet implemented for feature_name="
                 << feature_name << std::endl;
@@ -320,7 +323,7 @@ namespace feature_generation {
     for (int itr = 1; itr < iterations + 1; itr++) {
       if (layer_to_colours[itr].size() == 0) {
         int lower_iterations = itr - 1;
-        std::cout << "pruning reduced iterations from " << iterations << " to " << lower_iterations
+        std::cout << "Pruning reduced iterations from " << iterations << " to " << lower_iterations
                   << std::endl;
         iterations = lower_iterations;
         break;
