@@ -12,7 +12,7 @@ _DEBUG = True
 
 # Compiler flags
 if _DEBUG:
-    COMPILER_FLAGS = ["-O0", "-g", "-DDEBUGMODE"]
+    COMPILER_FLAGS = ["-O2", "-g", "-DDEBUGMODE"]
 else:
     COMPILER_FLAGS = ["-O3"]
 

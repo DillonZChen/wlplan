@@ -1,31 +1,24 @@
 #ifndef FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_WL2_NEIGHBOUR_CONTAINER_HPP
 #define FEATURE_GENERATION_NEIGHBOUR_CONTAINERS_WL2_NEIGHBOUR_CONTAINER_HPP
 
-#include "../neighbour_container.hpp"
+#include "wl_neighbour_container.hpp"
 
 #include <map>
 #include <set>
 #include <utility>
 
 namespace feature_generation {
-  class WL2NeighbourContainer : public NeighbourContainer {
+  class WL2NeighbourContainer : public WLNeighbourContainer {
+    // We use the same keys as relational WL: (multi)set of <node_colour, edge_label> pairs
+    // Since these are int-int pairs, we can reuse the same WL code for the 2-WL variants:
+    // - for lwl2, these are {col0, col1}, but in implementation we sort so col0 <= col1
+    // - for kwl2, there are <col0, col1> i.e. ordered tuples
+    // The only difference in this class is getting neighbour colours for pruning
+
    public:
     WL2NeighbourContainer(bool multiset_hash);
 
-    void clear() override;
-    void insert(const int colour);
-    void insert(const int colour0, const int colour1) override;
-    std::vector<int> to_vector() const override;
-
-    // pairs are <node_colour, n_occurrence>
-    std::vector<std::pair<int, int>> deconstruct(const std::vector<int> &colours) const;
     std::vector<int> get_neighbour_colours(const std::vector<int> &colours) const override;
-
-    std::vector<int> remap(const std::vector<int> &input, const std::map<int, int> &remap) override;
-
-   private:
-    std::set<int> neighbours_set;
-    std::map<int, int> neighbours_mset;
   };
 }  // namespace feature_generation
 

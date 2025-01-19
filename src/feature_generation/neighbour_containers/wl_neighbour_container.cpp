@@ -29,15 +29,15 @@ namespace feature_generation {
   std::vector<int> WLNeighbourContainer::to_vector() const {
     std::vector<int> vec;
     if (multiset_hash) {
-      for (const auto &kv : neighbours_mset) {
-        vec.push_back(kv.first.first);   // edge label
-        vec.push_back(kv.first.second);  // node colour
-        vec.push_back(kv.second);        // count in multiset
+      for (const auto &[label_colour, count] : neighbours_mset) {
+        vec.push_back(label_colour.first);   // edge label
+        vec.push_back(label_colour.second);  // node colour
+        vec.push_back(count);                // count in multiset
       }
     } else {
-      for (const auto &kv : neighbours_set) {
-        vec.push_back(kv.first);   // edge label
-        vec.push_back(kv.second);  // node colour
+      for (const auto &[label, colour] : neighbours_set) {
+        vec.push_back(label);   // edge label
+        vec.push_back(colour);  // node colour
       }
     }
     return vec;
