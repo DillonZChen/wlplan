@@ -53,8 +53,7 @@ namespace graph {
 
   void Graph::add_edge(const std::string &u_name, const int r, const std::string &v_name) {
     if (!store_node_names) {
-      std::cout << "Error: cannot add edge by name as store_node_names is false" << std::endl;
-      exit(-1);
+      throw std::runtime_error("Error: cannot add edge by name as store_node_names is false");
     }
     add_edge(node_to_index_.at(u_name), r, node_to_index_.at(v_name));
   }
@@ -63,9 +62,7 @@ namespace graph {
 
   void Graph::change_node_colour(const std::string &node_name, const int new_colour) {
     if (!store_node_names) {
-      std::cout << "Error: cannot change node colour by name as store_node_names is false"
-                << std::endl;
-      exit(-1);
+      throw std::runtime_error("Error: cannot change node colour by name as store_node_names is false");
     }
     change_node_colour(node_to_index_.at(node_name), new_colour);
   }
@@ -74,9 +71,7 @@ namespace graph {
 
   void Graph::change_node_value(const std::string &node_name, const double new_value) {
     if (!store_node_names) {
-      std::cout << "Error: cannot change node value by name as store_node_names is false"
-                << std::endl;
-      exit(-1);
+      throw std::runtime_error("Error: cannot change node value by name as store_node_names is false");
     }
     change_node_value(node_to_index_.at(node_name), new_value);
   }
@@ -93,8 +88,7 @@ namespace graph {
 
   std::string Graph::get_node_name(const int u) const {
     if (!store_node_names) {
-      std::cout << "Error: cannot get node name as store_node_names is false" << std::endl;
-      exit(-1);
+      throw std::runtime_error("Error: cannot get node name as store_node_names is false");
     }
     return index_to_node_.at(u);
   }

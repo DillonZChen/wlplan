@@ -28,7 +28,7 @@ namespace feature_generation {
 
     KWL2Features(const std::string &filename);
 
-    Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
+    Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
     inline int get_initial_colour(int index,
@@ -39,7 +39,6 @@ namespace feature_generation {
     void collect_impl(const std::vector<graph::Graph> &graphs) override;
     void refine(const std::shared_ptr<graph::Graph> &graph,
                 std::vector<int> &colours,
-                std::vector<int> &colours_tmp,
                 int iteration);
   };
 }  // namespace feature_generation

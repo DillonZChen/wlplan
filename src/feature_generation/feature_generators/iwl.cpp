@@ -29,12 +29,13 @@ namespace feature_generation {
 
   void IWLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                            std::vector<int> &colours,
-                           std::vector<int> &colours_tmp,
                            int iteration) {
     // memory for storing string and hashed int representation of colours
     std::vector<int> new_colour;
     std::vector<int> neighbour_vector;
     int new_colour_compressed;
+
+    std::vector<int> new_colours(colours.size(), UNSEEN_COLOUR);
 
     for (size_t u = 0; u < graph->nodes.size(); u++) {
       // skip unseen colours
@@ -65,16 +66,15 @@ namespace feature_generation {
       new_colour_compressed = get_colour_hash(new_colour, iteration);
 
     end_of_iteration:
-      colours_tmp[u] = new_colour_compressed;
+      new_colours[u] = new_colour_compressed;
     }
 
-    colours.swap(colours_tmp);
+    colours = new_colours;
   }
 
   void IWLFeatures::collect_impl(const std::vector<graph::Graph> &graphs) {
-    // intermediate graph colours during WL and extra memory for WL updates
+    // intermediate graph colours during WL
     std::vector<int> colours;
-    std::vector<int> colours_tmp;
 
     // init colours
     for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
@@ -84,7 +84,6 @@ namespace feature_generation {
       // individualisation for each node
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         colours = std::vector<int>(n_nodes, 0);
-        colours_tmp = std::vector<int>(n_nodes, 0);
 
         for (int u = 0; u < n_nodes; u++) {
           std::vector<int> colour_key = {graph->nodes[u]};
@@ -97,30 +96,22 @@ namespace feature_generation {
 
         // main WL loop
         for (int iteration = 1; iteration < iterations + 1; iteration++) {
-          refine(graph, colours, colours_tmp, iteration);
+          refine(graph, colours, iteration);
         }
       }
     }
   }
 
-  Embedding IWLFeatures::embed(const std::shared_ptr<graph::Graph> &graph) {
-    collecting = false;
-    if (!collected) {
-      throw std::runtime_error("IWLFeatures::collect() must be called before embedding");
-    }
-
+  Embedding IWLFeatures::embed_impl(const std::shared_ptr<graph::Graph> &graph) {
     /* 1. Initialise embedding */
     Embedding x0(get_n_features(), 0);
-
-    /* 2. Set up memory for WL updates */
     int n_nodes = graph->nodes.size();
 
     /* Individualisation */
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       std::vector<int> colours(n_nodes);
-      std::vector<int> colours_tmp(n_nodes);
 
-      /* 3. Compute initial colours */
+      /* 2. Compute initial colours */
       for (int u = 0; u < n_nodes; u++) {
         std::vector<int> colour_key = {graph->nodes[u]};
         if (u == node_i) {
@@ -130,9 +121,9 @@ namespace feature_generation {
         add_colour_to_x(col, 0, x0);
       }
 
-      /* 4. Main WL loop */
+      /* 3. Main WL loop */
       for (int itr = 1; itr < iterations + 1; itr++) {
-        refine(graph, colours, colours_tmp, itr);
+        refine(graph, colours, itr);
         for (const int col : colours) {
           add_colour_to_x(col, itr, x0);
         }

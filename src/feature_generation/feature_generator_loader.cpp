@@ -28,8 +28,7 @@ std::shared_ptr<feature_generation::Features> load_feature_generator(const std::
   } else if (feature_name == "niwl") {
     feature_generator = std::make_shared<feature_generation::NIWLFeatures>(save_file);
   } else {
-    std::cout << "Feature name " << feature_name << " not recognised. Exiting." << std::endl;
-    exit(-1);
+    throw std::runtime_error("Feature name " + feature_name + " not recognised.");
   }
   std::cout << "Feature generator loaded!" << std::endl;
   return feature_generator;

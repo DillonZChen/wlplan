@@ -18,12 +18,7 @@ namespace feature_generation {
 
   CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
-  Embedding CCWLFeatures::embed(const std::shared_ptr<graph::Graph> &graph) {
-    collecting = false;
-    if (!collected) {
-      throw std::runtime_error("CCWLFeatures::collect() must be called before embedding");
-    }
-
+  Embedding CCWLFeatures::embed_impl(const std::shared_ptr<graph::Graph> &graph) {
     // New additions to the WL algorithm are indicated with the [NUMERIC] comments.
     // We use a sum function for the pool operator as described in the ccWL algorithm.
     // To change this to max, we just need to replace += occurrences with std::max.
@@ -33,7 +28,6 @@ namespace feature_generation {
     Embedding x0(categorical_size * 2, 0);
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
-    std::vector<int> colours_tmp(n_nodes);
     std::set<int> nodes = graph->get_nodes_set();
 
     /* 2. Compute initial colours */
@@ -52,7 +46,7 @@ namespace feature_generation {
 
     /* 3. Main WL loop */
     for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, nodes, colours, colours_tmp, itr);
+      refine(graph, nodes, colours, itr);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
         col = colours[node_i];
         is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction

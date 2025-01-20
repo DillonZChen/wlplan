@@ -21,7 +21,7 @@ namespace feature_generation {
 
     LWL2Features(const std::string &filename);
 
-    Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
+    Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:
     inline int get_initial_colour(int index,
@@ -33,7 +33,6 @@ namespace feature_generation {
     void refine(const std::shared_ptr<graph::Graph> &graph,
                 std::vector<std::set<int>> &pair_to_neighbours,
                 std::vector<int> &colours,
-                std::vector<int> &colours_tmp,
                 int iteration);
   };
 }  // namespace feature_generation

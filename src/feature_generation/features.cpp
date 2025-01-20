@@ -56,10 +56,8 @@ namespace feature_generation {
                                    "2-lwl",
                                })
              .count(feature_name)) {
-      std::cout << "WARNING: pruning option `" << pruning << "`"
-                << " not yet supported for feature option `" << feature_name << "`. "
-                << "Defaulting to no layer pruning." << std::endl;
-      exit(-1);
+      throw std::runtime_error("Pruning option `" + pruning +
+                               "` not supported for feature option `" + feature_name + "`.");
     }
   }
 
@@ -77,8 +75,8 @@ namespace feature_generation {
     } else if (feature_name == "2-lwl") {
       neighbour_container = std::make_shared<LWL2NeighbourContainer>(multiset_hash);
     } else {
-      std::cout << "ERROR: neighbour container not yet implemented for feature_name="
-                << feature_name << std::endl;
+      throw std::runtime_error("Neighbour container not yet implemented for feature_name=" +
+                               feature_name);
     }
   }
 
@@ -262,6 +260,7 @@ namespace feature_generation {
     layer_to_colours = new_layer_to_colours();
     for (int itr = 0; itr < iterations + 1; itr++) {
       for (const auto &[key, val] : colour_hash[itr]) {
+#ifdef DEBUGMODE
         if (colour_to_layer[val] != itr) {
           std::cout << "ERROR: colour layers not preserved during remap. " << std::endl;
           std::cout << "old layer: " << itr << std::endl;
@@ -270,6 +269,7 @@ namespace feature_generation {
           std::cout << "Exiting." << std::endl;
           exit(-1);
         }
+#endif
         layer_to_colours[itr].insert(val);
       }
     }
@@ -296,8 +296,7 @@ namespace feature_generation {
 
   void Features::collect_from_dataset(const data::Dataset dataset) {
     if (graph_generator == nullptr) {
-      std::string err_msg = "No graph generator is set. Use graph input instead of dataset.";
-      throw std::runtime_error(err_msg);
+      throw std::runtime_error("No graph generator is set. Use graph input instead of dataset.");
     }
     std::vector<graph::Graph> graphs = convert_to_graphs(dataset);
     collect(graphs);
@@ -305,8 +304,7 @@ namespace feature_generation {
 
   void Features::collect(const std::vector<graph::Graph> &graphs) {
     if (pruning != PruningOptions::NONE && pruned) {
-      std::cout << "collect with pruning can only be called at most once" << std::endl;
-      exit(-1);
+      throw std::runtime_error("Collect with pruning can only be called at most once");
     }
 
     collecting = true;
@@ -359,11 +357,20 @@ namespace feature_generation {
   }
 
   Embedding Features::embed_graph(const graph::Graph &graph) {
-    return embed(std::make_shared<graph::Graph>(graph));
+    return embed_impl(std::make_shared<graph::Graph>(graph));
   }
 
   Embedding Features::embed_state(const planning::State &state) {
-    return embed(graph_generator->to_graph(state));
+    return embed_impl(graph_generator->to_graph(state));
+  }
+
+  Embedding Features::embed(const std::shared_ptr<graph::Graph> &graph) {
+    collecting = false;
+    if (!collected) {
+      throw std::runtime_error("collect() must be called before embedding");
+    }
+
+    return embed_impl(graph);
   }
 
   void Features::add_colour_to_x(int col, int itr, Embedding &x) {
@@ -407,7 +414,7 @@ namespace feature_generation {
       throw std::runtime_error("Weights have not been set for prediction.");
     }
 
-    Embedding x = embed(graph);
+    Embedding x = embed_impl(graph);
     double h = std::inner_product(x.begin(), x.end(), weights.begin(), 0.0);
     return h;
   }

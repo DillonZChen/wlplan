@@ -18,7 +18,7 @@ namespace feature_generation {
 
     NIWLFeatures(const std::string &filename);
 
-    Embedding embed(const std::shared_ptr<graph::Graph> &graph) override;
+    Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) override;
   };
 }  // namespace feature_generation
 

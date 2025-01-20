@@ -23,8 +23,8 @@ namespace feature_generation {
 
   NIWLFeatures::NIWLFeatures(const std::string &filename) : IWLFeatures(filename) {}
 
-  Embedding NIWLFeatures::embed(const std::shared_ptr<graph::Graph> &graph) {
-    Embedding iwl_embedding = IWLFeatures::embed(graph);
+  Embedding NIWLFeatures::embed_impl(const std::shared_ptr<graph::Graph> &graph) {
+    Embedding iwl_embedding = IWLFeatures::embed_impl(graph);
     double n = (double)graph->get_n_nodes();
     for (size_t i = 0; i < iwl_embedding.size(); i++) {
       iwl_embedding[i] = iwl_embedding[i] / n;

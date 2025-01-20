@@ -141,10 +141,12 @@ namespace feature_generation {
     // (~variable | child_1) & ... & (~variable | child_n)
     for (const auto &[ancestor, _] : feature_group) {
       for (const int child : edges_fw.at(ancestor)) {
+#ifdef DEBUGMODE
         if (!feature_group.count(child)) {
           std::cout << "ERROR: child of prune candidate is not a candidate" << std::endl;
           exit(-1);
         }
+#endif
         clauses.push_back(MaxSatClause({ancestor, child}, {true, false}, 0, true));
       }
     }

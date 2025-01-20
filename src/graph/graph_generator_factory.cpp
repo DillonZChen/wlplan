@@ -15,8 +15,7 @@ namespace graph {
     } else if (name == "custom") {
       graph_generator = NULL;
     } else {
-      std::cout << "Error: Unknown graph generator " << name << std::endl;
-      exit(-1);
+      throw std::runtime_error("Unknown graph generator " + name);
     }
     std::cout << "Finished constructing graph generator." << std::endl;
     return graph_generator;

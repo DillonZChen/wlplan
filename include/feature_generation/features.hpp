@@ -97,8 +97,9 @@ namespace feature_generation {
     // common init for initialisation and loading from file
     void initialise_variables();
 
-    // main collection body
+    // main virtual functions
     virtual void collect_impl(const std::vector<graph::Graph> &graphs) = 0;
+    virtual Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) = 0;
 
    public:
     Features(const std::string feature_name,
@@ -124,7 +125,8 @@ namespace feature_generation {
     std::vector<Embedding> embed_graphs(const std::vector<graph::Graph> &graphs);
     Embedding embed_graph(const graph::Graph &graph);
     Embedding embed_state(const planning::State &state);
-    virtual Embedding embed(const std::shared_ptr<graph::Graph> &graph) = 0;
+    Embedding embed(const std::shared_ptr<graph::Graph> &graph);
+
 
     void add_colour_to_x(int colour, int iteration, Embedding &x);
 
