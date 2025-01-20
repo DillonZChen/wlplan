@@ -457,6 +457,8 @@ py::class_<feature_generation::Features>(feature_generation_m, "_Features")
         "dataset"_a)
   .def("collect", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::collect),
         "graphs"_a)
+  .def("convert_to_graphs", &feature_generation::Features::convert_to_graphs, 
+        "dataset"_a)
   .def("set_problem", &feature_generation::Features::set_problem,
         "problem"_a)
   .def("get_string_representation", py::overload_cast<const feature_generation::Embedding &>(&feature_generation::Features::get_string_representation),
@@ -467,6 +469,8 @@ py::class_<feature_generation::Features>(feature_generation_m, "_Features")
         "dataset"_a)
   .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::embed_graphs),
         "graphs"_a)
+  .def("embed", py::overload_cast<const graph::Graph &>(&feature_generation::Features::embed_graph),
+        "graph"_a)
   .def("embed", py::overload_cast<const planning::State &>(&feature_generation::Features::embed_state),
         "state"_a)
   .def("get_n_features", &feature_generation::Features::get_n_features)

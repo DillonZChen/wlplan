@@ -80,9 +80,6 @@ namespace feature_generation {
     // for iteration j = 0, ..., iterations - 1
     std::vector<std::vector<long>> seen_colour_statistics;
 
-    // convert states to graphs
-    std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);
-
     // get hashed colour if it exists, and constructs it if it doesn't
     int get_colour_hash(const std::vector<int> &colour, const int iteration);
 
@@ -114,6 +111,9 @@ namespace feature_generation {
     virtual ~Features() = default;
 
     /* Feature generation functions */
+
+    // convert states to graphs
+    std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);
 
     // collect training colours
     void collect_from_dataset(const data::Dataset dataset);
