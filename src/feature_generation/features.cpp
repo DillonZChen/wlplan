@@ -319,7 +319,6 @@ namespace feature_generation {
 
     collected = true;
     collecting = false;
-    pruned = true;
 
     // check features have been collected
     if (get_n_features() == 0) {

@@ -7,12 +7,14 @@ namespace feature_generation {
 
   void Features::prune_bulk(const std::vector<graph::Graph> &graphs) {
     std::set<int> to_prune;
+    pruned = true;
     if (pruning == PruningOptions::COLLAPSE_ALL) {
       collected = true;
       std::vector<Embedding> X = embed_graphs(graphs);
       to_prune = prune_maxsat(X);
     } else {
       to_prune = std::set<int>();
+      pruned = false;
     }
 
     if (to_prune.size() != 0) {

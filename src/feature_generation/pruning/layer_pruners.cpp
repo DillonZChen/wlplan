@@ -6,12 +6,14 @@ namespace feature_generation {
                                       const std::vector<graph::Graph> &graphs,
                                       std::vector<std::vector<int>> &cur_colours) {
     std::set<int> to_prune;
+    pruned = true;
     if (pruning == PruningOptions::COLLAPSE_LAYER) {
       to_prune = prune_collapse_layer(iteration, cur_colours);
     } else if (pruning == PruningOptions::COLLAPSE_LAYER_X) {
       to_prune = prune_collapse_layer_x(iteration, graphs, cur_colours);
     } else {
       to_prune = std::set<int>();
+      pruned = false;
     }
 
     if (to_prune.size() != 0) {
