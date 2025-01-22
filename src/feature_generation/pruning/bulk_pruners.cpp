@@ -17,7 +17,7 @@ namespace feature_generation {
     } else if (pruning == PruningOptions::COLLAPSE_ALL_X) {
       collected = true;
       std::vector<Embedding> X = embed_graphs(graphs);
-      to_prune = prune_maxsat_x(X);
+      to_prune = prune_maxsat_x(X, iterations);
     } else {
       to_prune = std::set<int>();
       pruned = false;
@@ -166,7 +166,7 @@ namespace feature_generation {
     return to_prune;
   }
 
-  std::set<int> Features::prune_maxsat_x(std::vector<Embedding> X) {
+  std::set<int> Features::prune_maxsat_x(std::vector<Embedding> X, const int maxsat_iterations) {
     // Same as prune_maxsat but no marking distinct features via dependency graph, and just
     // letting maxsat deal with this
     std::cout << "Minimising equivalent features..." << std::endl;
@@ -176,7 +176,7 @@ namespace feature_generation {
     std::vector<std::set<int>> edges_fw = std::vector<std::set<int>>(n_features, std::set<int>());
     std::vector<std::set<int>> edges_bw = std::vector<std::set<int>>(n_features, std::set<int>());
 
-    for (int itr = 1; itr < iterations + 1; itr++) {
+    for (int itr = 1; itr < maxsat_iterations + 1; itr++) {
       // neighbours: std::vector<int>; colour: int
       for (const auto &[neighbours, colour] : colour_hash[itr]) {
         for (const int ancestor : neighbour_container->get_neighbour_colours(neighbours)) {

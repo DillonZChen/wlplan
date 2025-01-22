@@ -12,6 +12,7 @@ namespace feature_generation {
     static const std::string COLLAPSE_ALL_X;
     static const std::string COLLAPSE_LAYER;
     static const std::string COLLAPSE_LAYER_X;
+    static const std::string COLLAPSE_LAYER_Y;
 
     static const std::vector<std::string> get_all();
   };

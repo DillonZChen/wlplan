@@ -6,6 +6,7 @@ namespace feature_generation {
   const std::string PruningOptions::COLLAPSE_ALL_X = "collapse-all-x";
   const std::string PruningOptions::COLLAPSE_LAYER = "collapse-layer";
   const std::string PruningOptions::COLLAPSE_LAYER_X = "collapse-layer-x";
+  const std::string PruningOptions::COLLAPSE_LAYER_Y = "collapse-layer-y";
   const std::vector<std::string> PruningOptions::get_all() {
     return {
         NONE,
@@ -13,6 +14,7 @@ namespace feature_generation {
         COLLAPSE_ALL_X,
         COLLAPSE_LAYER,
         COLLAPSE_LAYER_X,
+        COLLAPSE_LAYER_Y,
     };
   }
 }  // namespace feature_generation

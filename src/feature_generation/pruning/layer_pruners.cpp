@@ -11,6 +11,8 @@ namespace feature_generation {
       to_prune = prune_collapse_layer(iteration, cur_colours);
     } else if (pruning == PruningOptions::COLLAPSE_LAYER_X) {
       to_prune = prune_collapse_layer_x(iteration, graphs, cur_colours);
+    } else if (pruning == PruningOptions::COLLAPSE_LAYER_Y) {
+      to_prune = prune_collapse_layer_y(iteration, graphs, cur_colours);
     } else {
       to_prune = std::set<int>();
       pruned = false;
@@ -107,5 +109,23 @@ namespace feature_generation {
     iterations = original_iterations;
 
     return features_to_prune;
+  }
+
+  std::set<int> Features::prune_collapse_layer_y(int iteration,
+                                                 const std::vector<graph::Graph> &graphs,
+                                                 std::vector<std::vector<int>> &cur_colours) {
+    int original_iterations = iterations;
+    iterations = iteration;
+    collecting = false;
+    collected = true;
+
+    std::vector<Embedding> X = embed_graphs(graphs);
+    std::set<int> to_prune = prune_maxsat_x(X, iterations);
+
+    collecting = true;
+    collected = false;
+    iterations = original_iterations;
+
+    return to_prune;
   }
 }  // namespace feature_generation
