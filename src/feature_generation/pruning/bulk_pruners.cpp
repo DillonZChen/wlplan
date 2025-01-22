@@ -1,6 +1,8 @@
 #include "../../../include/feature_generation/features.hpp"
 #include "../../../include/feature_generation/maxsat.hpp"
 
+#include <queue>
+
 const int KEEP = -1;
 
 namespace feature_generation {
@@ -20,32 +22,6 @@ namespace feature_generation {
     if (to_prune.size() != 0) {
       remap_colour_hash(to_prune);
     }
-  }
-
-  inline int mark_distinct_features(std::map<int, int> &feature_group,
-                                    std::map<int, int> &group_size) {
-    int changed = 0;
-    std::set<int> distinct_groups;
-    std::set<int> distinct_features;
-
-    // mark groups with size <= 1 and their corresponding feature as distinct
-    for (const auto &[colour, group] : feature_group) {
-      if (group >= 0 && group_size.at(group) <= 1) {  // feature became distinct for keeping
-        changed++;
-        distinct_features.insert(colour);
-        distinct_groups.insert(group);
-      }
-    }
-
-    // kept features should be erased
-    for (const int colour : distinct_features) {
-      feature_group.erase(colour);
-    }
-    for (const int group : distinct_groups) {
-      group_size.erase(group);
-    }
-
-    return changed;
   }
 
   std::set<int> Features::prune_maxsat(std::vector<Embedding> X) {
@@ -74,61 +50,63 @@ namespace feature_generation {
     }
 #endif
 
-    // 1. compute equivalent features candidates
-    std::cout << "Computing equivalent feature candidates." << std::endl;
+    // 1. compute equivalence groups
+    std::cout << "Computing equivalence groups." << std::endl;
     std::map<int, int> feature_group = get_equivalence_groups(X);
-    std::map<int, int> group_size;
-    for (const auto &[_, group] : feature_group) {
-      if (group_size.count(group) == 0) {
-        group_size[group] = 0;
+    std::map<int, std::set<int>> group_to_features;
+    for (const auto &[feature, group] : feature_group) {
+      if (group_to_features.count(group) == 0) {
+        group_to_features[group] = std::set<int>();
       }
-      group_size[group]++;
+      group_to_features[group].insert(feature);
     }
 
-    mark_distinct_features(feature_group, group_size);
+    std::cout << "  Current prune candidates: " << feature_group.size() << std::endl;
 
     // 2. mark features that should not be thrown out from highest iteration down
-    std::cout << "Pruning features via dependency graph." << std::endl;
-    int dp_iterations = 0;
-    while (true) {
-      std::cout << "DP iteration=" << dp_iterations << ". ";
-      dp_iterations++;
-      int changed = 0;
-      for (int itr = iterations; itr >= 0; itr--) {
-        for (const int colour : layer_to_colours[itr]) {
-          if (feature_group.count(colour)) {
-            continue;
-          }
-          for (const int ancestor_colour : edges_bw.at(colour)) {
-            // mark prune candidates as distinct, so skip non-candidates
-            if (!feature_group.count(ancestor_colour)) {
-              continue;
-            }
-            int ancestor_group = feature_group.at(ancestor_colour);
-            group_size.at(ancestor_group)--;
-            changed++;
-          }
+    std::cout << "Marking distinct features via dependency graph." << std::endl;
+    std::queue<int> q;
+    for (int colour = 0; colour < n_features; colour++) {
+      // mark all distinct features by putting in to queue
+      if (group_to_features.at(feature_group.at(colour)).size() == 1) {
+        q.push(colour);
+      }
+    }
+
+    while (!q.empty()) {
+      int colour = q.front();
+      q.pop();
+
+      // already marked as distinct so skip
+      if (feature_group.count(colour) == 0) {
+        continue;
+      }
+
+      // mark as distinct
+      int group = feature_group.at(colour);
+      group_to_features[group].erase(colour);
+      feature_group.erase(colour);
+
+      // add ancestors to queue
+      for (const int ancestor_colour : edges_bw.at(colour)) {
+        if (feature_group.count(ancestor_colour)) {
+          q.push(ancestor_colour);
         }
       }
 
-      changed += mark_distinct_features(feature_group, group_size);
-      std::cout << "changed: " << changed << ". candidates: " << feature_group.size() << std::endl;
-      if (changed == 0) {
-        break;
+      // check group distinct and add to queue if so
+      if (group_to_features[group].size() <= 1) {
+        for (const int feature : group_to_features[group]) {
+          q.push(feature);
+        }
+        group_to_features.erase(group);
       }
     }
+
+    std::cout << "  Current prune candidates: " << feature_group.size() << std::endl;
 
     // 3. maxsat
     std::cout << "Encoding MaxSAT." << std::endl;
-
-    // get groups
-    std::map<int, std::vector<int>> group_to_features;
-    for (const auto &[colour, group] : feature_group) {
-      if (group_to_features.count(group) == 0) {
-        group_to_features[group] = std::vector<int>();
-      }
-      group_to_features[group].push_back(colour);
-    }
 
     std::vector<MaxSatClause> clauses;
 
@@ -155,8 +133,9 @@ namespace feature_generation {
 
     // keep one feature from each equivalence group
     for (const auto &[group, features] : group_to_features) {
+      std::vector<int> features_v(features.begin(), features.end());
       std::vector<bool> negated(features.size(), true);
-      clauses.push_back(MaxSatClause(features, negated, 0, true));
+      clauses.push_back(MaxSatClause(features_v, negated, 0, true));
     }
 
     // solve
