@@ -9,6 +9,7 @@ namespace feature_generation {
    public:
     static const std::string NONE;
     static const std::string COLLAPSE_ALL;
+    static const std::string COLLAPSE_ALL_X;
     static const std::string COLLAPSE_LAYER;
     static const std::string COLLAPSE_LAYER_X;
 

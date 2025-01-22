@@ -144,6 +144,7 @@ namespace feature_generation {
                                          const std::vector<graph::Graph> &graphs,
                                          std::vector<std::vector<int>> &cur_colours);
     std::set<int> prune_maxsat(std::vector<Embedding> X);
+    std::set<int> prune_maxsat_x(std::vector<Embedding> X);
 
     /* Prediction functions */
 
