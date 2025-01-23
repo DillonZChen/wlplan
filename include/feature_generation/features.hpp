@@ -141,11 +141,11 @@ namespace feature_generation {
 
     std::set<int> prune_collapse_layer(int iteration, std::vector<std::vector<int>> &cur_colours);
     std::set<int> prune_collapse_layer_x(int iteration,
-                                         const std::vector<graph::Graph> &graphs,
-                                         std::vector<std::vector<int>> &cur_colours);
+                                         const std::vector<graph::Graph> &graphs);
     std::set<int> prune_collapse_layer_y(int iteration,
-                                         const std::vector<graph::Graph> &graphs,
-                                         std::vector<std::vector<int>> &cur_colours);
+                                         const std::vector<graph::Graph> &graphs);
+    std::set<int> prune_collapse_layer_f(int iteration,
+                                         const std::vector<graph::Graph> &graphs);
     std::set<int> prune_maxsat(std::vector<Embedding> X);
     std::set<int> prune_maxsat_x(std::vector<Embedding> X, const int maxsat_iterations);
 

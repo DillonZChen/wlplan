@@ -10,9 +10,15 @@ namespace feature_generation {
     if (pruning == PruningOptions::COLLAPSE_LAYER) {
       to_prune = prune_collapse_layer(iteration, cur_colours);
     } else if (pruning == PruningOptions::COLLAPSE_LAYER_X) {
-      to_prune = prune_collapse_layer_x(iteration, graphs, cur_colours);
+      to_prune = prune_collapse_layer_x(iteration, graphs);
     } else if (pruning == PruningOptions::COLLAPSE_LAYER_Y) {
-      to_prune = prune_collapse_layer_y(iteration, graphs, cur_colours);
+      to_prune = prune_collapse_layer_y(iteration, graphs);
+    } else if (pruning == PruningOptions::COLLAPSE_LAYER_F) {
+      to_prune = prune_collapse_layer_f(iteration, graphs);
+    } else if (pruning == PruningOptions::COLLAPSE_LAYER_YF) {
+      to_prune = prune_collapse_layer_y(iteration, graphs);
+      std::set<int> to_prune_f = prune_collapse_layer_f(iteration, graphs);
+      to_prune.insert(to_prune_f.begin(), to_prune_f.end());
     } else {
       to_prune = std::set<int>();
       pruned = false;
@@ -72,8 +78,7 @@ namespace feature_generation {
   }
 
   std::set<int> Features::prune_collapse_layer_x(int iteration,
-                                                 const std::vector<graph::Graph> &graphs,
-                                                 std::vector<std::vector<int>> &cur_colours) {
+                                                 const std::vector<graph::Graph> &graphs) {
     int original_iterations = iterations;
     iterations = iteration;
     collecting = false;
@@ -112,8 +117,7 @@ namespace feature_generation {
   }
 
   std::set<int> Features::prune_collapse_layer_y(int iteration,
-                                                 const std::vector<graph::Graph> &graphs,
-                                                 std::vector<std::vector<int>> &cur_colours) {
+                                                 const std::vector<graph::Graph> &graphs) {
     int original_iterations = iterations;
     iterations = iteration;
     collecting = false;
@@ -121,6 +125,35 @@ namespace feature_generation {
 
     std::vector<Embedding> X = embed_graphs(graphs);
     std::set<int> to_prune = prune_maxsat_x(X, iterations);
+
+    collecting = true;
+    collected = false;
+    iterations = original_iterations;
+
+    return to_prune;
+  }
+
+  std::set<int> Features::prune_collapse_layer_f(int iteration,
+                                                 const std::vector<graph::Graph> &graphs) {
+    int original_iterations = iterations;
+    iterations = iteration;
+    collecting = false;
+    collected = true;
+
+    std::set<int> to_prune;
+    std::vector<Embedding> X = embed_graphs(graphs);
+    int N = (int)X.size();
+    int D = (int)X.at(0).size();
+    int one_percent = N / 100;
+    for (int i = 0; i < D; i++) {
+      int count = 0;
+      for (int j = 0; j < N; j++) {
+        count += X.at(j).at(i);
+      }
+      if (count <= one_percent) {
+        to_prune.insert(i);
+      }
+    }
 
     collecting = true;
     collected = false;
