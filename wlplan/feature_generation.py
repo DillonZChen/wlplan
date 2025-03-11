@@ -1,8 +1,15 @@
 import os
 from typing import Optional
 
-from _wlplan.feature_generation import (PruningOptions, _CCWLFeatures, _IWLFeatures, _KWL2Features,
-                                        _LWL2Features, _NIWLFeatures, _WLFeatures)
+from _wlplan.feature_generation import (
+    PruningOptions,
+    _CCWLFeatures,
+    _IWLFeatures,
+    _KWL2Features,
+    _LWL2Features,
+    _NIWLFeatures,
+    _WLFeatures
+)
 from _wlplan.planning import Domain
 
 __all__ = [
