@@ -6,14 +6,13 @@ from heapq import heappop, heappush
 
 import numpy as np
 import pymimir  # pip install pymdzcf==0.1.0
-from goose.wlplan.wlplan.feature_generation import load_feature_generator
 from ipc23lt import get_dataset, get_domain_benchmark_dir, get_mimir_problem, get_predicates
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct
 from util import print_mat
 
 import wlplan
-from wlplan.feature_generation import get_feature_generator
+from wlplan.feature_generation import get_feature_generator, load_feature_generator
 from wlplan.planning import State, parse_problem
 
 LOGGER = logging.getLogger(__name__)
