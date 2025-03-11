@@ -17,6 +17,7 @@ def test_profile(domain_name):
     domain = parse_domain(domain_pddl)
     LOGGER.info(domain)
 
+
 @pytest.mark.parametrize("domain_name", sorted(NEURIPS24_DOMAINS))
 def test_profile(domain_name):
     domain_pddl = get_neurips24_domain_pddl(domain_name)

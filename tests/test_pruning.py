@@ -4,7 +4,7 @@ from itertools import product
 import pytest
 from colours import DOMAINS, colours_test
 
-from wlplan.feature_generation import PruningOptions, WLFeatures
+from wlplan.feature_generation import PruningOptions
 
 LOGGER = logging.getLogger(__name__)
 
@@ -13,4 +13,4 @@ LOGGER = logging.getLogger(__name__)
 def test_domain(domain_name, pruning):
     if pruning == PruningOptions.NONE:
         pytest.skip()
-    colours_test(domain_name, 4, WLFeatures, pruning)
+    colours_test(domain_name, 4, "wl", pruning)

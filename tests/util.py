@@ -2,6 +2,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 def print_mat(mat: list[list], rjust: bool = True):
     if not mat:
         LOGGER.warning("Empty matrix")

@@ -6,9 +6,22 @@ import pddl.logic
 import pddl.logic.functions
 from pddl.core import Domain as PDDLDomain
 
-from _wlplan.planning import (Atom, ComparatorType, ConstantExpression, Domain, Fluent,
-                              FluentExpression, FormulaExpression, Function, NumericCondition,
-                              NumericExpression, OperatorType, Predicate, Problem, State)
+from _wlplan.planning import (
+    Atom,
+    ComparatorType,
+    ConstantExpression,
+    Domain,
+    Fluent,
+    FluentExpression,
+    FormulaExpression,
+    Function,
+    NumericCondition,
+    NumericExpression,
+    OperatorType,
+    Predicate,
+    Problem,
+    State,
+)
 
 __all__ = ["parse_domain", "parse_problem"]
 

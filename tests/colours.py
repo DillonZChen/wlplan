@@ -2,8 +2,9 @@ import logging
 
 import numpy as np
 from ipc23lt import get_dataset
-
 from util import print_mat
+
+from wlplan.feature_generation import get_feature_generator
 
 ## https://dillonzchen.github.io/publications/chen-trevizan-thiebaux-icaps2024.pdf
 FD_COLOURS = {
@@ -22,9 +23,9 @@ FD_COLOURS = {
 DOMAINS = sorted(FD_COLOURS.keys())
 
 
-def colours_test(domain_name: str, iterations: int, Class, pruning: str = None):
+def colours_test(domain_name: str, iterations: int, feature_algorithm: str, pruning: str = None):
     logging.info(f"L={iterations}")
-    
+
     n_features = {}
 
     configs = {
@@ -39,7 +40,8 @@ def colours_test(domain_name: str, iterations: int, Class, pruning: str = None):
         multiset_hash = config["multiset_hash"]
         logging.info(f"{keep_statics=}, {multiset_hash=}")
         domain, dataset, _ = get_dataset(domain_name, keep_statics=keep_statics)
-        feature_generator = Class(
+        feature_generator = get_feature_generator(
+            feature_algorithm=feature_algorithm,
             domain=domain,
             graph_representation="ilg",
             iterations=iterations,
