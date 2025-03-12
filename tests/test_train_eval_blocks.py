@@ -9,10 +9,10 @@ import pymimir  # pip install pymdzcf==0.1.0
 from ipc23lt import get_dataset, get_domain_benchmark_dir, get_mimir_problem, get_predicates
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct
+from util import print_mat
 
 import wlplan
-from util import print_mat
-from wlplan.feature_generation import WLFeatures
+from wlplan.feature_generation import get_feature_generator, load_feature_generator
 from wlplan.planning import State, parse_problem
 
 LOGGER = logging.getLogger(__name__)
@@ -30,12 +30,13 @@ class Node(object):
 
 
 def test_train_eval_blocks():
-    """ Not optimised at all as the GBFS queue is implemented in Python """
+    """Not optimised at all as the GBFS queue is implemented in Python"""
 
     ### Train
     ## collect features
     wlplan_domain, dataset, y = get_dataset("blocksworld", keep_statics=False)
-    feature_generator = WLFeatures(
+    feature_generator = get_feature_generator(
+        feature_algorithm="wl",
         domain=wlplan_domain,
         graph_representation="ilg",
         iterations=4,
@@ -69,7 +70,7 @@ def test_train_eval_blocks():
 
     ## load
     LOGGER.info(f"Loading feature generator...")
-    feature_generator = WLFeatures.load(save_file)
+    feature_generator = load_feature_generator(save_file)
     w_loaded = np.array(feature_generator.get_weights())
     logging.info(type(w_loaded))
 
@@ -161,6 +162,7 @@ def test_train_eval_blocks():
         if expansions >= EXPANSION_LIMIT:
             LOGGER.info(f"Expansions limit reached")
             assert False
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

@@ -11,7 +11,7 @@ def test_notebook_exec():
 
     notebook = f"{path_to_dir}/../docs/examples/blocksworld.ipynb"
     run_path = f"{path_to_dir}/../docs/examples"
-    
+
     with open(notebook) as f:
         nb = nbformat.read(f, as_version=4)
         ep = ExecutePreprocessor(timeout=600, kernel_name="python3")

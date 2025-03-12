@@ -4,7 +4,7 @@ from itertools import product
 import numpy as np
 
 from wlplan.data import Dataset, ProblemStates
-from wlplan.feature_generation import PruningOptions, WLFeatures
+from wlplan.feature_generation import PruningOptions, get_feature_generator
 from wlplan.planning import Atom, Domain, Predicate, Problem, State
 
 ## domain
@@ -52,18 +52,20 @@ problem1 = Problem(domain, objects, positive_goals, negative_goals)
 # a
 # b d f
 # c e g
-state11 = State([
-    Atom(clear, ["a"]),
-    Atom(on, ["a", "b"]),
-    Atom(on, ["b", "c"]),
-    Atom(on_table, ["c"]),
-    Atom(clear, ["d"]),
-    Atom(on, ["d", "e"]),
-    Atom(on_table, ["e"]),
-    Atom(clear, ["f"]),
-    Atom(on, ["f", "g"]),
-    Atom(on_table, ["g"]),
-])
+state11 = State(
+    [
+        Atom(clear, ["a"]),
+        Atom(on, ["a", "b"]),
+        Atom(on, ["b", "c"]),
+        Atom(on_table, ["c"]),
+        Atom(clear, ["d"]),
+        Atom(on, ["d", "e"]),
+        Atom(on_table, ["e"]),
+        Atom(clear, ["f"]),
+        Atom(on, ["f", "g"]),
+        Atom(on_table, ["g"]),
+    ]
+)
 
 ## problem 1
 print("problem 1")
@@ -85,24 +87,28 @@ print(f"{negative_goals=}")
 problem2 = Problem(domain, objects, positive_goals, negative_goals)
 
 # a b c
-state21 = State([
-    Atom(clear, ["a"]),
-    Atom(on_table, ["a"]),
-    Atom(clear, ["b"]),
-    Atom(on_table, ["b"]),
-    Atom(clear, ["c"]),
-    Atom(on_table, ["c"]),
-])
+state21 = State(
+    [
+        Atom(clear, ["a"]),
+        Atom(on_table, ["a"]),
+        Atom(clear, ["b"]),
+        Atom(on_table, ["b"]),
+        Atom(clear, ["c"]),
+        Atom(on_table, ["c"]),
+    ]
+)
 
 # a
 # b
 # c
-state22 = State([
-    Atom(clear, ["a"]),
-    Atom(on, ["a", "b"]),
-    Atom(on, ["b", "c"]),
-    Atom(on_table, ["c"]),
-])
+state22 = State(
+    [
+        Atom(clear, ["a"]),
+        Atom(on, ["a", "b"]),
+        Atom(on, ["b", "c"]),
+        Atom(on_table, ["c"]),
+    ]
+)
 
 ## dataset
 data = [
@@ -138,8 +144,9 @@ def test_pruning():
     for pruning in PruningOptions.get_all():
         print("=" * 80)
         print(f"pruning={pruning}")
-        feature_generator = WLFeatures(
-            domain,
+        feature_generator = get_feature_generator(
+            feature_algorithm="wl",
+            domain=domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
             pruning=pruning,
@@ -172,8 +179,9 @@ def test_repeated_dataset():
         print("=" * 80)
         print(pruning)
         column_sizes = set()
-        feature_generator = WLFeatures(
-            domain,
+        feature_generator = get_feature_generator(
+            feature_algorithm="wl",
+            domain=domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
             pruning=pruning,
@@ -181,8 +189,9 @@ def test_repeated_dataset():
         )
         feature_generator.collect(dataset)
 
-        feature_generator_repeated = WLFeatures(
-            domain,
+        feature_generator_repeated = get_feature_generator(
+            feature_algorithm="wl",
+            domain=domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
             pruning=pruning,
@@ -200,14 +209,16 @@ def test_repeated_dataset():
 
         assert len(column_sizes) == 1
 
+
 def test_multiset():
     feature_generators = {}
     Xs = {}
     for pruning in PruningOptions.get_all():
         print("=" * 80)
         print(f"pruning={pruning}")
-        feature_generator = WLFeatures(
-            domain,
+        feature_generator = get_feature_generator(
+            feature_algorithm="wl",
+            domain=domain,
             graph_representation="ilg",
             iterations=ITERATIONS,
             pruning=pruning,

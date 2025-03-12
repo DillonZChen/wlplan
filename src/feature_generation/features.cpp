@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <thread>
 
 using json = nlohmann::json;
@@ -516,6 +517,20 @@ namespace feature_generation {
     return ret;
   }
 
+  bool create_directory_recursive(std::string const &dirName, std::error_code &err) {
+    // https://stackoverflow.com/a/71658518
+    err.clear();
+    if (!std::filesystem::create_directories(dirName, err)) {
+      if (std::filesystem::exists(dirName)) {
+        // The folder already exists:
+        err.clear();
+        return true;
+      }
+      return false;
+    }
+    return true;
+  }
+
   void Features::save(const std::string &filename) {
     // let Python handle file exceptions
     json j;
@@ -533,7 +548,19 @@ namespace feature_generation {
 
     j["weights"] = weights;
 
+    // Create directory if it doesn't exist
+    if (filename.find_last_of("/") != std::string::npos) {
+      std::error_code err;
+      std::string directory_name = filename.substr(0, filename.find_last_of("/"));
+      if (!create_directory_recursive(directory_name, err)) {
+        std::cout << "Error: failed to recursively create directory. " << err.message() << std::endl;
+      }
+    }
+
+    // Save to file
     std::ofstream o(filename);
     o << std::setw(4) << j << std::endl;
+
+    std::cout << "Saved feature generator to " << filename << std::endl;
   }
 }  // namespace feature_generation

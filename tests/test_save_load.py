@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from ipc23lt import get_dataset
 
-from wlplan.feature_generation import WLFeatures
+from wlplan.feature_generation import get_feature_generator, load_feature_generator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,7 +26,8 @@ def test_save_load(domain_name, desc):
     config = CONFIGS[desc]
     save_file = f"tests/models/save_load/{domain_name}_{desc}.json"
     domain, dataset, y = get_dataset(domain_name, keep_statics=config["keep_statics"])
-    feature_generator = WLFeatures(
+    feature_generator = get_feature_generator(
+        feature_algorithm="wl",
         domain=domain,
         graph_representation="ilg",
         iterations=4,
@@ -42,7 +43,7 @@ def test_save_load(domain_name, desc):
     feature_generator.save(save_file)
 
     ## load
-    feature_generator = WLFeatures.load(save_file)
+    feature_generator = load_feature_generator(save_file)
 
     loaded_X = np.array(feature_generator.embed(dataset)).astype(float)
     assert loaded_X.shape == X.shape

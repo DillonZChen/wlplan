@@ -6,9 +6,22 @@ import pddl.logic
 import pddl.logic.functions
 from pddl.core import Domain as PDDLDomain
 
-from _wlplan.planning import (Atom, ComparatorType, ConstantExpression, Domain, Fluent,
-                              FluentExpression, FormulaExpression, Function, NumericCondition,
-                              NumericExpression, OperatorType, Predicate, Problem, State)
+from _wlplan.planning import (
+    Atom,
+    ComparatorType,
+    ConstantExpression,
+    Domain,
+    Fluent,
+    FluentExpression,
+    FormulaExpression,
+    Function,
+    NumericCondition,
+    NumericExpression,
+    OperatorType,
+    Predicate,
+    Problem,
+    State,
+)
 
 __all__ = ["parse_domain", "parse_problem"]
 
@@ -115,18 +128,7 @@ def parse_domain(
     functions = sorted(list(functions.values()), key=lambda x: repr(x))
 
     # Get constant objects (ignores types)
-    constant_objects = set()
-    if "(:constants" in domain_content:
-        constant_objects_content = domain_content.split("(:constants")[1]
-        constant_objects_content = constant_objects_content.split(")")[0]
-        for line in constant_objects_content.split("\n"):
-            line = line.strip()
-            if len(line) == 0:
-                continue
-            lhs_rhs = line.split("-")  # type is on the rhs
-            objects = lhs_rhs[0].split()
-            constant_objects = constant_objects.union(set(objects))
-    constant_objects = sorted(list(constant_objects))
+    constant_objects = sorted(list(str(o) for o in pddl_domain.constants))
 
     domain = Domain(
         name=domain_name,

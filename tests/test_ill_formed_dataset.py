@@ -129,9 +129,11 @@ def test_bad_arity_in_goal():
 
 def test_bad_predicate_in_state():
     try:
-        state = State([
-            Atom(lime, ["a", "b", "c", "d", "e"]),
-        ])
+        state = State(
+            [
+                Atom(lime, ["a", "b", "c", "d", "e"]),
+            ]
+        )
         problem = Problem(blocksworld_domain, objects, positive_goals, negative_goals)
         data = [
             ProblemStates(problem, [state]),
@@ -146,9 +148,11 @@ def test_bad_predicate_in_state():
 
 def test_bad_object_in_state():
     try:
-        state = State([
-            Atom(on, ["asdfasdfa", "basdfasdf"]),
-        ])
+        state = State(
+            [
+                Atom(on, ["asdfasdfa", "basdfasdf"]),
+            ]
+        )
         problem = Problem(blocksworld_domain, objects, positive_goals, negative_goals)
         data = [
             ProblemStates(problem, [state]),
@@ -163,9 +167,11 @@ def test_bad_object_in_state():
 
 def test_bad_arity_in_state():
     try:
-        state = State([
-            Atom(on, ["a", "b", "c"]),
-        ])
+        state = State(
+            [
+                Atom(on, ["a", "b", "c"]),
+            ]
+        )
         problem = Problem(blocksworld_domain, objects, positive_goals, negative_goals)
         data = [
             ProblemStates(problem, [state]),
