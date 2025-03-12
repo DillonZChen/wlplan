@@ -549,10 +549,12 @@ namespace feature_generation {
     j["weights"] = weights;
 
     // Create directory if it doesn't exist
-    std::error_code err;
-    std::string directory_name = filename.substr(0, filename.find_last_of("/"));
-    if (!create_directory_recursive(directory_name, err)) {
-      std::cout << "Error: failed to recursively create directory. " << err.message() << std::endl;
+    if (filename.find_last_of("/") != std::string::npos) {
+      std::error_code err;
+      std::string directory_name = filename.substr(0, filename.find_last_of("/"));
+      if (!create_directory_recursive(directory_name, err)) {
+        std::cout << "Error: failed to recursively create directory. " << err.message() << std::endl;
+      }
     }
 
     // Save to file
