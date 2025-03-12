@@ -4,6 +4,8 @@ from typing import Optional
 import pddl
 import pddl.logic
 import pddl.logic.functions
+from pddl.core import Domain as PDDLDomain
+
 from _wlplan.planning import (
     Atom,
     ComparatorType,
@@ -18,9 +20,8 @@ from _wlplan.planning import (
     OperatorType,
     Predicate,
     Problem,
-    State
+    State,
 )
-from pddl.core import Domain as PDDLDomain
 
 __all__ = ["parse_domain", "parse_problem"]
 
