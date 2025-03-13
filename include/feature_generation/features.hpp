@@ -195,6 +195,8 @@ namespace feature_generation {
     std::vector<long> get_layer_to_n_colours() const;
     void print_init_colours() const;
 
+    std::vector<std::set<int>> get_layer_to_colours() const { return layer_to_colours; }
+
     void save(const std::string &filename);
   };
 }  // namespace feature_generation
