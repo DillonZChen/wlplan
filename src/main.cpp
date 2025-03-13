@@ -478,6 +478,7 @@ py::class_<feature_generation::Features>(feature_generation_m, "Features")
   .def("get_unseen_counts", &feature_generation::Features::get_unseen_counts)
   .def("get_layer_to_n_colours", &feature_generation::Features::get_layer_to_n_colours)
   .def("get_layer_to_colours", &feature_generation::Features::get_layer_to_colours)
+  .def("get_colour_to_layer", &feature_generation::Features::get_colour_to_layer)
   .def("print_init_colours", &feature_generation::Features::print_init_colours)
   .def("get_feature_name", &feature_generation::Features::get_feature_name)
   .def("get_graph_representation", &feature_generation::Features::get_graph_representation)
@@ -498,6 +499,8 @@ py::class_<feature_generation::Features>(feature_generation_m, "Features")
 py::class_<feature_generation::WLFeatures, feature_generation::Features>(feature_generation_m, "WLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
@@ -505,6 +508,8 @@ py::class_<feature_generation::WLFeatures, feature_generation::Features>(feature
 py::class_<feature_generation::LWL2Features, feature_generation::Features>(feature_generation_m, "LWL2Features")
   .def(py::init<const std::string &>(), 
         "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
@@ -512,6 +517,8 @@ py::class_<feature_generation::LWL2Features, feature_generation::Features>(featu
 py::class_<feature_generation::KWL2Features, feature_generation::Features>(feature_generation_m, "KWL2Features")
   .def(py::init<const std::string &>(), 
         "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
@@ -519,6 +526,8 @@ py::class_<feature_generation::KWL2Features, feature_generation::Features>(featu
 py::class_<feature_generation::IWLFeatures, feature_generation::Features>(feature_generation_m, "IWLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
@@ -526,6 +535,8 @@ py::class_<feature_generation::IWLFeatures, feature_generation::Features>(featur
 py::class_<feature_generation::NIWLFeatures, feature_generation::IWLFeatures>(feature_generation_m, "NIWLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
@@ -533,6 +544,8 @@ py::class_<feature_generation::NIWLFeatures, feature_generation::IWLFeatures>(fe
 py::class_<feature_generation::CCWLFeatures, feature_generation::WLFeatures>(feature_generation_m, "CCWLFeatures")
   .def(py::init<const std::string &>(), 
         "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
   .def("set_weights", &feature_generation::CCWLFeatures::set_weights,

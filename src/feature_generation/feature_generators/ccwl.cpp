@@ -18,6 +18,9 @@ namespace feature_generation {
 
   CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
+  CCWLFeatures::CCWLFeatures(const std::string &filename, bool quiet)
+      : WLFeatures(filename, quiet) {}
+
   Embedding CCWLFeatures::embed_impl(const std::shared_ptr<graph::Graph> &graph) {
     // New additions to the WL algorithm are indicated with the [NUMERIC] comments.
     // We use a sum function for the pool operator as described in the ccWL algorithm.

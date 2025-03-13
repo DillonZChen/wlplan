@@ -108,6 +108,8 @@ namespace feature_generation {
 
     Features(const std::string &filename);
 
+    Features(const std::string &filename, const bool quiet);
+
     virtual ~Features() = default;
 
     /* Feature generation functions */
@@ -195,7 +197,8 @@ namespace feature_generation {
     std::vector<long> get_layer_to_n_colours() const;
     void print_init_colours() const;
 
-    std::vector<std::set<int>> get_layer_to_colours() const { return layer_to_colours; }
+    std::vector<std::set<int>> get_layer_to_colours() const;
+    std::unordered_map<int, int> get_colour_to_layer() const { return colour_to_layer; };
 
     void save(const std::string &filename);
   };

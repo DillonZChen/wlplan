@@ -21,6 +21,8 @@ namespace feature_generation {
 
     CCWLFeatures(const std::string &filename);
 
+    CCWLFeatures(const std::string &filename, bool quiet);
+
     Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) override;
 
     void set_weights(const std::vector<double> &weights);

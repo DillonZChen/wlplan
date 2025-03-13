@@ -14,14 +14,12 @@ namespace feature_generation {
                              int iterations,
                              std::string pruning,
                              bool multiset_hash)
-      : IWLFeatures("niwl",
-                    domain,
-                    graph_representation,
-                    iterations,
-                    pruning,
-                    multiset_hash) {}
+      : IWLFeatures("niwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   NIWLFeatures::NIWLFeatures(const std::string &filename) : IWLFeatures(filename) {}
+
+  NIWLFeatures::NIWLFeatures(const std::string &filename, bool quiet)
+      : IWLFeatures(filename, quiet) {}
 
   Embedding NIWLFeatures::embed_impl(const std::shared_ptr<graph::Graph> &graph) {
     Embedding iwl_embedding = IWLFeatures::embed_impl(graph);
