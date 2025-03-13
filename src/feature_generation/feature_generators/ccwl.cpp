@@ -9,12 +9,21 @@
 using json = nlohmann::json;
 
 namespace feature_generation {
+  CCWLFeatures::CCWLFeatures(const std::string feature_name,
+                             const planning::Domain &domain,
+                             std::string graph_representation,
+                             int iterations,
+                             std::string pruning,
+                             bool multiset_hash)
+      : WLFeatures(feature_name, domain, graph_representation, iterations, pruning, multiset_hash) {
+  }
+
   CCWLFeatures::CCWLFeatures(const planning::Domain &domain,
                              std::string graph_representation,
                              int iterations,
                              std::string pruning,
                              bool multiset_hash)
-      : WLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
+      : CCWLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 

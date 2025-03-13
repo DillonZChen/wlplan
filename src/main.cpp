@@ -1,5 +1,6 @@
 #include "../include/data/dataset.hpp"
 #include "../include/feature_generation/feature_generators/ccwl.hpp"
+#include "../include/feature_generation/feature_generators/ccwla.hpp"
 #include "../include/feature_generation/feature_generators/iwl.hpp"
 #include "../include/feature_generation/feature_generators/kwl2.hpp"
 #include "../include/feature_generation/feature_generators/lwl2.hpp"
@@ -549,6 +550,17 @@ py::class_<feature_generation::CCWLFeatures, feature_generation::WLFeatures>(fea
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
   .def("set_weights", &feature_generation::CCWLFeatures::set_weights,
+        "weights"_a)
+;
+
+py::class_<feature_generation::CCWLaFeatures, feature_generation::WLFeatures>(feature_generation_m, "CCWLaFeatures")
+  .def(py::init<const std::string &>(), 
+        "filename"_a)
+  .def(py::init<const std::string &, bool>(), 
+        "filename"_a, "quiet"_a)
+  .def(py::init<planning::Domain &, std::string, int, std::string, bool>(), 
+        "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
+  .def("set_weights", &feature_generation::CCWLaFeatures::set_weights,
         "weights"_a)
 ;
 

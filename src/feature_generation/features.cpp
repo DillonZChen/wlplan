@@ -69,7 +69,7 @@ namespace feature_generation {
 
     // We use a factory style method here instead of a virtual function as this is called
     // from a constructor, from which virtual functions are not allowed to be called.
-    if (std::set<std::string>({"wl", "ccwl", "iwl", "niwl"}).count(feature_name)) {
+    if (std::set<std::string>({"wl", "ccwl", "ccwl-a", "iwl", "niwl"}).count(feature_name)) {
       neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
     } else if (feature_name == "2-kwl") {
       neighbour_container = std::make_shared<KWL2NeighbourContainer>(multiset_hash);

@@ -13,6 +13,13 @@
 namespace feature_generation {
   class CCWLFeatures : public WLFeatures {
    public:
+    CCWLFeatures(const std::string feature_name,
+                 const planning::Domain &domain,
+                 std::string graph_representation,
+                 int iterations,
+                 std::string pruning,
+                 bool multiset_hash);
+
     CCWLFeatures(const planning::Domain &domain,
                  std::string graph_representation,
                  int iterations,

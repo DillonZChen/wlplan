@@ -3,6 +3,7 @@ import os
 from typing import Optional
 
 from _wlplan.feature_generation import (
+    CCWLaFeatures,
     CCWLFeatures,
     Features,
     IWLFeatures,
@@ -24,6 +25,7 @@ __all__ = [
     "LWL2Features",
     "KWL2Features",
     "CCWLFeatures",
+    "CCWLaFeatures",
 ]
 
 
@@ -32,9 +34,10 @@ def _get_feature_generators_dict() -> dict[str, Features]:
         "wl": WLFeatures,
         "kwl2": KWL2Features,
         "lwl2": LWL2Features,
-        "ccwl": CCWLFeatures,
         "iwl": IWLFeatures,
         "niwl": NIWLFeatures,
+        "ccwl": CCWLFeatures,
+        "ccwl-a": CCWLaFeatures,
     }
 
 
