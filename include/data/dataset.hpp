@@ -33,7 +33,8 @@ namespace data {
     std::unordered_map<std::string, int> predicate_to_arity;
 
     void check_good_atom(const planning::Atom &atom,
-                         const std::unordered_set<planning::Object> &objects) const;
+                         const std::unordered_set<int> &objects,
+                         const planning::Problem &problem) const;
   };
 }  // namespace data
 

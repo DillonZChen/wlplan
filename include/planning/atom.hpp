@@ -11,14 +11,14 @@
 namespace planning {
   class Atom {
    public:
-    const std::shared_ptr<Predicate> predicate;
-    const std::vector<Object> objects;
+    const int predicate_id;
+    const std::vector<int> object_ids;
 
-    Atom(const Predicate &predicate, const std::vector<Object> &objects);
+    Atom(const int &predicate_id, const std::vector<int> &object_ids);
 
-    std::string to_string() const;
-
-    bool operator==(const Atom &other) const { return to_string() == other.to_string(); }
+    bool operator==(const Atom &other) const {
+      return predicate_id == other.predicate_id && object_ids == other.object_ids;
+    }
   };
 
 }  // namespace planning

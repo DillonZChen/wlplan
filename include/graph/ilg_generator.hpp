@@ -54,7 +54,6 @@ namespace graph {
    protected:
     /* The following variables remain constant for all problems */
     const planning::Domain &domain;
-    const std::unordered_map<std::string, int> predicate_to_colour;
     bool differentiate_constant_objects;
 
     /* These variables get reset every time a new problem is set */
@@ -88,7 +87,7 @@ namespace graph {
 
   inline int ILGGenerator::fact_colour(const planning::Atom &atom,
                                        const ILGFactDescription &fact_description) const {
-    return fact_colour(predicate_to_colour.at(atom.predicate->name), fact_description);
+    return fact_colour(atom.predicate_id, fact_description);
   }
 }  // namespace graph
 

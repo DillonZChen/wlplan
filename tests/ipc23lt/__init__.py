@@ -6,7 +6,7 @@ import pymimir
 
 import wlplan
 from wlplan.data import Dataset, ProblemStates
-from wlplan.planning import Predicate, State, parse_domain
+from wlplan.planning import Predicate, State, parse_domain, parse_problem
 
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
@@ -15,7 +15,7 @@ DOMAINS = {
     "ferry",
     "floortile",
     "miconic",
-    "rovers",
+    "rover",
     "satellite",
     "sokoban",
     "spanner",
@@ -60,7 +60,7 @@ def get_problem_pddl(domain_name: str, problem_name: str):
     return problem_pddl
 
 
-def get_predicates(mimir_domain: pymimir.Domain, keep_statics: bool):
+def get_predicates(mimir_domain: pymimir.Domain, keep_statics: bool) -> dict[str, Predicate]:
     predicates = {}
     if keep_statics:
         for predicate in mimir_domain.predicates:
@@ -91,15 +91,16 @@ def get_raw_dataset(domain_name: str, keep_statics: bool):
     mimir_domain = pymimir.DomainParser(str(domain_pddl)).parse()
 
     name_to_predicate = get_predicates(mimir_domain, keep_statics)
-    predicates = sorted(list(name_to_predicate.values()), key=lambda x: repr(x))
+    wlplan_domain = parse_domain(domain_pddl, domain_name, keep_statics)
+    predicates = wlplan_domain.predicates
+    name_to_predicate_id = {p.name: i for i, p in enumerate(predicates)}
+    predicates = sorted(list(predicates), key=lambda x: repr(x))
     predicate_names = repr([repr(x) for x in predicates]).replace("'", "")
     LOGGER.info(f"{domain_name} predicates for {keep_statics=}: {predicate_names}")
 
-    wlplan_domain = parse_domain(domain_pddl, domain_name, keep_statics)
-
     wlplan_data = []
     y = []
-
+    
     for f in os.listdir(f"{benchmark_dir}/training_plans"):
         problem_pddl = f"{benchmark_dir}/training/" + f.replace(".plan", ".pddl")
         plan_file = f"{benchmark_dir}/training_plans/" + f
@@ -112,22 +113,8 @@ def get_raw_dataset(domain_name: str, keep_statics: bool):
         name_to_object = {o.name: o for o in mimir_problem.objects}
 
         ## construct wlplan problem
-        positive_goals = []
-        for literal in mimir_problem.goal:
-            assert not literal.negated
-            mimir_atom = literal.atom
-            wlplan_atom = wlplan.planning.Atom(
-                predicate=name_to_predicate[mimir_atom.predicate.name],
-                objects=[o.name for o in mimir_atom.terms],
-            )
-            positive_goals.append(wlplan_atom)
-
-        wlplan_problem = wlplan.planning.Problem(
-            domain=wlplan_domain,
-            objects=list(name_to_object.keys()),
-            positive_goals=positive_goals,
-            negative_goals=[],
-        )
+        wlplan_problem = parse_problem(domain_pddl, problem_pddl, keep_statics)
+        object_to_id = wlplan_problem.get_object_to_id()
 
         ## collect actions
         actions = []
@@ -157,8 +144,8 @@ def get_raw_dataset(domain_name: str, keep_statics: bool):
                 if predicate_name not in name_to_predicate:
                     continue
                 wlplan_atom = wlplan.planning.Atom(
-                    predicate=name_to_predicate[predicate_name],
-                    objects=[o.name for o in atom.terms],
+                    predicate=name_to_predicate_id[predicate_name],
+                    objects=[object_to_id[o.name] for o in atom.terms],
                 )
                 atoms.append(wlplan_atom)
             return State(atoms)

@@ -21,43 +21,48 @@ namespace data {
         throw std::runtime_error(err_msg);
       }
 
-      std::unordered_set<planning::Object> objects;
+      std::unordered_set<int> objects;
+      std::unordered_map<planning::Object, int> object_to_id = problem.get_object_to_id();
       for (const planning::Object &object : problem.get_problem_objects()) {
-        objects.insert(object);
+        objects.insert(object_to_id.at(object));
       }
       for (const planning::Object &object : problem.get_constant_objects()) {
-        objects.insert(object);
+        objects.insert(object_to_id.at(object));
       }
 
       // check proposition consistency of goals
       for (const planning::Atom &goal : problem.get_positive_goals()) {
-        check_good_atom(goal, objects);
+        check_good_atom(goal, objects, problem);
       }
 
       for (const planning::Atom &goal : problem.get_negative_goals()) {
-        check_good_atom(goal, objects);
+        check_good_atom(goal, objects, problem);
       }
 
       // check proposition consistency of states
       for (const planning::State &state : states) {
         for (const std::shared_ptr<planning::Atom> &atom : state.atoms) {
-          check_good_atom(*atom, objects);
+          check_good_atom(*atom, objects, problem);
         }
       }
     }
   }
 
   void Dataset::check_good_atom(const planning::Atom &atom,
-                                const std::unordered_set<planning::Object> &objects) const {
-    if (predicate_to_arity.find(atom.predicate->name) == predicate_to_arity.end()) {
-      throw std::runtime_error("Unknown predicate " + atom.predicate->name);
+                                const std::unordered_set<int> &objects,
+                                const planning::Problem &problem) const {
+
+    std::string predicate_name = domain.predicates[atom.predicate_id].name;
+
+    if (predicate_to_arity.find(predicate_name) == predicate_to_arity.end()) {
+      throw std::runtime_error("Unknown predicate " + predicate_name);
     }
 
-    if (predicate_to_arity.at(atom.predicate->name) != (int)atom.objects.size()) {
-      throw std::runtime_error("Arity mismatch for " + atom.to_string());
+    if (predicate_to_arity.at(predicate_name) != (int)atom.object_ids.size()) {
+      throw std::runtime_error("Arity mismatch for " + problem.to_string(atom));
     }
 
-    for (const planning::Object &object : atom.objects) {
+    for (const int &object : atom.object_ids) {
       if (objects.count(object) == 0) {
         throw std::runtime_error("Unknown object " + object);
       }

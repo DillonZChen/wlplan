@@ -126,10 +126,8 @@ R"(Parameters
     objects : list[Object]
         List of object names.
 )")
-  .def(py::init<planning::Predicate &, std::vector<std::string> &>(), 
-        "predicate"_a, "objects"_a)
-  .def("__repr__", &::planning::Atom::to_string)
-  .def("__eq__", &::planning::Atom::operator==);
+  .def(py::init<int &, std::vector<int> &>(), 
+        "predicate"_a, "objects"_a);
 
 // Fluent
 py::class_<planning::Fluent>(planning_m, "Fluent",
@@ -298,6 +296,7 @@ R"(Parameters
   .def_property_readonly("positive_goals", &planning::Problem::get_positive_goals)
   .def_property_readonly("negative_goals", &planning::Problem::get_negative_goals)
   .def_property_readonly("numeric_goals", &planning::Problem::get_numeric_goals)
+  .def("get_object_to_id", &planning::Problem::get_object_to_id)
   .def("dump", &planning::Problem::dump)
 ;
 
@@ -317,9 +316,9 @@ R"(Parameters
         "atoms"_a, "values"_a)
   .def_property_readonly("atoms", &planning::State::get_atoms)
   .def_readonly("values", &planning::State::values)
-  .def("__repr__", &::planning::State::to_string)
+//   .def("__repr__", &::planning::State::to_string)
   .def("__eq__", &::planning::State::operator==)
-  .def("__hash__", &::planning::State::hash)
+//   .def("__hash__", &::planning::State::hash)
 ;
 
 

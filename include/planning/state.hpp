@@ -20,11 +20,11 @@ namespace planning {
     // for Python bindings
     std::vector<planning::Atom> get_atoms() const;
 
-    std::string to_string() const;
+    // std::string to_string() const;
 
     bool operator==(const State &other) const;
 
-    std::size_t hash() const;
+    // std::size_t hash() const;
   };
 }  // namespace planning
 

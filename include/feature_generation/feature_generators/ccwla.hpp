@@ -1,6 +1,8 @@
 #ifndef FEATURE_GENERATION_FEATURE_GENERATORS_CCWLA_HPP
 #define FEATURE_GENERATION_FEATURE_GENERATORS_CCWLA_HPP
 
+// Experimental: add max(a - b, 0) features to CCWL
+
 #include "ccwl.hpp"
 
 #include <memory>

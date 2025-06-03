@@ -61,6 +61,7 @@ def _get_predicates(pddl_domain: PDDLDomain, keep_statics: bool) -> dict[str, Pr
                     predicates[name] = predicate
                 else:
                     assert predicates[name] == predicate
+    predicates = {k: v for k, v in sorted(predicates.items(), key=lambda item: repr(item[1]))}
     return predicates
 
 
@@ -70,6 +71,7 @@ def _get_functions(pddl_domain: PDDLDomain) -> dict[str, Function]:
         name = function.name
         arity = function.arity
         functions[name] = Function(name=name, arity=arity)
+    functions = {k: v for k, v in sorted(functions.items(), key=lambda item: repr(item[1]))}
     return functions
 
 
@@ -100,11 +102,11 @@ def to_wlplan_domain(pddl_domain: PDDLDomain, domain_name: Optional[str] = None,
 
     # Get predicates
     predicates = _get_predicates(pddl_domain, keep_statics)
-    predicates = sorted(list(predicates.values()), key=lambda x: repr(x))
+    predicates = list(predicates.values())
 
     # Get functions
     functions = _get_functions(pddl_domain)
-    functions = sorted(list(functions.values()), key=lambda x: repr(x))
+    functions = list(functions.values())
 
     # Get constant objects (ignores types)
     constant_objects = sorted(list(str(o) for o in pddl_domain.constants))
@@ -124,9 +126,12 @@ def to_wlplan_problem(pddl_domain: PDDLDomain, pddl_problem: PDDLProblem, keep_s
     # Get domain information
     name_to_predicate = _get_predicates(pddl_domain, keep_statics)
     name_to_function = _get_functions(pddl_domain)
+    name_to_predicate_id = {p.name: i for i, p in enumerate(name_to_predicate.values())}
+    name_to_function_id = {f.name: i for i, f in enumerate(name_to_function.values())}
 
     # Get problem information
-    objects = sorted(o.name for o in pddl_problem.objects)
+    objects = sorted(o.name for o in pddl_domain.constants) + sorted(o.name for o in pddl_problem.objects)
+    object_to_id = {o: i for i, o in enumerate(objects)}
     statics = []  # TODO: also requires checking keep_statics flag
     fluents = []
     fluent_values = []
@@ -160,7 +165,7 @@ def to_wlplan_problem(pddl_domain: PDDLDomain, pddl_problem: PDDLProblem, keep_s
         elif isinstance(goal, pddl.logic.base.Not):
             a = goal._arg
             goal_type = "negative"
-        wlplan_atom = Atom(predicate=name_to_predicate[a.name], objects=[o.name for o in a.terms])
+        wlplan_atom = Atom(predicate=name_to_predicate_id[a.name], objects=[object_to_id[o.name] for o in a.terms])
         wlplan_goals[goal_type].append(wlplan_atom)
 
     def handle_numeric_goal(goal):

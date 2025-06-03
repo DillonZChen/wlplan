@@ -30,37 +30,37 @@ namespace planning {
     return ret;
   }
 
-  std::string State::to_string() const {
-    std::string ret = "State(atoms=[";
+//   std::string State::to_string() const {
+//     std::string ret = "State(atoms=[";
 
-    // sort atoms because order does not matter
-    std::vector<std::string> atom_strings;
-    for (size_t i = 0; i < atoms.size(); i++) {
-      atom_strings.push_back(atoms[i]->to_string());
-    }
-    std::sort(atom_strings.begin(), atom_strings.end());
-    for (size_t i = 0; i < atom_strings.size(); i++) {
-      ret += atom_strings[i];
-      if (i < atom_strings.size() - 1) {
-        ret += ", ";
-      }
-    }
-    ret += "], values=[";
+//     // sort atoms because order does not matter
+//     std::vector<std::string> atom_strings;
+//     for (size_t i = 0; i < atoms.size(); i++) {
+//       atom_strings.push_back(atoms[i]->to_string());
+//     }
+//     std::sort(atom_strings.begin(), atom_strings.end());
+//     for (size_t i = 0; i < atom_strings.size(); i++) {
+//       ret += atom_strings[i];
+//       if (i < atom_strings.size() - 1) {
+//         ret += ", ";
+//       }
+//     }
+//     ret += "], values=[";
 
-    // do not sort values because order depends on fluent order
-    for (size_t i = 0; i < values.size(); i++) {
-      ret += std::to_string(values[i]);
-      if (i < values.size() - 1) {
-        ret += ", ";
-      }
-    }
-    ret += "])";
-    return ret;
-  }
+//     // do not sort values because order depends on fluent order
+//     for (size_t i = 0; i < values.size(); i++) {
+//       ret += std::to_string(values[i]);
+//       if (i < values.size() - 1) {
+//         ret += ", ";
+//       }
+//     }
+//     ret += "])";
+//     return ret;
+//   }
 
   bool State::operator==(const State &other) const {
     return atoms == other.atoms && values == other.values;
   }
 
-  size_t State::hash() const { return std::hash<std::string>()(to_string()); }
+//   size_t State::hash() const { return std::hash<std::string>()(to_string()); }
 }  // namespace planning

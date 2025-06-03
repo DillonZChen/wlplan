@@ -64,6 +64,7 @@ namespace planning {
 
     std::vector<Object> get_problem_objects() const { return problem_objects; }
     std::vector<Object> get_constant_objects() const { return constant_objects; }
+    std::unordered_map<Object, int> get_object_to_id() const { return object_to_id; }
 
     std::vector<Atom> get_statics() const { return statics; }
     std::vector<Fluent> get_fluents() const { return fluents; }
@@ -81,6 +82,8 @@ namespace planning {
     bool is_constant_object(const Object &object) const {
       return constant_objects_set.count(object);
     }
+
+    std::string to_string(const planning::Atom &atom) const;
 
     void dump() const;
   };

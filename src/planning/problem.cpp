@@ -36,7 +36,7 @@ namespace planning {
         continue;
       }
       object_to_id[object] = cnt;
-      constant_objects_set.insert(object);
+      problem_objects_set.insert(object);
       problem_objects.push_back(object);
       cnt++;
     }
@@ -84,7 +84,7 @@ namespace planning {
     std::cout << "]" << std::endl;
     std::cout << "statics=[" << std::endl;
     for (const auto &static_atom : statics) {
-      std::cout << "  " << static_atom.to_string() << std::endl;
+      std::cout << "  " << to_string(static_atom) << std::endl;
     }
     std::cout << "]" << std::endl;
     std::cout << "fluents=[" << std::endl;
@@ -94,12 +94,12 @@ namespace planning {
     std::cout << "]" << std::endl;
     std::cout << "positive_goals=[" << std::endl;
     for (const auto &positive_goal : positive_goals) {
-      std::cout << "  " << positive_goal.to_string() << std::endl;
+      std::cout << "  " << to_string(positive_goal) << std::endl;
     }
     std::cout << "]" << std::endl;
     std::cout << "negative_goals=[" << std::endl;
     for (const auto &negative_goal : negative_goals) {
-      std::cout << "  " << negative_goal.to_string() << std::endl;
+      std::cout << "  " << to_string(negative_goal) << std::endl;
     }
     std::cout << "]" << std::endl;
     std::cout << "numeric_goals=[" << std::endl;
@@ -107,5 +107,17 @@ namespace planning {
       std::cout << "  " << numeric_goal.to_string() << std::endl;
     }
     std::cout << "]" << std::endl;
+  }
+
+  std::string Problem::to_string(const planning::Atom &atom) const {
+    std::string repr = domain->predicates[atom.predicate_id].name + "(";
+    for (size_t i = 0; i < atom.object_ids.size(); i++) {
+      repr += atom.object_ids[i];
+      if (i < atom.object_ids.size() - 1) {
+        repr += ", ";
+      }
+    }
+    repr += ")";
+    return repr;
   }
 }  // namespace planning
