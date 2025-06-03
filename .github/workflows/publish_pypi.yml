@@ -49,7 +49,7 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          mkdir _wlplan
+          mkdir -p _wlplan
           pip install .
           pybind11-stubgen _wlplan -o .
           touch _wlplan/py.typed

@@ -28,6 +28,8 @@ namespace feature_generation {
 
     KWL2Features(const std::string &filename);
 
+    KWL2Features(const std::string &filename, bool quiet);
+
     Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) override;
 
    protected:

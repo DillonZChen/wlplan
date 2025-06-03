@@ -13,6 +13,13 @@
 namespace feature_generation {
   class CCWLFeatures : public WLFeatures {
    public:
+    CCWLFeatures(const std::string feature_name,
+                 const planning::Domain &domain,
+                 std::string graph_representation,
+                 int iterations,
+                 std::string pruning,
+                 bool multiset_hash);
+
     CCWLFeatures(const planning::Domain &domain,
                  std::string graph_representation,
                  int iterations,
@@ -20,6 +27,8 @@ namespace feature_generation {
                  bool multiset_hash);
 
     CCWLFeatures(const std::string &filename);
+
+    CCWLFeatures(const std::string &filename, bool quiet);
 
     Embedding embed_impl(const std::shared_ptr<graph::Graph> &graph) override;
 

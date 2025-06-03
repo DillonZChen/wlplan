@@ -26,6 +26,8 @@ namespace feature_generation {
 
   KWL2Features::KWL2Features(const std::string &filename) : Features(filename) {}
 
+  KWL2Features::KWL2Features(const std::string &filename, bool quiet) : Features(filename, quiet) {}
+
   int kwl2_pair_to_index_map(int n, int i, int j) {
     // map pair where 0 <= i, j < n to vec index
     return i * n + j;

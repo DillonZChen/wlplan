@@ -28,6 +28,8 @@ namespace feature_generation {
 
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
+  WLFeatures::WLFeatures(const std::string &filename, bool quiet) : Features(filename, quiet) {}
+
   void WLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                           std::set<int> &nodes,
                           std::vector<int> &colours,
