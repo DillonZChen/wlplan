@@ -11,6 +11,7 @@
 #include "../include/graph/ilg_generator.hpp"
 #include "../include/graph/nilg_generator.hpp"
 #include "../include/planning/atom.hpp"
+#include "../include/planning/atom_verbose.hpp"
 #include "../include/planning/domain.hpp"
 #include "../include/planning/fluent.hpp"
 #include "../include/planning/function.hpp"
@@ -19,6 +20,8 @@
 #include "../include/planning/object.hpp"
 #include "../include/planning/predicate.hpp"
 #include "../include/planning/problem.hpp"
+#include "../include/planning/state.hpp"
+#include "../include/planning/state_verbose.hpp"
 
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -120,13 +123,26 @@ R"(Object is a type alias for a str. WLPlan does not exploit object types.
 py::class_<planning::Atom>(planning_m, "Atom", 
 R"(Parameters
 ----------
+    predicate : int
+        Predicate id.
+
+    objects : list[int]
+        List of object ids.
+)")
+  .def(py::init<int &, std::vector<int> &>(), 
+        "predicate"_a, "objects"_a);
+
+// Atom
+py::class_<planning::AtomVerbose>(planning_m, "AtomVerbose", 
+R"(Parameters
+----------
     predicate : Predicate
         Predicate object.
 
     objects : list[Object]
         List of object names.
 )")
-  .def(py::init<int &, std::vector<int> &>(), 
+  .def(py::init<planning::Predicate &, std::vector<planning::Object> &>(), 
         "predicate"_a, "objects"_a);
 
 // Fluent
@@ -321,6 +337,27 @@ R"(Parameters
 //   .def("__hash__", &::planning::State::hash)
 ;
 
+// StateVerbose
+py::class_<planning::StateVerbose>(planning_m, "StateVerbose", 
+R"(Parameters
+----------
+    atoms : list[AtomVerbose]
+        List of atoms.
+
+    values : list[float], optional
+        List of values for fluents defined in the problem.
+)")
+  .def(py::init<std::vector<planning::AtomVerbose> &>(), 
+        "atoms"_a)
+  .def(py::init<std::vector<planning::AtomVerbose> &, std::vector<double> &>(), 
+        "atoms"_a, "values"_a)
+  .def_property_readonly("atoms", &planning::StateVerbose::get_atoms)
+  .def_readonly("values", &planning::StateVerbose::values)
+//   .def("__repr__", &::planning::StateVerbose::to_string)
+  .def("__eq__", &::planning::StateVerbose::operator==)
+//   .def("__hash__", &::planning::StateVerbose::hash)
+;
+
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -360,6 +397,8 @@ Parameters
         List of training states.
 )")
   .def(py::init<planning::Problem &, std::vector<planning::State> &>(), 
+        "problem"_a, "states"_a)
+  .def(py::init<planning::Problem &, std::vector<planning::StateVerbose> &>(), 
         "problem"_a, "states"_a);
 
 

@@ -4,11 +4,9 @@ from typing import Optional
 import pddl
 import pddl.logic
 import pddl.logic.functions
-from pddl.core import Domain as PDDLDomain
-from pddl.core import Problem as PDDLProblem
-
 from _wlplan.planning import (
     Atom,
+    AtomVerbose,
     ComparatorType,
     ConstantExpression,
     Domain,
@@ -22,9 +20,10 @@ from _wlplan.planning import (
     Predicate,
     Problem,
     State,
+    StateVerbose,
 )
-
-__all__ = ["parse_domain", "parse_problem"]
+from pddl.core import Domain as PDDLDomain
+from pddl.core import Problem as PDDLProblem
 
 _PDDL_TO_WLPLAN_BINARY_OPS = {
     pddl.logic.functions.Plus: OperatorType.Plus,

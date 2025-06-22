@@ -2,6 +2,7 @@
 #define PLANNING_PROBLEM_HPP
 
 #include "atom.hpp"
+#include "atom_verbose.hpp"
 #include "domain.hpp"
 #include "fluent.hpp"
 #include "numeric_condition.hpp"
@@ -31,8 +32,8 @@ namespace planning {
     std::vector<double> fluent_values;
     std::unordered_map<std::string, int> fluent_name_to_id;
 
-    const std::vector<Atom> positive_goals;
-    const std::vector<Atom> negative_goals;
+    std::vector<Atom> positive_goals;
+    std::vector<Atom> negative_goals;
     std::vector<NumericCondition> numeric_goals;
 
     void update_fluent_map();
@@ -59,6 +60,11 @@ namespace planning {
             const std::vector<std::string> &objects,
             const std::vector<Atom> &positive_goals,
             const std::vector<Atom> &negative_goals);
+
+    Problem(const Domain &domain,
+            const std::vector<std::string> &objects,
+            const std::vector<AtomVerbose> &positive_goals,
+            const std::vector<AtomVerbose> &negative_goals);
 
     Domain get_domain() const { return *domain; }
 

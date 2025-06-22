@@ -75,6 +75,47 @@ namespace planning {
                    const std::vector<Atom> &negative_goals)
       : Problem(domain, objects, {}, {}, {}, positive_goals, negative_goals, {}) {}
 
+  Problem::Problem(const Domain &domain,
+                   const std::vector<std::string> &objects,
+                   const std::vector<AtomVerbose> &positive_goals,
+                   const std::vector<AtomVerbose> &negative_goals)
+      : Problem(domain, objects, {}, {}, {}, {}, {}, {}) {
+
+    std::unordered_map<std::string, int> predicate_to_colour = domain.predicate_to_colour;
+
+    std::vector<Atom> positive_goal_atoms;
+    for (const auto &goal : positive_goals) {
+      std::vector<int> object_ids;
+      for (const auto &object : goal.objects) {
+        if (object_to_id.count(object)) {
+          object_ids.push_back(object_to_id.at(object));
+        } else {
+          std::cout << "Error: Object '" << object << "' not found in problem objects."
+                    << std::endl;
+          std::exit(1);
+        }
+      }
+      positive_goal_atoms.emplace_back(predicate_to_colour.at(goal.predicate.name), object_ids);
+    }
+
+    std::vector<Atom> negative_goal_atoms;
+    for (const auto &goal : negative_goals) {
+      std::vector<int> object_ids;
+      for (const auto &object : goal.objects) {
+        if (object_to_id.count(object)) {
+          object_ids.push_back(object_to_id.at(object));
+        } else {
+          std::cout << "Error: Object '" << object << "' not found in problem objects."
+                    << std::endl;
+          std::exit(1);
+        }
+      }
+      negative_goal_atoms.emplace_back(predicate_to_colour.at(goal.predicate.name), object_ids);
+    }
+    this->positive_goals = std::move(positive_goal_atoms);
+    this->negative_goals = std::move(negative_goal_atoms);
+  }
+
   void Problem::dump() const {
     std::cout << "domain=" << domain->to_string() << std::endl;
     std::cout << "objects=[" << std::endl;
