@@ -27,6 +27,8 @@ namespace feature_generation {
 
   IWLFeatures::IWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
+  IWLFeatures::IWLFeatures(const std::string &filename, bool quiet) : WLFeatures(filename, quiet) {}
+
   void IWLFeatures::refine(const std::shared_ptr<graph::Graph> &graph,
                            std::vector<int> &colours,
                            int iteration) {

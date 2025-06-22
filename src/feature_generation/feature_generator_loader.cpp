@@ -1,6 +1,7 @@
 #include "../../include/feature_generation/feature_generator_loader.hpp"
 
 #include "../../include/feature_generation/feature_generators/ccwl.hpp"
+#include "../../include/feature_generation/feature_generators/ccwla.hpp"
 #include "../../include/feature_generation/feature_generators/iwl.hpp"
 #include "../../include/feature_generation/feature_generators/lwl2.hpp"
 #include "../../include/feature_generation/feature_generators/niwl.hpp"
@@ -23,6 +24,8 @@ std::shared_ptr<feature_generation::Features> load_feature_generator(const std::
     feature_generator = std::make_shared<feature_generation::LWL2Features>(save_file);
   } else if (feature_name == "ccwl") {
     feature_generator = std::make_shared<feature_generation::CCWLFeatures>(save_file);
+  } else if (feature_name == "ccwl-a") {
+    feature_generator = std::make_shared<feature_generation::CCWLaFeatures>(save_file);
   } else if (feature_name == "iwl") {
     feature_generator = std::make_shared<feature_generation::IWLFeatures>(save_file);
   } else if (feature_name == "niwl") {

@@ -5,6 +5,7 @@ import pddl
 import pddl.logic
 import pddl.logic.functions
 from pddl.core import Domain as PDDLDomain
+from pddl.core import Problem as PDDLProblem
 
 from _wlplan.planning import (
     Atom,
@@ -72,9 +73,7 @@ def _get_functions(pddl_domain: PDDLDomain) -> dict[str, Function]:
     return functions
 
 
-def _convert_pddl_to_wlplan_expression(
-    pddl_expression, fluent_to_id: dict[str, int]
-) -> NumericExpression:
+def _convert_pddl_to_wlplan_expression(pddl_expression, fluent_to_id: dict[str, int]) -> NumericExpression:
     if isinstance(pddl_expression, pddl.logic.functions.NumericFunction):
         toks = str(pddl_expression).replace(")", "").replace("(", "").split()
         fluent_name = toks[0] + "(" + ", ".join(toks[1:]) + ")"
@@ -92,32 +91,12 @@ def _convert_pddl_to_wlplan_expression(
     return expression
 
 
-def parse_domain(
-    domain_path: str,
-    domain_name: Optional[str] = None,
-    keep_statics: bool = True,
-) -> Domain:
-    """Parses a domain file and returns a Domain object.
+def to_wlplan_domain(pddl_domain: PDDLDomain, domain_name: Optional[str] = None, keep_statics: bool = True) -> Domain:
+    """Converts a Domain object from the pddl library to a Domain object in wlplan."""
 
-    Args:
-        domain_path (str): The path to the domain file.
-        domain_name (str, optional): The name of the domain. If not provided, it will be extracted from the file. Defaults to None.
-        keep_statics (bool, optional): Whether to keep static predicates in the domain, computed by taking the union of action effects. Defaults to True.
-    """
-
-    if not os.path.exists(domain_path):
-        raise FileNotFoundError(f"Domain file {domain_path} does not exist.")
-
-    with open(domain_path, "r") as f:
-        domain_content = f.read()
-
-    # Read domain name from file if not provided
+    # Domain name
     if domain_name is None:
-        domain_name = domain_content.split("(domain ")[1]
-        domain_name = domain_name.split(")")[0]
-
-    # Parse domain with the pddl package
-    pddl_domain = pddl.parse_domain(domain_path)
+        domain_name = pddl_domain.name
 
     # Get predicates
     predicates = _get_predicates(pddl_domain, keep_statics)
@@ -139,21 +118,8 @@ def parse_domain(
     return domain
 
 
-def parse_problem(domain_path: str, problem_path: str, keep_statics: bool = True) -> Problem:
-    """Parses a problem file and returns a Problem object.
-
-    Args:
-        domain_path (str): The path to the domain file.
-        problem_path (str): The path to the problem file.
-        keep_statics (bool, optional): Whether to keep static predicates in the parsed domain. Defaults to True.
-    """
-
-    if not os.path.exists(problem_path):
-        raise FileNotFoundError(f"Problem file {problem_path} does not exist.")
-
-    # Use the pddl package to help with parsing
-    pddl_domain = pddl.parse_domain(domain_path)
-    pddl_problem = pddl.parse_problem(problem_path)
+def to_wlplan_problem(pddl_domain: PDDLDomain, pddl_problem: PDDLProblem, keep_statics: bool = True) -> Problem:
+    """Converts a Problem object from the pddl library to a Problem object in wlplan."""
 
     # Get domain information
     name_to_predicate = _get_predicates(pddl_domain, keep_statics)
@@ -244,7 +210,7 @@ def parse_problem(domain_path: str, problem_path: str, keep_statics: bool = True
             raise ValueError(f"Unknown goal {goal} with type {type(goal)}")
 
     problem = Problem(
-        domain=parse_domain(domain_path),
+        domain=to_wlplan_domain(pddl_domain=pddl_domain, keep_statics=keep_statics),
         objects=objects,
         statics=statics,
         fluents=fluents,
@@ -254,6 +220,47 @@ def parse_problem(domain_path: str, problem_path: str, keep_statics: bool = True
         numeric_goals=wlplan_goals["numeric"],
     )
     return problem
+
+
+def parse_domain(
+    domain_path: str,
+    domain_name: Optional[str] = None,
+    keep_statics: bool = True,
+) -> Domain:
+    """Parses a domain file and returns a Domain object.
+
+    Args:
+        domain_path (str): The path to the domain file.
+        domain_name (str, optional): The name of the domain. If not provided, it will be extracted from the file. Defaults to None.
+        keep_statics (bool, optional): Whether to keep static predicates in the domain, computed by taking the union of action effects. Defaults to True.
+    """
+
+    if not os.path.exists(domain_path):
+        raise FileNotFoundError(f"Domain file {domain_path} does not exist.")
+
+    # Parse domain with the pddl package
+    pddl_domain = pddl.parse_domain(domain_path)
+
+    return to_wlplan_domain(pddl_domain=pddl_domain, domain_name=domain_name, keep_statics=keep_statics)
+
+
+def parse_problem(domain_path: str, problem_path: str, keep_statics: bool = True) -> Problem:
+    """Parses a problem file and returns a Problem object.
+
+    Args:
+        domain_path (str): The path to the domain file.
+        problem_path (str): The path to the problem file.
+        keep_statics (bool, optional): Whether to keep static predicates in the parsed domain. Defaults to True.
+    """
+
+    if not os.path.exists(problem_path):
+        raise FileNotFoundError(f"Problem file {problem_path} does not exist.")
+
+    # Use the pddl package to help with parsing
+    pddl_domain = pddl.parse_domain(domain_path)
+    pddl_problem = pddl.parse_problem(problem_path)
+
+    return to_wlplan_problem(pddl_domain=pddl_domain, pddl_problem=pddl_problem, keep_statics=keep_statics)
 
 
 if __name__ == "__main__":

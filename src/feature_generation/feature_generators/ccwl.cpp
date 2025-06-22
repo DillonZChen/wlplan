@@ -9,14 +9,26 @@
 using json = nlohmann::json;
 
 namespace feature_generation {
+  CCWLFeatures::CCWLFeatures(const std::string feature_name,
+                             const planning::Domain &domain,
+                             std::string graph_representation,
+                             int iterations,
+                             std::string pruning,
+                             bool multiset_hash)
+      : WLFeatures(feature_name, domain, graph_representation, iterations, pruning, multiset_hash) {
+  }
+
   CCWLFeatures::CCWLFeatures(const planning::Domain &domain,
                              std::string graph_representation,
                              int iterations,
                              std::string pruning,
                              bool multiset_hash)
-      : WLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
+      : CCWLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
   CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
+
+  CCWLFeatures::CCWLFeatures(const std::string &filename, bool quiet)
+      : WLFeatures(filename, quiet) {}
 
   Embedding CCWLFeatures::embed_impl(const std::shared_ptr<graph::Graph> &graph) {
     // New additions to the WL algorithm are indicated with the [NUMERIC] comments.

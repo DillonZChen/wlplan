@@ -18,6 +18,9 @@ namespace feature_generation {
 
   LWL2Features::LWL2Features(const std::string &filename) : KWL2Features(filename) {}
 
+  LWL2Features::LWL2Features(const std::string &filename, bool quiet)
+      : KWL2Features(filename, quiet) {}
+
   int lwl2_pair_to_index_map(int n, int i, int j) {
     // map pair where 0 <= i < j < n to vec index
     return j - i - 1 + (i * n) - (i * (i + 1)) / 2;

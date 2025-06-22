@@ -35,7 +35,7 @@ jobs:
 
       - name: Build and install
         run: |
-          mkdir _wlplan
+          mkdir -p _wlplan
           python -m pip install -v .
 
       - name: Install test dependencies

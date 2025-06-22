@@ -69,7 +69,7 @@ namespace feature_generation {
 
     // We use a factory style method here instead of a virtual function as this is called
     // from a constructor, from which virtual functions are not allowed to be called.
-    if (std::set<std::string>({"wl", "ccwl", "iwl", "niwl"}).count(feature_name)) {
+    if (std::set<std::string>({"wl", "ccwl", "ccwl-a", "iwl", "niwl"}).count(feature_name)) {
       neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
     } else if (feature_name == "2-kwl") {
       neighbour_container = std::make_shared<KWL2NeighbourContainer>(multiset_hash);
@@ -93,7 +93,9 @@ namespace feature_generation {
     return ret;
   }
 
-  Features::Features(const std::string &filename) {
+  Features::Features(const std::string &filename) : Features(filename, false) {}
+
+  Features::Features(const std::string &filename, const bool quiet) {
     // let Python handle file exceptions
     std::ifstream i(filename);
     json j;
@@ -113,13 +115,6 @@ namespace feature_generation {
     iterations = j.at("iterations").get<int>();
     pruning = j.at("pruning").get<std::string>();
     multiset_hash = j.at("multiset_hash").get<bool>();
-
-    std::cout << "package_version=" << package_version << std::endl;
-    std::cout << "feature_name=" << feature_name << std::endl;
-    std::cout << "graph_representation=" << graph_representation << std::endl;
-    std::cout << "iterations=" << iterations << std::endl;
-    std::cout << "pruning=" << pruning << std::endl;
-    std::cout << "multiset_hash=" << multiset_hash << std::endl;
 
     // load colours
     StrColourHash colour_hash_str = j.at("colour_hash").get<StrColourHash>();
@@ -149,11 +144,9 @@ namespace feature_generation {
         j.at("domain").at("constant_objects").get<std::vector<planning::Object>>();
     domain = std::make_shared<planning::Domain>(
         domain_name, domain_predicates, domain_functions, constant_objects);
-    std::cout << "domain=" << domain->to_string() << std::endl;
 
     // load weights if they exist
     std::vector<double> weights_tmp = j.at("weights").get<std::vector<double>>();
-    std::cout << "weights_size=" << weights_tmp.size() << std::endl;
     if (weights_tmp.size() > 0) {
       store_weights = true;
       weights = weights_tmp;
@@ -161,12 +154,26 @@ namespace feature_generation {
       store_weights = false;
     }
 
+    // reconstruct layer to colours
+    layer_to_colours = get_layer_to_colours();
+
     // initialise other variables (assume collection already done)
     collected = true;
     collecting = false;
     pruned = true;
 
     initialise_variables();
+
+    if (!quiet) {
+      std::cout << "package_version=" << package_version << std::endl;
+      std::cout << "feature_name=" << feature_name << std::endl;
+      std::cout << "graph_representation=" << graph_representation << std::endl;
+      std::cout << "iterations=" << iterations << std::endl;
+      std::cout << "pruning=" << pruning << std::endl;
+      std::cout << "multiset_hash=" << multiset_hash << std::endl;
+      std::cout << "domain=" << domain->to_string() << std::endl;
+      std::cout << "weights_size=" << weights_tmp.size() << std::endl;
+    }
   }
 
   void Features::set_problem(const planning::Problem &problem) {
@@ -492,6 +499,25 @@ namespace feature_generation {
     return layer_to_n_colours;
   }
 
+  std::vector<std::set<int>> Features::get_layer_to_colours() const {
+    std::vector<std::set<int>> ret(iterations + 1, std::set<int>());
+    for (auto &[colour, layer] : colour_to_layer) {
+      ret[layer].insert(colour);
+    }
+#ifndef NDEBUG
+    for (int i = 0; i < iterations + 1; i++) {
+      if (ret[i].size() != layer_to_colours[i].size()) {
+        std::cout << "ERROR: layer_to_colours and colour_to_layer do not match." << std::endl;
+        std::cout << "layer_to_colours[" << i << "].size()=" << layer_to_colours[i].size()
+                  << std::endl;
+        std::cout << "ret[" << i << "].size()=" << ret[i].size() << std::endl;
+        exit(-1);
+      }
+    }
+#endif
+    return ret;
+  }
+
   void Features::set_weights(const std::vector<double> &weights) {
     if (((int)weights.size()) != get_n_features()) {
       throw std::runtime_error("Number of weights must match number of features.");
@@ -553,7 +579,8 @@ namespace feature_generation {
       std::error_code err;
       std::string directory_name = filename.substr(0, filename.find_last_of("/"));
       if (!create_directory_recursive(directory_name, err)) {
-        std::cout << "Error: failed to recursively create directory. " << err.message() << std::endl;
+        std::cout << "Error: failed to recursively create directory. " << err.message()
+                  << std::endl;
       }
     }
 
