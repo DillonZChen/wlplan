@@ -8,13 +8,11 @@ namespace feature_generation {
   class PruningOptions {
    public:
     static const std::string NONE;
-    static const std::string COLLAPSE_ALL;
-    static const std::string COLLAPSE_ALL_X;
-    static const std::string COLLAPSE_LAYER;
-    static const std::string COLLAPSE_LAYER_X;  // bfg2019
-    static const std::string COLLAPSE_LAYER_Y;  // maxsat
-    static const std::string COLLAPSE_LAYER_F;  // frequency count < 1% n_data
-    static const std::string COLLAPSE_LAYER_YF;  // Y then F
+    static const std::string ALL_MAXSAT;
+    static const std::string LAYER_GREEDY;  // bfg2019
+    static const std::string LAYER_MAXSAT;  // MaxSAT
+    static const std::string LAYER_FREQUENCY;  // frequency count < 1% n_data
+    static const std::string LAYER_MAXSAT_FREQUENCY;  // MaxSAT then frequency
 
     static const std::vector<std::string> get_all();
   };

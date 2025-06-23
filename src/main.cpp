@@ -459,8 +459,6 @@ auto feature_generation_m = m.def_submodule("feature_generation");
 
 py::class_<feature_generation::PruningOptions>(feature_generation_m, "PruningOptions")
   .def_readonly_static("NONE", &feature_generation::PruningOptions::NONE)
-  .def_readonly_static("COLLAPSE_ALL", &feature_generation::PruningOptions::COLLAPSE_ALL)
-  .def_readonly_static("COLLAPSE_LAYER", &feature_generation::PruningOptions::COLLAPSE_LAYER)
   .def_static("get_all", &feature_generation::PruningOptions::get_all)
 ;
 

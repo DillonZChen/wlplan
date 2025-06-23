@@ -2,23 +2,19 @@
 
 namespace feature_generation {
   const std::string PruningOptions::NONE = "none";
-  const std::string PruningOptions::COLLAPSE_ALL = "collapse-all";
-  const std::string PruningOptions::COLLAPSE_ALL_X = "collapse-all-x";
-  const std::string PruningOptions::COLLAPSE_LAYER = "collapse-layer";
-  const std::string PruningOptions::COLLAPSE_LAYER_X = "collapse-layer-x";
-  const std::string PruningOptions::COLLAPSE_LAYER_Y = "collapse-layer-y";
-  const std::string PruningOptions::COLLAPSE_LAYER_F = "collapse-layer-f";
-  const std::string PruningOptions::COLLAPSE_LAYER_YF = "collapse-layer-yf";
+  const std::string PruningOptions::ALL_MAXSAT = "a-m";
+  const std::string PruningOptions::LAYER_GREEDY = "i-g";
+  const std::string PruningOptions::LAYER_MAXSAT = "i-m";
+  const std::string PruningOptions::LAYER_FREQUENCY = "i-f";
+  const std::string PruningOptions::LAYER_MAXSAT_FREQUENCY = "i-mf";
   const std::vector<std::string> PruningOptions::get_all() {
     return {
         NONE,
-        // COLLAPSE_ALL,
-        COLLAPSE_ALL_X,
-        // COLLAPSE_LAYER,
-        COLLAPSE_LAYER_X,
-        COLLAPSE_LAYER_Y,
-        COLLAPSE_LAYER_F,
-        COLLAPSE_LAYER_YF,
+        ALL_MAXSAT,
+        LAYER_GREEDY,
+        LAYER_MAXSAT,
+        LAYER_FREQUENCY,
+        LAYER_MAXSAT_FREQUENCY,
     };
   }
 }  // namespace feature_generation

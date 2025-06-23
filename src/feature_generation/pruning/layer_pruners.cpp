@@ -7,17 +7,15 @@ namespace feature_generation {
                                       std::vector<std::vector<int>> &cur_colours) {
     std::set<int> to_prune;
     pruned = true;
-    if (pruning == PruningOptions::COLLAPSE_LAYER) {
-      to_prune = prune_collapse_layer(iteration, cur_colours);
-    } else if (pruning == PruningOptions::COLLAPSE_LAYER_X) {
-      to_prune = prune_collapse_layer_x(iteration, graphs);
-    } else if (pruning == PruningOptions::COLLAPSE_LAYER_Y) {
-      to_prune = prune_collapse_layer_y(iteration, graphs);
-    } else if (pruning == PruningOptions::COLLAPSE_LAYER_F) {
-      to_prune = prune_collapse_layer_f(iteration, graphs);
-    } else if (pruning == PruningOptions::COLLAPSE_LAYER_YF) {
-      to_prune = prune_collapse_layer_y(iteration, graphs);
-      std::set<int> to_prune_f = prune_collapse_layer_f(iteration, graphs);
+    if (pruning == PruningOptions::LAYER_GREEDY) {
+      to_prune = prune_collapse_layer_greedy(iteration, graphs);
+    } else if (pruning == PruningOptions::LAYER_MAXSAT) {
+      to_prune = prune_collapse_layer_maxsat(iteration, graphs);
+    } else if (pruning == PruningOptions::LAYER_FREQUENCY) {
+      to_prune = prune_collapse_layer_frequency(iteration, graphs);
+    } else if (pruning == PruningOptions::LAYER_MAXSAT_FREQUENCY) {
+      to_prune = prune_collapse_layer_maxsat(iteration, graphs);
+      std::set<int> to_prune_f = prune_collapse_layer_frequency(iteration, graphs);
       to_prune.insert(to_prune_f.begin(), to_prune_f.end());
     } else {
       to_prune = std::set<int>();
@@ -40,45 +38,9 @@ namespace feature_generation {
     }
   }
 
-  std::set<int> Features::prune_collapse_layer(int iteration,
-                                               std::vector<std::vector<int>> &cur_colours) {
-    std::set<int> colours = get_iteration_colours(iteration);
-    std::set<int> features_to_prune;
-
-    std::map<int, std::vector<int>> columns;
-    size_t n_graphs = cur_colours.size();
-
-    for (int colour : colours) {
-      columns[colour] = std::vector<int>(n_graphs, 0);
-    }
-    for (size_t graph_i = 0; graph_i < n_graphs; graph_i++) {
-      for (size_t node_i = 0; node_i < cur_colours[graph_i].size(); node_i++) {
-        int colour = cur_colours[graph_i][node_i];
-        if (colours.count(colour) == 0) {
-          // this occurs for isolated nodes and would cause seg fault below
-          continue;
-        }
-        columns[colour][graph_i]++;
-      }
-    }
-
-    // greedily select first unique features
-    std::unordered_set<std::vector<int>, int_vector_hasher> unique_features;
-    for (int colour : colours) {
-      std::vector<int> column = columns[colour];
-      if (unique_features.count(column) == 0) {
-        unique_features.insert(column);
-      } else {
-        // throw out because not unique
-        features_to_prune.insert(colour);
-      }
-    }
-
-    return features_to_prune;
-  }
-
-  std::set<int> Features::prune_collapse_layer_x(int iteration,
-                                                 const std::vector<graph::Graph> &graphs) {
+  std::set<int> Features::prune_collapse_layer_greedy(int iteration,
+                                                      const std::vector<graph::Graph> &graphs) {
+    // As in Bonet et al. 2019
     int original_iterations = iterations;
     iterations = iteration;
     collecting = false;
@@ -116,15 +78,16 @@ namespace feature_generation {
     return features_to_prune;
   }
 
-  std::set<int> Features::prune_collapse_layer_y(int iteration,
-                                                 const std::vector<graph::Graph> &graphs) {
+  std::set<int> Features::prune_collapse_layer_maxsat(int iteration,
+                                                      const std::vector<graph::Graph> &graphs) {
+    // MaxSAT but per layer
     int original_iterations = iterations;
     iterations = iteration;
     collecting = false;
     collected = true;
 
     std::vector<Embedding> X = embed_graphs(graphs);
-    std::set<int> to_prune = prune_maxsat_x(X, iterations);
+    std::set<int> to_prune = prune_maxsat(X, iterations);
 
     collecting = true;
     collected = false;
@@ -133,8 +96,9 @@ namespace feature_generation {
     return to_prune;
   }
 
-  std::set<int> Features::prune_collapse_layer_f(int iteration,
-                                                 const std::vector<graph::Graph> &graphs) {
+  std::set<int> Features::prune_collapse_layer_frequency(int iteration,
+                                                         const std::vector<graph::Graph> &graphs) {
+    // Frequency count < 1% of n_data
     int original_iterations = iterations;
     iterations = iteration;
     collecting = false;
