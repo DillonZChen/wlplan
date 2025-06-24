@@ -169,10 +169,6 @@ def test_pruning():
             t = time.time() - t
             print(f"{t=:.3f}s")
 
-    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[PruningOptions.COLLAPSE_LAYER].shape
-    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[None].shape
-    # assert Xs[PruningOptions.COLLAPSE_LAYER].shape <= Xs[None].shape
-
 
 def test_repeated_dataset():
     for pruning in PruningOptions.get_all():
@@ -240,7 +236,3 @@ def test_multiset():
                 X = np.array(feature_generator.embed(dataset))
             t = time.time() - t
             print(f"{t=:.3f}s")
-
-    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[PruningOptions.COLLAPSE_LAYER].shape
-    # assert Xs[PruningOptions.COLLAPSE_ALL].shape <= Xs[None].shape
-    # assert Xs[PruningOptions.COLLAPSE_LAYER].shape <= Xs[None].shape

@@ -182,15 +182,4 @@ namespace graph {
     base_graph = modify_graph_from_state(state, base_graph, true);
     return base_graph;
   }
-
-  int ILGGenerator::get_n_edge_labels() const { return domain.get_max_arity(); }
-
-  void ILGGenerator::print_init_colours() const {
-    std::cout << "Initial node colours:" << std::endl;
-    for (const auto &kv : colour_to_description) {
-      std::cout << kv.first << " -> " << kv.second << std::endl;
-    }
-  }
-
-  void ILGGenerator::dump_graph() const { base_graph->dump(); }
 }  // namespace graph

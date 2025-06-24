@@ -48,8 +48,7 @@ namespace feature_generation {
   void Features::check_valid_configuration() {
     // check pruning support
     if (std::set<std::string>({
-                                  PruningOptions::COLLAPSE_LAYER,
-                                  PruningOptions::COLLAPSE_LAYER_X,
+                                  PruningOptions::LAYER_GREEDY,
                               })
             .count(pruning) &&
         !std::set<std::string>({

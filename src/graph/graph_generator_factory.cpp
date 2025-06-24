@@ -2,6 +2,7 @@
 
 #include "../../include/graph/ilg_generator.hpp"
 #include "../../include/graph/nilg_generator.hpp"
+#include "../../include/graph/ploig_generator.hpp"
 
 namespace graph {
   std::shared_ptr<GraphGenerator> create_graph_generator(const std::string &name,
@@ -12,6 +13,8 @@ namespace graph {
       graph_generator = std::make_shared<ILGGenerator>(domain, false);
     } else if (name == "nilg") {
       graph_generator = std::make_shared<NILGGenerator>(domain, true);
+    } else if (name == "ploig") {
+      graph_generator = std::make_shared<PLOIGGenerator>(domain, true);
     } else if (name == "custom") {
       graph_generator = NULL;
     } else {

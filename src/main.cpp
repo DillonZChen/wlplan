@@ -10,6 +10,7 @@
 #include "../include/feature_generation/pruning_options.hpp"
 #include "../include/graph/ilg_generator.hpp"
 #include "../include/graph/nilg_generator.hpp"
+#include "../include/graph/ploig_generator.hpp"
 #include "../include/planning/atom.hpp"
 #include "../include/planning/domain.hpp"
 #include "../include/planning/fluent.hpp"
@@ -361,7 +362,9 @@ Parameters
         List of training states.
 )")
   .def(py::init<planning::Problem &, std::vector<planning::State> &>(), 
-        "problem"_a, "states"_a);
+        "problem"_a, "states"_a)
+  .def_readonly("problem", &data::ProblemStates::problem)
+  .def_readonly("states", &data::ProblemStates::states);
 
 
 
@@ -441,6 +444,14 @@ py::class_<graph::NILGGenerator, graph::ILGGenerator>(graph_m, "NILGGenerator")
   .def("to_graph", &graph::NILGGenerator::to_graph, "state"_a)
 ;
 
+// PLOIGGenerator
+py::class_<graph::PLOIGGenerator>(graph_m, "PLOIGGenerator")
+  .def(py::init<planning::Domain &, bool>(), 
+        "domain"_a, "differentiate_constant_objects"_a)
+  .def("set_problem", &graph::PLOIGGenerator::set_problem, "problem"_a)
+  .def("to_graph", &graph::PLOIGGenerator::to_graph, "state"_a)
+;
+
 //////////////////////////////////////////////////////////////////////////////
 // Feature Generation
 //////////////////////////////////////////////////////////////////////////////
@@ -448,8 +459,6 @@ auto feature_generation_m = m.def_submodule("feature_generation");
 
 py::class_<feature_generation::PruningOptions>(feature_generation_m, "PruningOptions")
   .def_readonly_static("NONE", &feature_generation::PruningOptions::NONE)
-  .def_readonly_static("COLLAPSE_ALL", &feature_generation::PruningOptions::COLLAPSE_ALL)
-  .def_readonly_static("COLLAPSE_LAYER", &feature_generation::PruningOptions::COLLAPSE_LAYER)
   .def_static("get_all", &feature_generation::PruningOptions::get_all)
 ;
 

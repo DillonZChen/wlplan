@@ -42,7 +42,7 @@ def _get_feature_generators_dict() -> dict[str, Features]:
 
 
 def get_available_graph_choices() -> list[str | None]:
-    return [None, "custom", "ilg", "nilg"]
+    return [None, "custom", "ilg", "nilg", "ploig"]
 
 
 def get_available_pruning_methods() -> list[str | None]:
