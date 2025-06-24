@@ -35,6 +35,8 @@ jobs:
 
       - name: Pass tests
         run: |
+          mkdir -p _wlplan
+          python -m pip install -v .
           python -m pip install -r tests/test-requirements.txt
           pytest tests/check_not_debug.py
           pytest
