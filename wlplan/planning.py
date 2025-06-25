@@ -4,9 +4,6 @@ from typing import Optional
 import pddl
 import pddl.logic
 import pddl.logic.functions
-from pddl.core import Domain as PDDLDomain
-from pddl.core import Problem as PDDLProblem
-
 from _wlplan.planning import (
     Atom,
     ComparatorType,
@@ -23,6 +20,8 @@ from _wlplan.planning import (
     Problem,
     State,
 )
+from pddl.core import Domain as PDDLDomain
+from pddl.core import Problem as PDDLProblem
 
 __all__ = ["parse_domain", "parse_problem"]
 
@@ -73,7 +72,9 @@ def _get_functions(pddl_domain: PDDLDomain) -> dict[str, Function]:
     return functions
 
 
-def _convert_pddl_to_wlplan_expression(pddl_expression, fluent_to_id: dict[str, int]) -> NumericExpression:
+def _convert_pddl_to_wlplan_expression(
+    pddl_expression, fluent_to_id: dict[str, int]
+) -> NumericExpression:
     if isinstance(pddl_expression, pddl.logic.functions.NumericFunction):
         toks = str(pddl_expression).replace(")", "").replace("(", "").split()
         fluent_name = toks[0] + "(" + ", ".join(toks[1:]) + ")"
@@ -91,7 +92,9 @@ def _convert_pddl_to_wlplan_expression(pddl_expression, fluent_to_id: dict[str, 
     return expression
 
 
-def to_wlplan_domain(pddl_domain: PDDLDomain, domain_name: Optional[str] = None, keep_statics: bool = True) -> Domain:
+def to_wlplan_domain(
+    pddl_domain: PDDLDomain, domain_name: Optional[str] = None, keep_statics: bool = True
+) -> Domain:
     """Converts a Domain object from the pddl library to a Domain object in wlplan."""
 
     # Domain name
@@ -118,7 +121,9 @@ def to_wlplan_domain(pddl_domain: PDDLDomain, domain_name: Optional[str] = None,
     return domain
 
 
-def to_wlplan_problem(pddl_domain: PDDLDomain, pddl_problem: PDDLProblem, keep_statics: bool = True) -> Problem:
+def to_wlplan_problem(
+    pddl_domain: PDDLDomain, pddl_problem: PDDLProblem, keep_statics: bool = True
+) -> Problem:
     """Converts a Problem object from the pddl library to a Problem object in wlplan."""
 
     # Get domain information
@@ -241,7 +246,9 @@ def parse_domain(
     # Parse domain with the pddl package
     pddl_domain = pddl.parse_domain(domain_path)
 
-    return to_wlplan_domain(pddl_domain=pddl_domain, domain_name=domain_name, keep_statics=keep_statics)
+    return to_wlplan_domain(
+        pddl_domain=pddl_domain, domain_name=domain_name, keep_statics=keep_statics
+    )
 
 
 def parse_problem(domain_path: str, problem_path: str, keep_statics: bool = True) -> Problem:
@@ -260,7 +267,9 @@ def parse_problem(domain_path: str, problem_path: str, keep_statics: bool = True
     pddl_domain = pddl.parse_domain(domain_path)
     pddl_problem = pddl.parse_problem(problem_path)
 
-    return to_wlplan_problem(pddl_domain=pddl_domain, pddl_problem=pddl_problem, keep_statics=keep_statics)
+    return to_wlplan_problem(
+        pddl_domain=pddl_domain, pddl_problem=pddl_problem, keep_statics=keep_statics
+    )
 
 
 if __name__ == "__main__":

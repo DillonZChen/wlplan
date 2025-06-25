@@ -253,6 +253,18 @@ namespace feature_generation {
     for (int itr = 1; itr < iterations + 1; itr++) {
       for (size_t i = 0; i < new_hash_vec[itr].size(); i++) {
         std::vector<int> key = new_hash_vec[itr][i].first;
+        // if any value in key is not present in remap, continue
+        bool missing = false;
+        for (const int val : key) {
+          if (remap.count(val) == 0) {
+            missing = true;
+            break;
+          }
+        }
+        if (missing) {
+          continue;
+        }
+
         int val = new_hash_vec[itr][i].second;
         if (new_colour_layer[val] > 0) {
           key = neighbour_container->remap(key, remap);

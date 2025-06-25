@@ -126,15 +126,20 @@ def get_feature_generator(
 
     graph_choices = get_available_graph_choices()
     if graph_representation not in graph_choices:
-        raise ValueError(f"graph_representation must be one of {graph_choices}")
+        raise ValueError(f"graph-representation must be one of {graph_choices}")
     if graph_representation is None:
         graph_representation = "custom"
 
     prune_choices = get_available_pruning_methods()
     if pruning not in prune_choices:
-        raise ValueError(f"pruning must be one of {prune_choices}")
+        raise ValueError(f"feature-pruning must be one of {prune_choices}")
     if pruning is None:
         pruning = "none"
+
+    if pruning.startswith("i-") and feature_algorithm not in {"wl", "lwl2"}:
+        raise NotImplementedError(
+            f"feature-pruning={pruning} and features={feature_algorithm} are not compatible"
+        )
 
     return FG(
         domain=domain,
