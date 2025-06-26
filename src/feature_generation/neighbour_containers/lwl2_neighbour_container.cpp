@@ -10,6 +10,14 @@ namespace feature_generation {
                                                  const std::map<int, int> &remap) {
     clear();
 
+    // print input
+#ifdef DEBUGMODE
+    for (const int &col : input) {
+      std::cout << col << " ";
+    }
+    std::cout << std::endl;
+#endif
+
     std::vector<int> output = {remap.at(input.at(0))};
 
     for (const auto &[col0, col1, n_occurrences] : deconstruct(input)) {

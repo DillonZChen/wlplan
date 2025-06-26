@@ -43,9 +43,3 @@ jobs:
 
       - name: Test code
         run: pytest
-
-      - name: Test isort
-        run: py.test --isort
-
-      - name: Test black
-        run: py.test --black

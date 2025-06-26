@@ -23,10 +23,7 @@ namespace feature_generation {
     std::vector<int> remap(const std::vector<int> &input, const std::map<int, int> &remap) override;
 
    protected:
-    // profiling showed that using pairs is faster than vector of maps/sets, and that ordered
-    // containers are faster than unordered containers given that pair does not have a hash
-    std::set<std::pair<int, int>> neighbours_set;
-    std::map<std::pair<int, int>, int> neighbours_mset;
+    std::map<std::pair<int, int>, int> neighbours;
   };
 }  // namespace feature_generation
 

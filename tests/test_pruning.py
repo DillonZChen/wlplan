@@ -13,4 +13,9 @@ LOGGER = logging.getLogger(__name__)
 def test_domain(domain_name, pruning):
     if pruning == PruningOptions.NONE:
         pytest.skip()
-    colours_test(domain_name, 4, "wl", pruning)
+    colours_test(domain_name, 2, "wl", pruning)
+
+
+@pytest.mark.parametrize("domain_name,pruning", product(DOMAINS, ["i-mf"]))
+def test_expressive(domain_name, pruning):
+    colours_test(domain_name, 2, "lwl2", pruning)

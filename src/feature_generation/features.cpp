@@ -47,15 +47,8 @@ namespace feature_generation {
 
   void Features::check_valid_configuration() {
     // check pruning support
-    if (std::set<std::string>({
-                                  PruningOptions::LAYER_GREEDY,
-                              })
-            .count(pruning) &&
-        !std::set<std::string>({
-                                   "wl",
-                                   "2-lwl",
-                               })
-             .count(feature_name)) {
+    if (pruning != PruningOptions::NONE &&
+        !std::set<std::string>({"wl", "2-lwl"}).count(feature_name)) {
       throw std::runtime_error("Pruning option `" + pruning +
                                "` not supported for feature option `" + feature_name + "`.");
     }
@@ -201,18 +194,68 @@ namespace feature_generation {
     return colour_hash[iteration][colour];
   }
 
-  std::map<int, int> Features::remap_colour_hash(const std::set<int> &to_prune) {
+  std::map<int, int> Features::remap_colour_hash(std::set<int> &to_prune) {
+
+    //////////////////////////////////////////
+#ifdef DEBUGMODE
+    std::cout << "****************************************************************" << std::endl;
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      for (const auto &[key, val] : colour_hash[itr]) {
+        std::cout << "HASH_ITR " << itr << " HASH ";
+        debug_hash(key, val);
+      }
+    }
+    std::cout << "PRUNE";
+    for (const int i : to_prune) {
+      std::cout << " " << i;
+    }
+    std::cout << std::endl;
+#endif
+    //////////////////////////////////////////
+
     // remap values
     std::map<int, int> remap;
     std::vector<std::vector<std::pair<std::vector<int>, int>>> new_hash_vec(
         iterations + 1, std::vector<std::pair<std::vector<int>, int>>());
     std::unordered_map<int, int> new_colour_layer;
 
+    int modifications = 1;
+    int post_pruning_itr = 0;
+    while (modifications > 0) {
+      std::cout << "Post-pruning iteration " << post_pruning_itr << std::endl;
+      post_pruning_itr++;
+      modifications = 0;
+      for (int itr = 1; itr < iterations + 1; itr++) {
+        for (const auto &[key, val] : colour_hash.at(itr)) {
+          // if to_prune appears in any value or key in colour hash, discard it
+          if (to_prune.count(val) > 0) {
+            continue;
+          }
+
+          bool skip = false;
+          for (const int &neighbour : neighbour_container->get_neighbour_colours(key)) {
+            if (to_prune.count(neighbour) > 0) {
+              skip = true;
+              break;
+            }
+          }
+          if (skip) {
+            to_prune.insert(val);
+            modifications++;
+          }
+        }
+      }
+      std::cout << "Pruned an additional " << modifications << " features" << std::endl;
+    }
+
     for (int itr = 0; itr < iterations + 1; itr++) {
       for (const auto &[key, val] : colour_hash.at(itr)) {
+        // if to_prune appears in any value or key in colour hash, discard it
         if (to_prune.count(val) > 0) {
           continue;
         }
+
+        // otherwise remap
         int new_val = remap.size();
         remap[val] = new_val;
         new_hash_vec[itr].push_back(std::make_pair(key, new_val));
@@ -222,15 +265,6 @@ namespace feature_generation {
 
     //////////////////////////////////////////
 #ifdef DEBUGMODE
-    for (int itr = 1; itr < iterations + 1; itr++) {
-      for (const auto &[key, val] : colour_hash[itr]) {
-        std::cout << "HASH_ITR " << itr << " HASH ";
-        debug_hash(key, val);
-      }
-    }
-    for (const int i : to_prune) {
-      std::cout << "PRUNE " << i << std::endl;
-    }
     for (const auto &[key, val] : remap) {
       std::cout << "REMAP " << key << " -> " << val << " LAYER: " << new_colour_layer[val]
                 << std::endl;
@@ -253,18 +287,6 @@ namespace feature_generation {
     for (int itr = 1; itr < iterations + 1; itr++) {
       for (size_t i = 0; i < new_hash_vec[itr].size(); i++) {
         std::vector<int> key = new_hash_vec[itr][i].first;
-        // if any value in key is not present in remap, continue
-        bool missing = false;
-        for (const int val : key) {
-          if (remap.count(val) == 0) {
-            missing = true;
-            break;
-          }
-        }
-        if (missing) {
-          continue;
-        }
-
         int val = new_hash_vec[itr][i].second;
         if (new_colour_layer[val] > 0) {
           key = neighbour_container->remap(key, remap);
@@ -292,6 +314,31 @@ namespace feature_generation {
         layer_to_colours[itr].insert(val);
       }
     }
+
+    //////////////////////////////////////////
+#ifdef DEBUGMODE
+    std::cout << "--- NEW COLOUR_HASH AFTER REMAP ---" << std::endl;
+    for (int itr = 0; itr < iterations + 1; itr++) {
+      for (const auto &[key, val] : colour_hash[itr]) {
+        std::cout << "HASH_ITR " << itr << " HASH ";
+        debug_hash(key, val);
+      }
+    }
+    std::cout << "--- NEW COLOUR_TO_LAYER AFTER REMAP ---" << std::endl;
+    for (const auto &[key, val] : colour_to_layer) {
+      std::cout << "COL " << key << " LAYER " << val << std::endl;
+    }
+    std::cout << "--- NEW LAYER_TO_COLOURS AFTER REMAP ---" << std::endl;
+    for (int itr = 0; itr < iterations + 1; itr++) {
+      std::cout << "LAYER " << itr << " COLS ";
+      for (const int col : layer_to_colours[itr]) {
+        std::cout << col << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << "****************************************************************" << std::endl;
+#endif
+    //////////////////////////////////////////
 
     return remap;
   }

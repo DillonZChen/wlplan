@@ -6,39 +6,22 @@ namespace feature_generation {
   WLNeighbourContainer::WLNeighbourContainer(bool multiset_hash)
       : NeighbourContainer(multiset_hash) {}
 
-  void WLNeighbourContainer::clear() {
-    if (multiset_hash) {
-      neighbours_mset.clear();
-    } else {
-      neighbours_set.clear();
-    }
-  }
+  void WLNeighbourContainer::clear() { neighbours.clear(); }
 
   void WLNeighbourContainer::insert(const int node_colour, const int edge_label) {
     const std::pair<int, int> key = std::make_pair(edge_label, node_colour);
-    if (multiset_hash) {
-      if (neighbours_mset.count(key) > 0)
-        neighbours_mset[key]++;
-      else
-        neighbours_mset[key] = 1;
-    } else {
-      neighbours_set.insert(key);
-    }
+    if (multiset_hash && neighbours.count(key) > 0)
+      neighbours[key]++;
+    else
+      neighbours[key] = 1;
   }
 
   std::vector<int> WLNeighbourContainer::to_vector() const {
     std::vector<int> vec;
-    if (multiset_hash) {
-      for (const auto &[label_colour, count] : neighbours_mset) {
-        vec.push_back(label_colour.first);   // edge label
-        vec.push_back(label_colour.second);  // node colour
-        vec.push_back(count);                // count in multiset
-      }
-    } else {
-      for (const auto &[label, colour] : neighbours_set) {
-        vec.push_back(label);   // edge label
-        vec.push_back(colour);  // node colour
-      }
+    for (const auto &[label_colour, count] : neighbours) {
+      vec.push_back(label_colour.first);   // edge label
+      vec.push_back(label_colour.second);  // node colour
+      vec.push_back(count);                // count in multiset (always 1 for set)
     }
     return vec;
   }
@@ -47,12 +30,7 @@ namespace feature_generation {
   WLNeighbourContainer::deconstruct(const std::vector<int> &colours) const {
     std::vector<std::tuple<int, int, int>> output;
 
-    int inc;
-    if (multiset_hash) {
-      inc = 3;
-    } else {
-      inc = 2;
-    }
+    int inc = 3;
 
     if (colours.size() % inc != 1) {
       throw std::runtime_error("Key " + to_string(colours) + " has size() % " +
@@ -63,12 +41,7 @@ namespace feature_generation {
     for (size_t i = 1; i < colours.size(); i += inc) {
       int edge_label = colours.at(i);
       int node_colour = colours.at(i + 1);
-      int n_occurrences;
-      if (multiset_hash) {
-        n_occurrences = colours.at(i + 2);
-      } else {
-        n_occurrences = 1;
-      }
+      int n_occurrences = colours.at(i + 2);
       output.push_back(std::tuple<int, int, int>(node_colour, edge_label, n_occurrences));
     }
 

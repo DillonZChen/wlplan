@@ -45,7 +45,8 @@ class int_vector_hasher {
 
 namespace feature_generation {
   using Embedding = std::vector<double>;
-  using VecColourHash = std::vector<std::unordered_map<std::vector<int>, int, int_vector_hasher>>;
+  using ColourHash = std::unordered_map<std::vector<int>, int, int_vector_hasher>;
+  using VecColourHash = std::vector<ColourHash>;
   using StrColourHash = std::vector<std::unordered_map<std::string, int>>;
 
   class Features {
@@ -86,7 +87,7 @@ namespace feature_generation {
     // reformat colour hash based on colours to throw out
     VecColourHash new_colour_hash() const;
     std::vector<std::set<int>> new_layer_to_colours() const;
-    std::map<int, int> remap_colour_hash(const std::set<int> &to_prune);
+    std::map<int, int> remap_colour_hash(std::set<int> &to_prune);
 
     // check if configuration is valid
     void check_valid_configuration();
