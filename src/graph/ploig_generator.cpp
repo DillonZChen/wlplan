@@ -116,7 +116,6 @@ namespace graph {
       if (positive_goal_names.count(atom_name)) {
         unachieved_goals.erase(atom_name);
         ag.push_back(atom);
-        std::cout << atom_name << " is an achieved goal." << std::endl;
       } else {
         ap.push_back(atom);
       }
