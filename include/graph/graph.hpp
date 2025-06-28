@@ -23,7 +23,7 @@ namespace graph {
     Graph(const std::vector<int> &node_colours,
           const std::vector<std::string> &node_names,
           const std::vector<std::vector<std::pair<int, int>>> &edges);
-          
+
     Graph(const std::vector<int> &node_colours,
           const std::vector<std::vector<std::pair<int, int>>> &edges);
 

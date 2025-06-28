@@ -31,7 +31,7 @@ and adding the following to the root CMakeLists.txt file of your project
     target_link_libraries(<your_project> PRIVATE wlplan)
 
 ## Graph Representations
-The graph representations of planning tasks implemented thus far are 
+The graph representations of planning tasks implemented thus far are
 | Name                                   | WLPlan shorthand | Reference                                                                                                                            |
 | -------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | Instance Learning Graph (ILG)          | `ilg`            | D. Z. Chen, F. Trevizan, S. Thiébaux:  Return to Tradition: Learning Reliable Heuristics with Classical Machine Learning. ICAPS 2024 |

@@ -1,4 +1,5 @@
 import networkx as nx
+
 from _wlplan.graph import Graph
 from _wlplan.graph import ILGGenerator as _ILGGenerator
 from _wlplan.graph import NILGGenerator as _NILGGenerator

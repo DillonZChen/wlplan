@@ -5,7 +5,7 @@
 // Dillon Z. Chen, Felipe Trevizan, and Sylvie Thiébaux. Return to Tradition: Learning Reliable
 // Heuristics with Classical Machine Learning. In ICAPS, 2024.
 
-// Link: 
+// Link:
 // https://arxiv.org/abs/2403.16508
 
 #include "../../planning/atom.hpp"

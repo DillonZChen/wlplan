@@ -5,7 +5,7 @@ The source code and installation instructions for WLPlan is available on `GitHub
 
 .. toctree::
     :caption: Package Reference
-    
+
     package/wlplan
     package/data
     package/feature_generation

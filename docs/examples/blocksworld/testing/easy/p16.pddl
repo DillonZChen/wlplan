@@ -3,7 +3,7 @@
 (define (problem blocksworld-16)
  (:domain blocksworld)
  (:objects b1 b2 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 b13 b14 b15 b16 b17 - object)
- (:init 
+ (:init
     (arm-empty)
     (clear b17)
     (on b17 b8)
@@ -25,7 +25,7 @@
     (on b15 b14)
     (on b14 b5)
     (on-table b5))
- (:goal  (and 
+ (:goal  (and
     (clear b3)
     (on b3 b13)
     (on b13 b1)

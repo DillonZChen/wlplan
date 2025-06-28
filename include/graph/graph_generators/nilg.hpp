@@ -1,8 +1,8 @@
 #ifndef GRAPH_GRAPH_GENERATORS_NILG_HPP
 #define GRAPH_GRAPH_GENERATORS_NILG_HPP
 
-// Reference: 
-// Dillon Z. Chen and Sylvie Thiébaux. Graph Learning for Numeric Planning. In NeurIPS, 2024. 
+// Reference:
+// Dillon Z. Chen and Sylvie Thiébaux. Graph Learning for Numeric Planning. In NeurIPS, 2024.
 
 // Link:
 // https://arxiv.org/abs/2410.24080
