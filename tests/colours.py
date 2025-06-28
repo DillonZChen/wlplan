@@ -23,7 +23,7 @@ FD_COLOURS = {
 DOMAINS = sorted(FD_COLOURS.keys())
 
 
-def colours_test(domain_name: str, iterations: int, feature_algorithm: str, pruning: str = None):
+def colours_test(domain_name: str, iterations: int, feature_algorithm: str, pruning: str = "none"):
     logging.info(f"L={iterations}")
 
     n_features = {}

@@ -28,29 +28,27 @@ __all__ = [
     "CCWLaFeatures",
 ]
 
-
-def _get_feature_generators_dict() -> dict[str, Features]:
-    return {
-        "wl": WLFeatures,
-        "kwl2": KWL2Features,
-        "lwl2": LWL2Features,
-        "iwl": IWLFeatures,
-        "niwl": NIWLFeatures,
-        "ccwl": CCWLFeatures,
-        "ccwl-a": CCWLaFeatures,
-    }
+_FEATURE_GENERATORS = {
+    "wl": WLFeatures,
+    "kwl2": KWL2Features,
+    "lwl2": LWL2Features,
+    "iwl": IWLFeatures,
+    "niwl": NIWLFeatures,
+    "ccwl": CCWLFeatures,
+    "ccwl-a": CCWLaFeatures,
+}
 
 
-def get_available_graph_choices() -> list[str | None]:
+def get_available_graph_choices() -> list[str]:
     return ["custom", "ilg", "nilg", "ploig"]
 
 
-def get_available_pruning_methods() -> list[str | None]:
+def get_available_pruning_methods() -> list[str]:
     return PruningOptions.get_all()
 
 
-def get_available_feature_generators() -> set[str]:
-    return set(_get_feature_generators_dict().keys())
+def get_available_feature_generators() -> list[str]:
+    return list(_FEATURE_GENERATORS.keys())
 
 
 def load_feature_generator(filename: str, quiet: bool = False) -> Features:
@@ -76,11 +74,10 @@ def load_feature_generator(filename: str, quiet: bool = False) -> Features:
         data = json.load(f)
     feature_generator = data["feature_name"]
 
-    FG = _get_feature_generators_dict()
-    if feature_generator not in FG:
+    if feature_generator not in _FEATURE_GENERATORS:
         raise ValueError(f"Unknown {feature_generator=} in {filename=}")
 
-    return FG[feature_generator](filename=filename, quiet=quiet)
+    return _FEATURE_GENERATORS[feature_generator](filename=filename, quiet=quiet)
 
 
 def get_feature_generator(
@@ -88,7 +85,7 @@ def get_feature_generator(
     domain: Domain,
     graph_representation: str = "ilg",
     iterations: int = 2,
-    pruning: Optional[str] = None,
+    pruning: str = "none",
     multiset_hash: bool = False,
 ) -> Features:
     """
@@ -118,30 +115,23 @@ def get_feature_generator(
     ------
         ValueError: If the specified feature algorithm is unknown.
     """
-    FGs = _get_feature_generators_dict()
-    if feature_algorithm in FGs:
-        FG = FGs[feature_algorithm]
+    if feature_algorithm in _FEATURE_GENERATORS:
+        FeatureGenerator = _FEATURE_GENERATORS[feature_algorithm]
     else:
         raise ValueError(f"Unknown feature algorithm: {feature_algorithm}")
 
     graph_choices = get_available_graph_choices()
     if graph_representation not in graph_choices:
         raise ValueError(f"graph-representation must be one of {graph_choices}")
-    if graph_representation is None:
-        graph_representation = "custom"
 
     prune_choices = get_available_pruning_methods()
     if pruning not in prune_choices:
         raise ValueError(f"feature-pruning must be one of {prune_choices}")
-    if pruning is None:
-        pruning = "none"
 
     if pruning.startswith("i-") and feature_algorithm not in {"wl", "lwl2"}:
-        raise NotImplementedError(
-            f"feature-pruning={pruning} and features={feature_algorithm} are not compatible"
-        )
+        raise NotImplementedError(f"{pruning=} and {feature_algorithm=} are not compatible")
 
-    return FG(
+    return FeatureGenerator(
         domain=domain,
         graph_representation=graph_representation,
         iterations=iterations,

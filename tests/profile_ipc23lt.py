@@ -28,7 +28,7 @@ def test_profile(domain_name):
             feature_algorithm="wl",
             domain=domain,
             iterations=4,
-            pruning=None,
+            pruning="none",
             multiset_hash=config["multiset_hash"],
         )
         feature_generator.collect(dataset)

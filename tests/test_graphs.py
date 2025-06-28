@@ -21,9 +21,9 @@ def test_blocksworld_random_path_graph():
     feature_generator = get_feature_generator(
         feature_algorithm="wl",
         domain=domain,
-        graph_representation=None,
+        graph_representation="custom",
         iterations=4,
-        pruning=None,
+        pruning="none",
     )
     graphs = []
     LOGGER.info("Converting to random path graphs")
