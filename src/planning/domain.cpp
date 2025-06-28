@@ -10,8 +10,8 @@ namespace planning {
                  const std::vector<Object> &constant_objects)
       : name(name),
         predicates(predicates),
-        schemata(schemata),
         functions(functions),
+        schemata(schemata),
         constant_objects(constant_objects) {
     // sort items to ensure consistency when saving and loading models
     std::sort(this->predicates.begin(), this->predicates.end());

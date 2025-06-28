@@ -12,6 +12,7 @@ namespace graph {
                                                  const std::vector<planning::Action> &actions) {
     std::shared_ptr<Graph> graph = ILGGenerator::to_graph(state);
     // TODO add action nodes
+    throw std::runtime_error("AOAG.to_graph() not yet implemented");
     return graph;
   }
 
