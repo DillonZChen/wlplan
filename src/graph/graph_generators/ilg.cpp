@@ -1,4 +1,4 @@
-#include "../../include/graph/ilg_generator.hpp"
+#include "../../../include/graph/graph_generators/ilg.hpp"
 
 #define X(description, name) name,
 char const *fact_description_name[] = {ILG_FACT_DESCRIPTIONS};

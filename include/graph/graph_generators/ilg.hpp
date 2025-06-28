@@ -1,12 +1,19 @@
-#ifndef GRAPH_ILG_GENERATOR_HPP
-#define GRAPH_ILG_GENERATOR_HPP
+#ifndef GRAPH_GRAPH_GENERATORS_ILG
+#define GRAPH_GRAPH_GENERATORS_ILG
 
-#include "../planning/atom.hpp"
-#include "../planning/domain.hpp"
-#include "../planning/problem.hpp"
-#include "../planning/state.hpp"
-#include "graph.hpp"
-#include "graph_generator.hpp"
+// Reference:
+// Dillon Z. Chen, Felipe Trevizan, and Sylvie Thiébaux. Return to Tradition: Learning Reliable
+// Heuristics with Classical Machine Learning. In ICAPS, 2024.
+
+// Link: 
+// https://arxiv.org/abs/2403.16508
+
+#include "../../planning/atom.hpp"
+#include "../../planning/domain.hpp"
+#include "../../planning/problem.hpp"
+#include "../../planning/state.hpp"
+#include "../graph.hpp"
+#include "../graph_generator.hpp"
 
 #include <map>
 #include <memory>
@@ -34,8 +41,8 @@ namespace graph {
 
     void set_problem(const planning::Problem &problem) override;
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
-    void reset_graph() const override;
+    std::shared_ptr<Graph> to_graph_opt(const planning::State &state);
+    void reset_graph() const;
 
    protected:
     /* The following variables remain constant for all problems */
@@ -76,4 +83,4 @@ namespace graph {
   }
 }  // namespace graph
 
-#endif  // GRAPH_ILG_GENERATOR_HPP
+#endif  // GRAPH_GRAPH_GENERATORS_ILG

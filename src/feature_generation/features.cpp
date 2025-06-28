@@ -132,10 +132,17 @@ namespace feature_generation {
           planning::Function(raw_functions[i].first, raw_functions[i].second));
     }
 
+    std::vector<std::pair<std::string, int>> raw_schemata =
+        j.at("domain").at("schemata").get<std::vector<std::pair<std::string, int>>>();
+    std::vector<planning::Predicate> domain_schemata = std::vector<planning::Predicate>();
+    for (size_t i = 0; i < raw_schemata.size(); i++) {
+      domain_schemata.push_back(planning::Predicate(raw_schemata[i].first, raw_schemata[i].second));
+    }
+
     std::vector<planning::Object> constant_objects =
         j.at("domain").at("constant_objects").get<std::vector<planning::Object>>();
     domain = std::make_shared<planning::Domain>(
-        domain_name, domain_predicates, domain_functions, constant_objects);
+        domain_name, domain_predicates, domain_functions, domain_schemata, constant_objects);
 
     // load weights if they exist
     std::vector<double> weights_tmp = j.at("weights").get<std::vector<double>>();

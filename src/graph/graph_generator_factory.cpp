@@ -1,8 +1,8 @@
 #include "../../include/graph/graph_generator_factory.hpp"
 
-#include "../../include/graph/ilg_generator.hpp"
-#include "../../include/graph/nilg_generator.hpp"
-#include "../../include/graph/ploig_generator.hpp"
+#include "../../include/graph/graph_generators/ilg.hpp"
+#include "../../include/graph/graph_generators/nilg.hpp"
+#include "../../include/graph/graph_generators/ploig.hpp"
 
 namespace graph {
   std::shared_ptr<GraphGenerator> create_graph_generator(const std::string &name,

@@ -2,7 +2,6 @@
 #define DATA_DATASET_HPP
 
 #include "../graph/graph.hpp"
-#include "../graph/ilg_generator.hpp"
 #include "../planning/problem.hpp"
 #include "../planning/state.hpp"
 

@@ -8,9 +8,9 @@
 #include "../include/feature_generation/feature_generators/wl.hpp"
 #include "../include/feature_generation/features.hpp"
 #include "../include/feature_generation/pruning_options.hpp"
-#include "../include/graph/ilg_generator.hpp"
-#include "../include/graph/nilg_generator.hpp"
-#include "../include/graph/ploig_generator.hpp"
+#include "../include/graph/graph_generators/ilg.hpp"
+#include "../include/graph/graph_generators/nilg.hpp"
+#include "../include/graph/graph_generators/ploig.hpp"
 #include "../include/planning/atom.hpp"
 #include "../include/planning/domain.hpp"
 #include "../include/planning/fluent.hpp"
@@ -95,14 +95,8 @@ R"(Parameters
     constant_objects : list[Object], optional
         List of constant objects.
 )")
-  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>, std::vector<planning::Object>>(), 
-        "name"_a, "predicates"_a, "functions"_a, "constant_objects"_a)
-  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Object>>(), 
-        "name"_a, "predicates"_a, "constant_objects"_a)
-  .def(py::init<std::string &, std::vector<planning::Predicate>>(), 
-        "name"_a, "predicates"_a)
-  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>>(), 
-        "name"_a, "predicates"_a, "functions"_a)
+  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>, std::vector<planning::Predicate>, std::vector<planning::Object>>(), 
+        "name"_a, "predicates"_a, "functions"_a, "schemata"_a, "constant_objects"_a)
   .def_readonly("name", &planning::Domain::name)
   .def_readonly("predicates", &planning::Domain::predicates)
   .def_readonly("functions", &planning::Domain::functions)

@@ -1,4 +1,4 @@
-#include "../../include/graph/nilg_generator.hpp"
+#include "../../../include/graph/graph_generators/nilg.hpp"
 
 namespace graph {
   NILGGenerator::NILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects)

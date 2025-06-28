@@ -1,4 +1,4 @@
-#include "../../include/graph/ploig_generator.hpp"
+#include "../../../include/graph/graph_generators/ploig.hpp"
 
 namespace graph {
   PLOIGGenerator::PLOIGGenerator(const planning::Domain &domain,
@@ -73,8 +73,6 @@ namespace graph {
       positive_goal_names.insert(atom.to_string());
     }
   }
-
-  void PLOIGGenerator::reset_graph() const {}
 
   std::shared_ptr<Graph> PLOIGGenerator::to_graph(const planning::State &state) {
     // reset graph and variables
@@ -174,10 +172,5 @@ namespace graph {
     }
 
     return std::make_shared<Graph>(graph);
-  }
-
-  std::shared_ptr<Graph> PLOIGGenerator::to_graph_opt(const planning::State &state) {
-    // TODO optimise
-    return to_graph(state);
   }
 }  // namespace graph

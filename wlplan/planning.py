@@ -4,6 +4,9 @@ from typing import Optional
 import pddl
 import pddl.logic
 import pddl.logic.functions
+from pddl.core import Domain as PDDLDomain
+from pddl.core import Problem as PDDLProblem
+
 from _wlplan.planning import (
     Atom,
     ComparatorType,
@@ -20,8 +23,6 @@ from _wlplan.planning import (
     Problem,
     State,
 )
-from pddl.core import Domain as PDDLDomain
-from pddl.core import Problem as PDDLProblem
 
 __all__ = ["parse_domain", "parse_problem"]
 
@@ -72,6 +73,16 @@ def _get_functions(pddl_domain: PDDLDomain) -> dict[str, Function]:
     return functions
 
 
+def _get_schemata(pddl_domain: PDDLDomain) -> dict[str, Predicate]:
+    # We currently do not use action effects so we treat schemata as predicates.
+    schemata = {}
+    for schema in pddl_domain.actions:
+        name = schema.name
+        arity = len(schema.parameters)
+        schemata[name] = Predicate(name=name, arity=arity)
+    return schemata
+
+
 def _convert_pddl_to_wlplan_expression(
     pddl_expression, fluent_to_id: dict[str, int]
 ) -> NumericExpression:
@@ -109,6 +120,10 @@ def to_wlplan_domain(
     functions = _get_functions(pddl_domain)
     functions = sorted(list(functions.values()), key=lambda x: repr(x))
 
+    # Get schemata
+    schemata = _get_schemata(pddl_domain)
+    schemata = sorted(list(schemata.values()), key=lambda x: repr(x))
+
     # Get constant objects (ignores types)
     constant_objects = sorted(list(str(o) for o in pddl_domain.constants))
 
@@ -116,6 +131,7 @@ def to_wlplan_domain(
         name=domain_name,
         predicates=predicates,
         functions=functions,
+        schemata=schemata,
         constant_objects=constant_objects,
     )
     return domain

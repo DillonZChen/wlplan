@@ -1,7 +1,14 @@
-#ifndef GRAPH_NILG_GENERATOR_HPP
-#define GRAPH_NILG_GENERATOR_HPP
+#ifndef GRAPH_GRAPH_GENERATORS_NILG_HPP
+#define GRAPH_GRAPH_GENERATORS_NILG_HPP
 
-#include "ilg_generator.hpp"
+// Reference: 
+// Dillon Z. Chen and Sylvie Thiébaux. Graph Learning for Numeric Planning. In NeurIPS, 2024. 
+
+// Link:
+// https://arxiv.org/abs/2410.24080
+
+
+#include "ilg.hpp"
 
 #include <map>
 #include <memory>
@@ -20,7 +27,7 @@ namespace graph {
 
     // Extends ILG methods
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
+    std::shared_ptr<Graph> to_graph_opt(const planning::State &state);
 
    protected:
     std::unordered_map<std::string, int> fluent_to_colour;
@@ -37,4 +44,4 @@ namespace graph {
   };
 }  // namespace graph
 
-#endif  // GRAPH_NILG_GENERATOR_HPP
+#endif  // GRAPH_GRAPH_GENERATORS_NILG_HPP
