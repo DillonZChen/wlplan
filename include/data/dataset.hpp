@@ -2,6 +2,7 @@
 #define DATA_DATASET_HPP
 
 #include "../graph/graph.hpp"
+#include "../planning/action.hpp"
 #include "../planning/problem.hpp"
 #include "../planning/state.hpp"
 
@@ -10,21 +11,24 @@
 #include <vector>
 
 namespace data {
-  class ProblemStates {
+  class ProblemDataset {
    public:
     const planning::Problem problem;
     const std::vector<planning::State> states;
+    const std::vector<std::vector<planning::Action>> actions;
 
-    ProblemStates(const planning::Problem &problem, const std::vector<planning::State> &states)
-        : problem(problem), states(states){};
+    ProblemDataset(const planning::Problem &problem, const std::vector<planning::State> &states);
+    ProblemDataset(const planning::Problem &problem,
+                  const std::vector<planning::State> &states,
+                  const std::vector<std::vector<planning::Action>> &actions);
   };
 
-  class Dataset {
+  class DomainDataset {
    public:
     const planning::Domain &domain;
-    const std::vector<ProblemStates> data;
+    const std::vector<ProblemDataset> data;
 
-    Dataset(const planning::Domain &domain, const std::vector<ProblemStates> &data);
+    DomainDataset(const planning::Domain &domain, const std::vector<ProblemDataset> &data);
 
     size_t get_size() const;
 

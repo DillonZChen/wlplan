@@ -4,9 +4,8 @@ import zipfile
 
 import pymimir
 
-import wlplan
-from wlplan.data import Dataset, ProblemStates
-from wlplan.planning import Predicate, State, parse_domain
+from wlplan.data import DomainDataset, ProblemDataset
+from wlplan.planning import parse_domain
 
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
@@ -73,6 +72,6 @@ def get_dataset(domain_name: str):
     domain, data, y = get_raw_dataset(domain_name)
     problem_states = []
     for problem, states in data:
-        problem_states.append(ProblemStates(problem=problem, states=states))
-    dataset = Dataset(domain=domain, data=problem_states)
+        problem_states.append(ProblemDataset(problem=problem, states=states))
+    dataset = DomainDataset(domain=domain, data=problem_states)
     return domain, dataset, y

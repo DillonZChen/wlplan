@@ -1,3 +1,3 @@
-from _wlplan.data import Dataset, ProblemStates
+from _wlplan.data import DomainDataset, ProblemDataset
 
-__all__ = ["Dataset", "ProblemStates"]
+__all__ = ["DomainDataset", "ProblemDataset"]

@@ -116,15 +116,15 @@ namespace feature_generation {
     /* Feature generation functions */
 
     // convert states to graphs
-    std::vector<graph::Graph> convert_to_graphs(const data::Dataset dataset);
+    std::vector<graph::Graph> convert_to_graphs(const data::DomainDataset dataset);
 
     // collect training colours
-    void collect_from_dataset(const data::Dataset dataset);
+    void collect_from_dataset(const data::DomainDataset dataset);
     void collect(const std::vector<graph::Graph> &graphs);
     void layer_redundancy_check();
 
     // embedding assumes training is done, and returns a feature matrix X
-    std::vector<Embedding> embed_dataset(const data::Dataset &dataset);
+    std::vector<Embedding> embed_dataset(const data::DomainDataset &dataset);
     std::vector<Embedding> embed_graphs(const std::vector<graph::Graph> &graphs);
     Embedding embed_graph(const graph::Graph &graph);
     Embedding embed_state(const planning::State &state);

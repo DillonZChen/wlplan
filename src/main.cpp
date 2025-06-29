@@ -324,8 +324,8 @@ R"(Parameters
 //////////////////////////////////////////////////////////////////////////////
 auto data_m = m.def_submodule("data");
 
-// Dataset
-py::class_<data::Dataset>(data_m, "Dataset",
+// DomainDataset
+py::class_<data::DomainDataset>(data_m, "DomainDataset",
 R"(WLPlan dataset object.
 
 Datasets contain a domain and a list of problem states.
@@ -335,14 +335,14 @@ Parameters
     domain : Domain
         Domain object.
 
-    data : list[ProblemStates]
+    data : list[ProblemDataset]
         List of problem states.
 )")
-  .def(py::init<planning::Domain &, std::vector<data::ProblemStates> &>(),
+  .def(py::init<planning::Domain &, std::vector<data::ProblemDataset> &>(),
         "domain"_a, "data"_a);
 
-// ProblemStates
-py::class_<data::ProblemStates>(data_m, "ProblemStates",
+// ProblemDataset
+py::class_<data::ProblemDataset>(data_m, "ProblemDataset",
 R"(Stores a problem and training states for the problem.
 
 Upon initialisation, the problem and states are checked for consistency.
@@ -354,11 +354,17 @@ Parameters
 
     states : list[State]
         List of training states.
+
+    actions : list[list[Action]], optional
+        List of actions for each state.
 )")
   .def(py::init<planning::Problem &, std::vector<planning::State> &>(),
         "problem"_a, "states"_a)
-  .def_readonly("problem", &data::ProblemStates::problem)
-  .def_readonly("states", &data::ProblemStates::states);
+  .def(py::init<planning::Problem &, std::vector<planning::State> &, std::vector<std::vector<planning::Action>>>(),
+        "problem"_a, "states"_a, "actions"_a)
+  .def_readonly("problem", &data::ProblemDataset::problem)
+  .def_readonly("states", &data::ProblemDataset::states)
+  .def_readonly("actions", &data::ProblemDataset::actions);
 
 
 
@@ -457,7 +463,7 @@ py::class_<feature_generation::PruningOptions>(feature_generation_m, "PruningOpt
 ;
 
 py::class_<feature_generation::Features>(feature_generation_m, "Features")
-  .def("collect", py::overload_cast<const data::Dataset>(&feature_generation::Features::collect_from_dataset),
+  .def("collect", py::overload_cast<const data::DomainDataset>(&feature_generation::Features::collect_from_dataset),
         "dataset"_a)
   .def("collect", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::collect),
         "graphs"_a)
@@ -469,7 +475,7 @@ py::class_<feature_generation::Features>(feature_generation_m, "Features")
         "embedding"_a)
   .def("get_string_representation", py::overload_cast<const planning::State &>(&feature_generation::Features::get_string_representation),
         "state"_a)
-  .def("embed", py::overload_cast<const data::Dataset &>(&feature_generation::Features::embed_dataset),
+  .def("embed", py::overload_cast<const data::DomainDataset &>(&feature_generation::Features::embed_dataset),
         "dataset"_a)
   .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::embed_graphs),
         "graphs"_a)

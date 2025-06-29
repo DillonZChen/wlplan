@@ -350,24 +350,25 @@ namespace feature_generation {
     return remap;
   }
 
-  std::vector<graph::Graph> Features::convert_to_graphs(const data::Dataset dataset) {
+  std::vector<graph::Graph> Features::convert_to_graphs(const data::DomainDataset dataset) {
     std::vector<graph::Graph> graphs;
 
-    const std::vector<data::ProblemStates> &data = dataset.data;
+    const std::vector<data::ProblemDataset> &data = dataset.data;
     for (size_t i = 0; i < data.size(); i++) {
       const auto &problem_states = data[i];
       const auto &problem = problem_states.problem;
       const auto &states = problem_states.states;
+      const auto &actions = problem_states.actions;
       graph_generator->set_problem(problem);
-      for (const planning::State &state : states) {
-        graphs.push_back(*(graph_generator->to_graph(state)));
+      for (size_t j = 0; j < states.size(); j++) {
+        graphs.push_back(*(graph_generator->to_graph(states[j], actions[j])));
       }
     }
 
     return graphs;
   }
 
-  void Features::collect_from_dataset(const data::Dataset dataset) {
+  void Features::collect_from_dataset(const data::DomainDataset dataset) {
     if (graph_generator == nullptr) {
       throw std::runtime_error("No graph generator is set. Use graph input instead of dataset.");
     }
@@ -412,7 +413,7 @@ namespace feature_generation {
   }
 
   // overloaded embedding functions
-  std::vector<Embedding> Features::embed_dataset(const data::Dataset &dataset) {
+  std::vector<Embedding> Features::embed_dataset(const data::DomainDataset &dataset) {
     std::vector<graph::Graph> graphs = convert_to_graphs(dataset);
     if (graphs.size() == 0) {
       throw std::runtime_error("No graphs to embed");
