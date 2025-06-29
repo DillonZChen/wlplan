@@ -4,7 +4,7 @@ import numpy as np
 from ipc23lt import get_dataset
 from util import print_mat
 
-from wlplan.feature_generation import get_feature_generator
+from wlplan.feature_generator import init_feature_generator
 
 ## https://dillonzchen.github.io/publications/chen-trevizan-thiebaux-icaps2024.pdf
 FD_COLOURS = {
@@ -40,7 +40,7 @@ def colours_test(domain_name: str, iterations: int, feature_algorithm: str, prun
         multiset_hash = config["multiset_hash"]
         logging.info(f"{keep_statics=}, {multiset_hash=}")
         domain, dataset, _ = get_dataset(domain_name, keep_statics=keep_statics)
-        feature_generator = get_feature_generator(
+        feature_generator = init_feature_generator(
             feature_algorithm=feature_algorithm,
             domain=domain,
             graph_representation="ilg",

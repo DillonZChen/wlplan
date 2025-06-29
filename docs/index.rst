@@ -8,6 +8,6 @@ The source code and installation instructions for WLPlan is available on `GitHub
 
     package/wlplan
     package/data
-    package/feature_generation
+    package/feature_generator
     package/graph
     package/planning

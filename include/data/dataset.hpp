@@ -1,7 +1,7 @@
 #ifndef DATA_DATASET_HPP
 #define DATA_DATASET_HPP
 
-#include "../graph/graph.hpp"
+#include "../graph_generator/graph.hpp"
 #include "../planning/action.hpp"
 #include "../planning/problem.hpp"
 #include "../planning/state.hpp"

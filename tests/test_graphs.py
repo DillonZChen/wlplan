@@ -3,11 +3,12 @@ import random
 
 import networkx as nx
 import numpy as np
+import pytest
 from ipc23lt import get_raw_dataset as get_ipc23lt_dataset
 from neurips24 import get_raw_dataset as get_neurips24_dataset
 
-from wlplan.feature_generation import get_feature_generator
-from wlplan.graph import ILGGenerator, NILGGenerator, from_networkx, to_networkx
+from wlplan.feature_generator import init_feature_generator
+from wlplan.graph_generator import ILGGenerator, NILGGenerator, from_networkx, to_networkx
 
 LOGGER = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def test_blocksworld_random_path_graph():
     LOGGER.info("Getting raw dataset")
     domain, dataset, _ = get_ipc23lt_dataset(domain_name="blocksworld", keep_statics=False)
     LOGGER.info("Constructing feature generator")
-    feature_generator = get_feature_generator(
+    feature_generator = init_feature_generator(
         feature_algorithm="wl",
         domain=domain,
         graph_representation="custom",
@@ -49,7 +50,7 @@ def test_blocksworld_random_path_graph():
 def test_ilg():
     """Test ILG generator does not crash"""
     domain, dataset, _ = get_ipc23lt_dataset(domain_name="blocksworld", keep_statics=False)
-    ilg_generator = ILGGenerator(domain)
+    ilg_generator = ILGGenerator(domain, differentiate_constant_objects=True)
     for problem, states in dataset:
         for state in states:
             ilg_generator.set_problem(problem)
@@ -61,8 +62,11 @@ def test_ilg():
 
 def test_nilg():
     """Test NILG generator does not crash"""
-    domain, dataset, _ = get_ipc23lt_dataset(domain_name="blocksworld", keep_statics=False)
-    ilg_generator = ILGGenerator(domain)
+    try:
+        domain, dataset, _ = get_neurips24_dataset(domain_name="blocksworld", keep_statics=False)
+    except NotImplementedError:
+        pytest.skip()
+    ilg_generator = NILGGenerator(domain, differentiate_constant_objects=True)
     for problem, states in dataset:
         for state in states:
             ilg_generator.set_problem(problem)

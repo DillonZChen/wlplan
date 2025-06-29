@@ -1,16 +1,16 @@
 #include "../include/data/dataset.hpp"
-#include "../include/feature_generation/feature_generators/ccwl.hpp"
-#include "../include/feature_generation/feature_generators/ccwla.hpp"
-#include "../include/feature_generation/feature_generators/iwl.hpp"
-#include "../include/feature_generation/feature_generators/kwl2.hpp"
-#include "../include/feature_generation/feature_generators/lwl2.hpp"
-#include "../include/feature_generation/feature_generators/niwl.hpp"
-#include "../include/feature_generation/feature_generators/wl.hpp"
-#include "../include/feature_generation/features.hpp"
-#include "../include/feature_generation/pruning_options.hpp"
-#include "../include/graph/graph_generators/ilg.hpp"
-#include "../include/graph/graph_generators/nilg.hpp"
-#include "../include/graph/graph_generators/ploig.hpp"
+#include "../include/feature_generator/feature_generators/ccwl.hpp"
+#include "../include/feature_generator/feature_generators/ccwla.hpp"
+#include "../include/feature_generator/feature_generators/iwl.hpp"
+#include "../include/feature_generator/feature_generators/kwl2.hpp"
+#include "../include/feature_generator/feature_generators/lwl2.hpp"
+#include "../include/feature_generator/feature_generators/niwl.hpp"
+#include "../include/feature_generator/feature_generators/wl.hpp"
+#include "../include/feature_generator/features.hpp"
+#include "../include/feature_generator/pruning_options.hpp"
+#include "../include/graph_generator/graph_generators/ilg.hpp"
+#include "../include/graph_generator/graph_generators/nilg.hpp"
+#include "../include/graph_generator/graph_generators/ploig.hpp"
 #include "../include/planning/atom.hpp"
 #include "../include/planning/domain.hpp"
 #include "../include/planning/fluent.hpp"
@@ -60,7 +60,8 @@ R"(Parameters
   .def_readonly("name", &planning::Predicate::name)
   .def_readonly("arity", &planning::Predicate::arity)
   .def("__repr__", &::planning::Predicate::to_string)
-  .def("__eq__", &::planning::Predicate::operator==);
+  .def("__eq__", &::planning::Predicate::operator==)
+;
 
 // Function
 py::class_<planning::Function>(planning_m, "Function",
@@ -77,7 +78,8 @@ R"(Parameters
   .def_readonly("name", &planning::Function::name)
   .def_readonly("arity", &planning::Function::arity)
   .def("__repr__", &::planning::Function::to_string)
-  .def("__eq__", &::planning::Function::operator==);
+  .def("__eq__", &::planning::Function::operator==)
+;
 
 // Domain
 py::class_<planning::Domain>(planning_m, "Domain",
@@ -102,14 +104,16 @@ R"(Parameters
   .def_readonly("functions", &planning::Domain::functions)
   .def_readonly("constant_objects", &planning::Domain::constant_objects)
   .def("__repr__", &::planning::Domain::to_string)
-  .def("__eq__", &::planning::Domain::operator==);
+  .def("__eq__", &::planning::Domain::operator==)
+;
 
 /* Task components */
 
 // Object
 py::class_<planning::Object>(planning_m, "Object",
 R"(Object is a type alias for a str. WLPlan does not exploit object types.
-)");
+)")
+;
 
 // Atom
 py::class_<planning::Atom>(planning_m, "Atom",
@@ -124,7 +128,8 @@ R"(Parameters
   .def(py::init<planning::Predicate &, std::vector<std::string> &>(),
         "predicate"_a, "objects"_a)
   .def("__repr__", &::planning::Atom::to_string)
-  .def("__eq__", &::planning::Atom::operator==);
+  .def("__eq__", &::planning::Atom::operator==)
+;
 
 // Fluent
 py::class_<planning::Fluent>(planning_m, "Fluent",
@@ -139,14 +144,16 @@ R"(Parameters
   .def(py::init<planning::Function &, std::vector<std::string> &>(),
         "function"_a, "objects"_a)
   .def("__repr__", &::planning::Fluent::to_string)
-  .def("__eq__", &::planning::Fluent::operator==);
+  .def("__eq__", &::planning::Fluent::operator==)
+;
 
 // OperatorType
 py::enum_<planning::OperatorType>(planning_m, "OperatorType")
   .value("Plus", planning::OperatorType::Plus)
   .value("Minus", planning::OperatorType::Minus)
   .value("Multiply", planning::OperatorType::Multiply)
-  .value("Divide", planning::OperatorType::Divide);
+  .value("Divide", planning::OperatorType::Divide)
+;
 
 // NumericExpression (FormulaExpression, ConstantExpression, FluentExpression)
 py::class_<planning::NumericExpression, std::shared_ptr<planning::NumericExpression>>(planning_m, "NumericExpression",
@@ -154,7 +161,8 @@ R"(NumericExpression is an abstract class for numeric expressions.
 )")
   .def("evaluate", &planning::NumericExpression::evaluate, "values"_a)
   .def("get_fluent_ids", &planning::NumericExpression::get_fluent_ids)
-  .def("__repr__", &planning::NumericExpression::to_string);
+  .def("__repr__", &planning::NumericExpression::to_string)
+;
 
 // FormulaExpression
 py::class_<planning::FormulaExpression, planning::NumericExpression, std::shared_ptr<planning::FormulaExpression>>(planning_m, "FormulaExpression",
@@ -170,7 +178,8 @@ R"(Parameters
         Numeric expression.
 )")
   .def(py::init<planning::OperatorType, std::shared_ptr<planning::NumericExpression> &, std::shared_ptr<planning::NumericExpression> &>(),
-        "op_type"_a, "expr_a"_a, "expr_b"_a);
+        "op_type"_a, "expr_a"_a, "expr_b"_a)
+;
 
 // ConstantExpression
 py::class_<planning::ConstantExpression, planning::NumericExpression, std::shared_ptr<planning::ConstantExpression>>(planning_m, "ConstantExpression",
@@ -180,7 +189,8 @@ R"(Parameters
         Numeric value.
 )")
   .def(py::init<double>(),
-        "value"_a);
+        "value"_a)
+;
 
 // FluentExpression
 py::class_<planning::FluentExpression, planning::NumericExpression, std::shared_ptr<planning::FluentExpression>>(planning_m, "FluentExpression",
@@ -193,13 +203,15 @@ R"(Parameters
         Fluent name.
 )")
   .def(py::init<int, std::string>(),
-        "id"_a, "fluent_name"_a);
+        "id"_a, "fluent_name"_a)
+;
 
 // ComparatorType
 py::enum_<planning::ComparatorType>(planning_m, "ComparatorType")
   .value("GreaterThan", planning::ComparatorType::GreaterThan)
   .value("GreaterThanOrEqual", planning::ComparatorType::GreaterThanOrEqual)
-  .value("Equal", planning::ComparatorType::Equal);
+  .value("Equal", planning::ComparatorType::Equal)
+;
 
 // NumericCondition
 py::class_<planning::NumericCondition>(planning_m, "NumericCondition",
@@ -215,7 +227,8 @@ R"(Parameters
         "comparator_type"_a, "expression"_a)
   .def("evaluate_formula", &planning::NumericCondition::evaluate_formula, "values"_a)
   .def("evaluate_error", &planning::NumericCondition::evaluate_error, "values"_a)
-  .def("evaluate_formula_and_error", &planning::NumericCondition::evaluate_formula_and_error, "values"_a);
+  .def("evaluate_formula_and_error", &planning::NumericCondition::evaluate_formula_and_error, "values"_a)
+;
 
 // Problem
 py::class_<planning::Problem>(planning_m, "Problem",
@@ -339,7 +352,8 @@ Parameters
         List of problem states.
 )")
   .def(py::init<planning::Domain &, std::vector<data::ProblemDataset> &>(),
-        "domain"_a, "data"_a);
+        "domain"_a, "data"_a)
+;
 
 // ProblemDataset
 py::class_<data::ProblemDataset>(data_m, "ProblemDataset",
@@ -364,17 +378,18 @@ Parameters
         "problem"_a, "states"_a, "actions"_a)
   .def_readonly("problem", &data::ProblemDataset::problem)
   .def_readonly("states", &data::ProblemDataset::states)
-  .def_readonly("actions", &data::ProblemDataset::actions);
+  .def_readonly("actions", &data::ProblemDataset::actions)
+;
 
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Graph
 //////////////////////////////////////////////////////////////////////////////
-auto graph_m = m.def_submodule("graph");
+auto graph_generator_m = m.def_submodule("graph_generator");
 
 // Graph
-py::class_<graph::Graph, std::shared_ptr<graph::Graph>>(graph_m, "Graph",
+py::class_<graph_generator::Graph, std::shared_ptr<graph_generator::Graph>>(graph_generator_m, "Graph",
 R"(WLPlan graph object.
 
 Graphs have integer node colours and edge labels.
@@ -420,93 +435,103 @@ Methods
         "node_colours"_a, "node_names"_a, "edges"_a)
   .def(py::init<std::vector<int>, std::vector<std::vector<std::pair<int, int>>>>(),
         "node_colours"_a, "edges"_a)
-  .def_readonly("node_colours", &graph::Graph::nodes)
-  .def_readonly("node_values", &graph::Graph::node_values)
-  .def_readonly("edges", &graph::Graph::edges)
-  .def("get_node_name", &graph::Graph::get_node_name, "u"_a)
-  .def("dump", &graph::Graph::dump)
-  .def("__repr__", &::graph::Graph::to_string);
+  .def_readonly("node_colours", &graph_generator::Graph::nodes)
+  .def_readonly("node_values", &graph_generator::Graph::node_values)
+  .def_readonly("edges", &graph_generator::Graph::edges)
+  .def("get_node_name", &graph_generator::Graph::get_node_name,
+        "u"_a)
+  .def("dump", &graph_generator::Graph::dump)
+  .def("__repr__", &::graph_generator::Graph::to_string)
+;
 
+// GraphGenerator
+py::class_<graph_generator::GraphGenerator>(graph_generator_m, "GraphGenerator")
+  .def("to_graphs", &graph_generator::GraphGenerator::to_graphs,
+        "dataset"_a)
+  .def("set_problem", &graph_generator::GraphGenerator::set_problem,
+        "problem"_a)
+  .def("to_graph", py::overload_cast<const planning::State &>(&graph_generator::GraphGenerator::to_graph),
+        "state"_a)
+  .def("to_graph", py::overload_cast<const planning::State &, const std::vector<planning::Action> &>(&graph_generator::GraphGenerator::to_graph),
+        "state"_a, "actions"_a)
+;
 
 // ILGGenerator
-py::class_<graph::ILGGenerator>(graph_m, "ILGGenerator")
+py::class_<graph_generator::ILGGenerator, graph_generator::GraphGenerator>(graph_generator_m, "ILGGenerator")
   .def(py::init<planning::Domain &, bool>(),
         "domain"_a, "differentiate_constant_objects"_a)
-  .def("set_problem", &graph::ILGGenerator::set_problem, "problem"_a)
-  .def("to_graph", &graph::ILGGenerator::to_graph, "state"_a)
 ;
 
 // NILGGenerator
-py::class_<graph::NILGGenerator, graph::ILGGenerator>(graph_m, "NILGGenerator")
+py::class_<graph_generator::NILGGenerator, graph_generator::ILGGenerator>(graph_generator_m, "NILGGenerator")
   .def(py::init<planning::Domain &, bool>(),
         "domain"_a, "differentiate_constant_objects"_a)
-  .def("set_problem", &graph::NILGGenerator::set_problem, "problem"_a)
-  .def("to_graph", &graph::NILGGenerator::to_graph, "state"_a)
 ;
 
 // PLOIGGenerator
-py::class_<graph::PLOIGGenerator>(graph_m, "PLOIGGenerator")
+py::class_<graph_generator::PLOIGGenerator, graph_generator::GraphGenerator>(graph_generator_m, "PLOIGGenerator")
   .def(py::init<planning::Domain &, bool>(),
         "domain"_a, "differentiate_constant_objects"_a)
-  .def("set_problem", &graph::PLOIGGenerator::set_problem, "problem"_a)
-  .def("to_graph", &graph::PLOIGGenerator::to_graph, "state"_a)
 ;
 
 //////////////////////////////////////////////////////////////////////////////
 // Feature Generation
 //////////////////////////////////////////////////////////////////////////////
-auto feature_generation_m = m.def_submodule("feature_generation");
+auto feature_generator_m = m.def_submodule("feature_generator");
 
-py::class_<feature_generation::PruningOptions>(feature_generation_m, "PruningOptions")
-  .def_readonly_static("NONE", &feature_generation::PruningOptions::NONE)
-  .def_static("get_all", &feature_generation::PruningOptions::get_all)
+// PruningOptions
+py::class_<feature_generator::PruningOptions>(feature_generator_m, "PruningOptions")
+  .def_readonly_static("NONE", &feature_generator::PruningOptions::NONE)
+  .def_static("get_all", &feature_generator::PruningOptions::get_all)
 ;
 
-py::class_<feature_generation::Features>(feature_generation_m, "Features")
-  .def("collect", py::overload_cast<const data::DomainDataset>(&feature_generation::Features::collect_from_dataset),
+// Features
+py::class_<feature_generator::Features>(feature_generator_m, "Features")
+  .def("collect", py::overload_cast<const data::DomainDataset>(&feature_generator::Features::collect_from_dataset),
         "dataset"_a)
-  .def("collect", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::collect),
+  .def("collect", py::overload_cast<const std::vector<graph_generator::Graph> &>(&feature_generator::Features::collect),
         "graphs"_a)
-  .def("convert_to_graphs", &feature_generation::Features::convert_to_graphs,
+  .def("to_graphs", &feature_generator::Features::to_graphs,
         "dataset"_a)
-  .def("set_problem", &feature_generation::Features::set_problem,
+  .def("set_problem", &feature_generator::Features::set_problem,
         "problem"_a)
-  .def("get_string_representation", py::overload_cast<const feature_generation::Embedding &>(&feature_generation::Features::get_string_representation),
+  .def("get_string_representation", py::overload_cast<const feature_generator::Embedding &>(&feature_generator::Features::get_string_representation),
         "embedding"_a)
-  .def("get_string_representation", py::overload_cast<const planning::State &>(&feature_generation::Features::get_string_representation),
+  .def("get_string_representation", py::overload_cast<const planning::State &>(&feature_generator::Features::get_string_representation),
         "state"_a)
-  .def("embed", py::overload_cast<const data::DomainDataset &>(&feature_generation::Features::embed_dataset),
+  .def("embed", py::overload_cast<const data::DomainDataset &>(&feature_generator::Features::embed_dataset),
         "dataset"_a)
-  .def("embed", py::overload_cast<const std::vector<graph::Graph> &>(&feature_generation::Features::embed_graphs),
+  .def("embed", py::overload_cast<const std::vector<graph_generator::Graph> &>(&feature_generator::Features::embed_graphs),
         "graphs"_a)
-  .def("embed", py::overload_cast<const graph::Graph &>(&feature_generation::Features::embed_graph),
+  .def("embed", py::overload_cast<const graph_generator::Graph &>(&feature_generator::Features::embed_graph),
         "graph"_a)
-  .def("embed", py::overload_cast<const planning::State &>(&feature_generation::Features::embed_state),
+  .def("embed", py::overload_cast<const planning::State &>(&feature_generator::Features::embed_state),
         "state"_a)
-  .def("get_n_features", &feature_generation::Features::get_n_features)
-  .def("get_seen_counts", &feature_generation::Features::get_seen_counts)
-  .def("get_unseen_counts", &feature_generation::Features::get_unseen_counts)
-  .def("get_layer_to_n_colours", &feature_generation::Features::get_layer_to_n_colours)
-  .def("get_layer_to_colours", &feature_generation::Features::get_layer_to_colours)
-  .def("get_colour_to_layer", &feature_generation::Features::get_colour_to_layer)
-  .def("print_init_colours", &feature_generation::Features::print_init_colours)
-  .def("get_feature_name", &feature_generation::Features::get_feature_name)
-  .def("get_graph_representation", &feature_generation::Features::get_graph_representation)
-  .def("get_iterations", &feature_generation::Features::get_iterations)
-  .def("get_pruning", &feature_generation::Features::get_pruning)
-  .def("set_pruning", &feature_generation::Features::set_pruning,
+  .def("get_n_features", &feature_generator::Features::get_n_features)
+  .def("get_seen_counts", &feature_generator::Features::get_seen_counts)
+  .def("get_unseen_counts", &feature_generator::Features::get_unseen_counts)
+  .def("get_layer_to_n_colours", &feature_generator::Features::get_layer_to_n_colours)
+  .def("get_layer_to_colours", &feature_generator::Features::get_layer_to_colours)
+  .def("get_colour_to_layer", &feature_generator::Features::get_colour_to_layer)
+  .def("print_init_colours", &feature_generator::Features::print_init_colours)
+  .def("get_feature_name", &feature_generator::Features::get_feature_name)
+  .def("get_graph_representation", &feature_generator::Features::get_graph_representation)
+  .def("get_iterations", &feature_generator::Features::get_iterations)
+  .def("get_pruning", &feature_generator::Features::get_pruning)
+  .def("set_pruning", &feature_generator::Features::set_pruning,
         "pruning"_a)
-  .def("set_weights", &feature_generation::Features::set_weights,
+  .def("set_weights", &feature_generator::Features::set_weights,
         "weights"_a)
-  .def("get_weights", &feature_generation::Features::get_weights)
-  .def("predict", py::overload_cast<const graph::Graph &>(&feature_generation::Features::predict),
+  .def("get_weights", &feature_generator::Features::get_weights)
+  .def("predict", py::overload_cast<const graph_generator::Graph &>(&feature_generator::Features::predict),
         "graph"_a)
-  .def("predict", py::overload_cast<const planning::State &>(&feature_generation::Features::predict),
+  .def("predict", py::overload_cast<const planning::State &>(&feature_generator::Features::predict),
         "state"_a)
-  .def("save", &feature_generation::Features::save)
+  .def("save", &feature_generator::Features::save)
 ;
 
-py::class_<feature_generation::WLFeatures, feature_generation::Features>(feature_generation_m, "WLFeatures")
+// WLFeatures
+py::class_<feature_generator::WLFeatures, feature_generator::Features>(feature_generator_m, "WLFeatures")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
@@ -515,7 +540,8 @@ py::class_<feature_generation::WLFeatures, feature_generation::Features>(feature
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
-py::class_<feature_generation::LWL2Features, feature_generation::Features>(feature_generation_m, "LWL2Features")
+// LWL2Features
+py::class_<feature_generator::LWL2Features, feature_generator::Features>(feature_generator_m, "LWL2Features")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
@@ -524,7 +550,8 @@ py::class_<feature_generation::LWL2Features, feature_generation::Features>(featu
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
-py::class_<feature_generation::KWL2Features, feature_generation::Features>(feature_generation_m, "KWL2Features")
+// KWL2Features
+py::class_<feature_generator::KWL2Features, feature_generator::Features>(feature_generator_m, "KWL2Features")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
@@ -533,7 +560,8 @@ py::class_<feature_generation::KWL2Features, feature_generation::Features>(featu
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
-py::class_<feature_generation::IWLFeatures, feature_generation::Features>(feature_generation_m, "IWLFeatures")
+// IWLFeatures
+py::class_<feature_generator::IWLFeatures, feature_generator::Features>(feature_generator_m, "IWLFeatures")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
@@ -542,7 +570,8 @@ py::class_<feature_generation::IWLFeatures, feature_generation::Features>(featur
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
-py::class_<feature_generation::NIWLFeatures, feature_generation::IWLFeatures>(feature_generation_m, "NIWLFeatures")
+// NIWLFeatures
+py::class_<feature_generator::NIWLFeatures, feature_generator::IWLFeatures>(feature_generator_m, "NIWLFeatures")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
@@ -551,25 +580,27 @@ py::class_<feature_generation::NIWLFeatures, feature_generation::IWLFeatures>(fe
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
 ;
 
-py::class_<feature_generation::CCWLFeatures, feature_generation::WLFeatures>(feature_generation_m, "CCWLFeatures")
+// CCWLFeatures
+py::class_<feature_generator::CCWLFeatures, feature_generator::WLFeatures>(feature_generator_m, "CCWLFeatures")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
         "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(),
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
-  .def("set_weights", &feature_generation::CCWLFeatures::set_weights,
+  .def("set_weights", &feature_generator::CCWLFeatures::set_weights,
         "weights"_a)
 ;
 
-py::class_<feature_generation::CCWLaFeatures, feature_generation::WLFeatures>(feature_generation_m, "CCWLaFeatures")
+// CCWLaFeatures
+py::class_<feature_generator::CCWLaFeatures, feature_generator::WLFeatures>(feature_generator_m, "CCWLaFeatures")
   .def(py::init<const std::string &>(),
         "filename"_a)
   .def(py::init<const std::string &, bool>(),
         "filename"_a, "quiet"_a)
   .def(py::init<planning::Domain &, std::string, int, std::string, bool>(),
         "domain"_a, "graph_representation"_a, "iterations"_a, "pruning"_a, "multiset_hash"_a)
-  .def("set_weights", &feature_generation::CCWLaFeatures::set_weights,
+  .def("set_weights", &feature_generator::CCWLaFeatures::set_weights,
         "weights"_a)
 ;
 
