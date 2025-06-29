@@ -1,6 +1,5 @@
 import json
 import os
-from typing import Optional
 
 from _wlplan.feature_generation import (
     CCWLaFeatures,
