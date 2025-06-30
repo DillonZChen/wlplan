@@ -69,7 +69,23 @@ def init_graph_generator(
     )
 
 
-def from_networkx(graph: nx.Graph):
+def from_networkx(graph: nx.Graph) -> Graph:
+    """
+    Converts a NetworkX graph to a WLPlan graph.
+
+    Parameters
+    ----------
+        graph : nx.Graph
+            Input NetworkX graph.
+
+    Returns
+    -------
+        Graph : Output WLPlan graph.
+
+    Raises
+    ------
+        ValueError: If node colours or edge labels are not specified in the graph attributes.
+    """
     node_colours = []
     node_names = []
     name_to_idx = {}
@@ -90,8 +106,11 @@ def from_networkx(graph: nx.Graph):
     for u, v, attr in graph.edges(data=True):
         if "label" in attr:
             relation = attr["label"]
+        elif "relation" in attr:
+            relation = attr["relation"]
         else:
             raise ValueError(f"Edge label not specified for edge ({u}, {v})")
+
         edges[name_to_idx[u]].append((relation, name_to_idx[v]))
 
     wlplan_graph = Graph(node_colours, node_names, edges)
@@ -99,7 +118,19 @@ def from_networkx(graph: nx.Graph):
     return wlplan_graph
 
 
-def to_networkx(graph: Graph):
+def to_networkx(graph: Graph) -> nx.Graph:
+    """
+    Converts a WLPlan graph to a NetworkX graph.
+
+    Parameters
+    ----------
+        graph : nx.Graph
+            Input WLPlan graph.
+
+    Returns
+    -------
+        Graph : Output NetworkX graph.
+    """
     G = nx.Graph()
     for u, colour in enumerate(graph.node_colours):
         node_name = graph.get_node_name(u)

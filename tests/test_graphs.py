@@ -66,9 +66,8 @@ def test_ilg_blocksworld_counts():
     domain_pddl = get_domain_pddl(domain_name=domain_name)
     domain = parse_domain(domain_path=domain_pddl, domain_name=domain_name, keep_statics=True)
     ilg_generator = ILGGenerator(domain, differentiate_constant_objects=True)
-    assert (
-        ilg_generator.get_n_features() == 1 + len(domain.predicates) * 5
-    )  # also include neg goals
+    # also include neg goals
+    assert ilg_generator.get_n_features() == 1 + len(domain.predicates) * 5
     assert ilg_generator.get_n_relations() == max(p.arity for p in domain.predicates)
 
 
