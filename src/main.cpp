@@ -375,6 +375,8 @@ Parameters
 )")
   .def(py::init<planning::Domain &, std::vector<data::ProblemDataset> &>(),
         "domain"_a, "data"_a)
+  .def_readonly("domain", &data::DomainDataset::domain)
+  .def_readonly("data", &data::DomainDataset::data)
 ;
 
 // ProblemDataset

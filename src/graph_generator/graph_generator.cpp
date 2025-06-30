@@ -23,13 +23,13 @@ namespace graph_generator {
 
     const std::vector<data::ProblemDataset> &data = dataset.data;
     for (size_t i = 0; i < data.size(); i++) {
-      const auto &problem_states = data[i];
-      const auto &problem = problem_states.problem;
-      const auto &states = problem_states.states;
-      const auto &actions = problem_states.actions;
+      const auto &d = data.at(i);
+      const auto &problem = d.problem;
+      const auto &states = d.states;
+      const auto &actions = d.actions;
       set_problem(problem);
       for (size_t j = 0; j < states.size(); j++) {
-        graphs.push_back(*(to_graph(states[j], actions[j])));
+        graphs.push_back(*(to_graph(states.at(j), actions.at(j))));
       }
     }
 

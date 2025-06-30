@@ -19,13 +19,13 @@ namespace data {
 
     ProblemDataset(const planning::Problem &problem, const std::vector<planning::State> &states);
     ProblemDataset(const planning::Problem &problem,
-                  const std::vector<planning::State> &states,
-                  const std::vector<std::vector<planning::Action>> &actions);
+                   const std::vector<planning::State> &states,
+                   const std::vector<std::vector<planning::Action>> &actions);
   };
 
   class DomainDataset {
    public:
-    const planning::Domain &domain;
+    const planning::Domain domain;
     const std::vector<ProblemDataset> data;
 
     DomainDataset(const planning::Domain &domain, const std::vector<ProblemDataset> &data);
