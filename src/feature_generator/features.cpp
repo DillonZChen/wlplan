@@ -134,9 +134,9 @@ namespace feature_generator {
 
     std::vector<std::pair<std::string, int>> raw_schemata =
         j.at("domain").at("schemata").get<std::vector<std::pair<std::string, int>>>();
-    std::vector<planning::Predicate> domain_schemata = std::vector<planning::Predicate>();
+    std::vector<planning::Schema> domain_schemata = std::vector<planning::Schema>();
     for (size_t i = 0; i < raw_schemata.size(); i++) {
-      domain_schemata.push_back(planning::Predicate(raw_schemata[i].first, raw_schemata[i].second));
+      domain_schemata.push_back(planning::Schema(raw_schemata[i].first, raw_schemata[i].second));
     }
 
     std::vector<planning::Object> constant_objects =

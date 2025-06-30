@@ -39,22 +39,18 @@ namespace graph_generator {
    public:
     ILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
 
+    // Graph generation
     void set_problem(const planning::Problem &problem) override;
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state);
-    void reset_graph() const;
+    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
+    void reset_graph() const override;
+
+    // Graph features
+    int get_n_features() const override { return colour_to_description.size(); };
+    int get_n_relations() const override { return domain.get_predicate_arity(); };
 
    protected:
-    /* The following variables remain constant for all problems */
-    const planning::Domain &domain;
     const std::unordered_map<std::string, int> predicate_to_colour;
-    bool differentiate_constant_objects;
-
-    /* These variables get reset every time a new problem is set */
-    std::shared_ptr<Graph> base_graph;
-    std::unordered_set<std::string> positive_goal_names;
-    std::unordered_set<std::string> negative_goal_names;
-    std::shared_ptr<planning::Problem> problem;
 
     int fact_colour(const int predicate_idx, const ILGFactDescription &fact_description) const;
     int fact_colour(const planning::Atom &atom, const ILGFactDescription &fact_description) const;

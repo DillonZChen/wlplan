@@ -3,20 +3,10 @@
 namespace graph_generator {
   PLOIGGenerator::PLOIGGenerator(const planning::Domain &domain,
                                  bool differentiate_constant_objects)
-      : domain(domain), differentiate_constant_objects(differentiate_constant_objects) {
-    // initialise initial node colours
-    if (differentiate_constant_objects) {
-      // add constant object colours
-      for (size_t i = 0; i < domain.constant_objects.size(); i++) {
-        int colour = -(i + 1);
-        colour_to_description[colour] = domain.constant_objects[i] + " _CONSTANT_";
-      }
-    }
-
-    colour_to_description[0] = "_OBJECT_";
-
-    // add predicate colours
-    int col = 1;
+      : GraphGenerator(domain, differentiate_constant_objects) {
+    // Note that there are edge colours here.
+    // The only node (object) colours are already handled in GraphGenerator.
+    n_relations = 0;
     std::string desc;
     for (const auto &predicate : domain.predicates) {
       std::map<std::pair<int, int>, int> ag;
@@ -25,34 +15,34 @@ namespace graph_generator {
       for (int i = 0; i < predicate.arity; i++) {
         for (int j = i + 1; j < predicate.arity; j++) {
           desc = predicate.name + "__AG " + std::to_string(i) + " " + std::to_string(j);
-          colour_to_description[col] = desc;
-          ag[std::make_pair(i, j)] = col;
-          col++;
+          colour_to_description[n_relations] = desc;
+          ag[std::make_pair(i, j)] = n_relations;
+          n_relations++;
 
           desc = predicate.name + "__AG " + std::to_string(j) + " " + std::to_string(i);
-          colour_to_description[col] = desc;
-          ag[std::make_pair(j, i)] = col;
-          col++;
+          colour_to_description[n_relations] = desc;
+          ag[std::make_pair(j, i)] = n_relations;
+          n_relations++;
 
           desc = predicate.name + "__UG " + std::to_string(i) + " " + std::to_string(j);
-          colour_to_description[col] = desc;
-          ug[std::make_pair(i, j)] = col;
-          col++;
+          colour_to_description[n_relations] = desc;
+          ug[std::make_pair(i, j)] = n_relations;
+          n_relations++;
 
           desc = predicate.name + "__UG " + std::to_string(j) + " " + std::to_string(i);
-          colour_to_description[col] = desc;
-          ug[std::make_pair(j, i)] = col;
-          col++;
+          colour_to_description[n_relations] = desc;
+          ug[std::make_pair(j, i)] = n_relations;
+          n_relations++;
 
           desc = predicate.name + "__AP " + std::to_string(i) + " " + std::to_string(j);
-          colour_to_description[col] = desc;
-          ap[std::make_pair(i, j)] = col;
-          col++;
+          colour_to_description[n_relations] = desc;
+          ap[std::make_pair(i, j)] = n_relations;
+          n_relations++;
 
           desc = predicate.name + "__AP " + std::to_string(j) + " " + std::to_string(i);
-          colour_to_description[col] = desc;
-          ap[std::make_pair(j, i)] = col;
-          col++;
+          colour_to_description[n_relations] = desc;
+          ap[std::make_pair(j, i)] = n_relations;
+          n_relations++;
         }
       }
       ag_to_e_col[predicate.name] = ag;
@@ -172,5 +162,10 @@ namespace graph_generator {
     }
 
     return std::make_shared<Graph>(graph);
+  }
+
+  std::shared_ptr<Graph> PLOIGGenerator::to_graph_opt(const planning::State &state) {
+    // TODO optimise
+    return to_graph(state);
   }
 }  // namespace graph_generator

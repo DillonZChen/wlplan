@@ -6,7 +6,7 @@ namespace planning {
   Domain::Domain(const std::string &name,
                  const std::vector<Predicate> &predicates,
                  const std::vector<Function> &functions,
-                 const std::vector<Predicate> &schemata,
+                 const std::vector<Schema> &schemata,
                  const std::vector<Object> &constant_objects)
       : name(name),
         predicates(predicates),
@@ -27,22 +27,19 @@ namespace planning {
   Domain::Domain(const std::string &name,
                  const std::vector<Predicate> &predicates,
                  const std::vector<Function> &functions)
-      : Domain(name, predicates, functions, std::vector<Predicate>(), std::vector<Object>()) {}
+      : Domain(name, predicates, functions, std::vector<Schema>(), std::vector<Object>()) {}
 
   Domain::Domain(const std::string &name,
                  const std::vector<Predicate> &predicates,
                  const std::vector<Object> &constant_objects)
-      : Domain(name,
-               predicates,
-               std::vector<Function>(),
-               std::vector<Predicate>(),
-               constant_objects) {}
+      : Domain(name, predicates, std::vector<Function>(), std::vector<Schema>(), constant_objects) {
+  }
 
   Domain::Domain(const std::string &name, const std::vector<Predicate> &predicates)
       : Domain(name,
                predicates,
                std::vector<Function>(),
-               std::vector<Predicate>(),
+               std::vector<Schema>(),
                std::vector<Object>()) {}
 
   std::unordered_map<std::string, Predicate> Domain::get_name_to_predicate() const {
@@ -61,13 +58,34 @@ namespace planning {
     return name_to_function;
   }
 
-  int Domain::get_max_arity() const {
+  std::unordered_map<std::string, Schema> Domain::get_name_to_schema() const {
+    std::unordered_map<std::string, Schema> name_to_schema;
+    for (const auto &schema : schemata) {
+      name_to_schema[schema.name] = schema;
+    }
+    return name_to_schema;
+  }
+
+  int Domain::get_predicate_arity() const {
+    int max_arity = 0;
+    for (size_t i = 0; i < predicates.size(); i++) {
+      max_arity = std::max(max_arity, predicates[i].arity);
+    }
+    return max_arity;
+  }
+
+  int Domain::get_function_arity() const {
     int max_arity = 0;
     for (size_t i = 0; i < functions.size(); i++) {
       max_arity = std::max(max_arity, functions[i].arity);
     }
-    for (size_t i = 0; i < predicates.size(); i++) {
-      max_arity = std::max(max_arity, predicates[i].arity);
+    return max_arity;
+  }
+
+  int Domain::get_schemata_arity() const {
+    int max_arity = 0;
+    for (size_t i = 0; i < schemata.size(); i++) {
+      max_arity = std::max(max_arity, schemata[i].arity);
     }
     return max_arity;
   }

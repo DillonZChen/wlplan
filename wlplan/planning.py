@@ -21,6 +21,7 @@ from _wlplan.planning import (
     OperatorType,
     Predicate,
     Problem,
+    Schema,
     State,
 )
 
@@ -79,7 +80,7 @@ def _get_schemata(pddl_domain: PDDLDomain) -> dict[str, Predicate]:
     for schema in pddl_domain.actions:
         name = schema.name
         arity = len(schema.parameters)
-        schemata[name] = Predicate(name=name, arity=arity)
+        schemata[name] = Schema(name=name, arity=arity)
     return schemata
 
 

@@ -4,6 +4,7 @@
 #include "../../include/utils/nlohmann/json.hpp"
 #include "function.hpp"
 #include "predicate.hpp"
+#include "schema.hpp"
 #include "state.hpp"
 
 #include <string>
@@ -18,7 +19,7 @@ namespace planning {
     std::string name;
     std::vector<Predicate> predicates;
     std::vector<Function> functions;
-    std::vector<Predicate> schemata;  // represented as predicates as effects not used in WLPlan
+    std::vector<Schema> schemata;
     std::vector<Object> constant_objects;
 
     // maps a predicate to an ID in {0, ..., n_pred - 1}, sorted by predicate name and arity
@@ -27,7 +28,7 @@ namespace planning {
     Domain(const std::string &name,
            const std::vector<Predicate> &predicates,
            const std::vector<Function> &functions,
-           const std::vector<Predicate> &schemata,
+           const std::vector<Schema> &schemata,
            const std::vector<Object> &constant_objects);
 
     Domain(const std::string &name,
@@ -42,8 +43,11 @@ namespace planning {
 
     std::unordered_map<std::string, Predicate> get_name_to_predicate() const;
     std::unordered_map<std::string, Function> get_name_to_function() const;
+    std::unordered_map<std::string, Schema> get_name_to_schema() const;
 
-    int get_max_arity() const;
+    int get_predicate_arity() const;
+    int get_function_arity() const;
+    int get_schemata_arity() const;
 
     json to_json() const;
 

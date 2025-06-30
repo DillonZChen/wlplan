@@ -7,7 +7,6 @@
 // Link:
 // https://arxiv.org/abs/2410.24080
 
-
 #include "ilg.hpp"
 
 #include <map>
@@ -22,12 +21,19 @@ namespace graph_generator {
    public:
     NILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
 
-    // Change the base graph based on the input problem
+    // Graph generation
     void set_problem(const planning::Problem &problem) override;
-
-    // Extends ILG methods
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state);
+    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
+
+    // Graph features
+    int get_n_features() const override {
+      // same as ILG with an additional single, continuous value
+      return colour_to_description.size() + 1;
+    };
+    int get_n_relations() const override {
+      return std::max(domain.get_predicate_arity(), domain.get_function_arity());
+    };
 
    protected:
     std::unordered_map<std::string, int> fluent_to_colour;

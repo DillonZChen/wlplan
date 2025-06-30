@@ -20,6 +20,7 @@
 #include "../include/planning/object.hpp"
 #include "../include/planning/predicate.hpp"
 #include "../include/planning/problem.hpp"
+#include "../include/planning/schema.hpp"
 
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -68,10 +69,10 @@ py::class_<planning::Function>(planning_m, "Function",
 R"(Parameters
 ----------
     name : str
-        Predicate name.
+        Function name.
 
     arity : int
-        Predicate arity.
+        Function arity.
 )")
   .def(py::init<std::string &, int>(),
         "name"_a, "arity"_a)
@@ -79,6 +80,24 @@ R"(Parameters
   .def_readonly("arity", &planning::Function::arity)
   .def("__repr__", &::planning::Function::to_string)
   .def("__eq__", &::planning::Function::operator==)
+;
+
+// Function
+py::class_<planning::Schema>(planning_m, "Schema",
+R"(Parameters
+----------
+    name : str
+        Schema name.
+
+    arity : int
+        Schema arity.
+)")
+  .def(py::init<std::string &, int>(),
+        "name"_a, "arity"_a)
+  .def_readonly("name", &planning::Schema::name)
+  .def_readonly("arity", &planning::Schema::arity)
+  .def("__repr__", &::planning::Schema::to_string)
+  .def("__eq__", &::planning::Schema::operator==)
 ;
 
 // Domain
@@ -94,10 +113,13 @@ R"(Parameters
     functions : list[Function], optional
         List of functions.
 
+    schemata : list[Schema], optional
+        List of schemata.
+
     constant_objects : list[Object], optional
         List of constant objects.
 )")
-  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>, std::vector<planning::Predicate>, std::vector<planning::Object>>(),
+  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>, std::vector<planning::Schema>, std::vector<planning::Object>>(),
         "name"_a, "predicates"_a, "functions"_a, "schemata"_a, "constant_objects"_a)
   .def_readonly("name", &planning::Domain::name)
   .def_readonly("predicates", &planning::Domain::predicates)
@@ -446,6 +468,8 @@ Methods
 
 // GraphGenerator
 py::class_<graph_generator::GraphGenerator>(graph_generator_m, "GraphGenerator")
+  .def("get_n_features", &graph_generator::GraphGenerator::get_n_features)
+  .def("get_n_relations", &graph_generator::GraphGenerator::get_n_relations)
   .def("to_graphs", &graph_generator::GraphGenerator::to_graphs,
         "dataset"_a)
   .def("set_problem", &graph_generator::GraphGenerator::set_problem,

@@ -6,20 +6,8 @@ char const *fact_description_name[] = {ILG_FACT_DESCRIPTIONS};
 
 namespace graph_generator {
   ILGGenerator::ILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects)
-      : domain(domain),
-        predicate_to_colour(domain.predicate_to_colour),
-        differentiate_constant_objects(differentiate_constant_objects) {
-    // initialise initial node colours
-    if (differentiate_constant_objects) {
-      // add constant object colours
-      for (size_t i = 0; i < domain.constant_objects.size(); i++) {
-        int colour = -(i + 1);
-        colour_to_description[colour] = domain.constant_objects[i] + " _CONSTANT_";
-      }
-    }
-
-    colour_to_description[0] = "_OBJECT_";
-
+      : predicate_to_colour(domain.predicate_to_colour),
+        GraphGenerator(domain, differentiate_constant_objects) {
     // add predicate colours
     for (size_t i = 0; i < domain.predicates.size(); i++) {
       for (int j = 0; j < (int)ILGFactDescription::_LAST; j++) {
@@ -108,7 +96,7 @@ namespace graph_generator {
 
     for (const auto &atom : state.atoms) {
       atom_node_str = atom->to_string();
-      pred_idx = predicate_to_colour.at(atom->predicate->name);
+      pred_idx = domain.predicate_to_colour.at(atom->predicate->name);
       if (positive_goal_names.count(atom_node_str)) {
         atom_node = graph->get_node_index(atom_node_str);
         graph->change_node_colour(atom_node, fact_colour(pred_idx, ILGFactDescription::T_POS_GOAL));

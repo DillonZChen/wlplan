@@ -28,25 +28,22 @@ namespace graph_generator {
    public:
     PLOIGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
 
+    // Graph generation
     void set_problem(const planning::Problem &problem) override;
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
     // TODO implement optimised variant
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override {
-      return to_graph(state);
-    };
+    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
     void reset_graph() const override{};
 
+    // Graph features
+    int get_n_features() const override { return colour_to_description.size(); }
+    int get_n_relations() const override { return n_relations; };
+
    protected:
-    /* The following variables remain constant for all problems */
-    const planning::Domain &domain;
+    int n_relations;
     std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ag_to_e_col;
     std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ug_to_e_col;
     std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ap_to_e_col;
-    bool differentiate_constant_objects;
-
-    /* These variables get reset every time a new problem is set */
-    std::shared_ptr<planning::Problem> problem;
-    std::unordered_set<std::string> positive_goal_names;
   };
 }  // namespace graph_generator
 

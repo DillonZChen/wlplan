@@ -4,11 +4,13 @@ import random
 import networkx as nx
 import numpy as np
 import pytest
+from ipc23lt import get_domain_pddl
 from ipc23lt import get_raw_dataset as get_ipc23lt_dataset
 from neurips24 import get_raw_dataset as get_neurips24_dataset
 
 from wlplan.feature_generator import init_feature_generator
 from wlplan.graph_generator import ILGGenerator, NILGGenerator, from_networkx, to_networkx
+from wlplan.planning import parse_domain
 
 LOGGER = logging.getLogger(__name__)
 
@@ -56,8 +58,18 @@ def test_ilg():
             ilg_generator.set_problem(problem)
             graph = ilg_generator.to_graph(state)
             nx_graph = to_networkx(graph)  # just checks to see no crash
-            if nx_graph:
-                pass
+            assert nx_graph is not None
+
+
+def test_ilg_blocksworld_counts():
+    domain_name = "blocksworld"
+    domain_pddl = get_domain_pddl(domain_name=domain_name)
+    domain = parse_domain(domain_path=domain_pddl, domain_name=domain_name, keep_statics=True)
+    ilg_generator = ILGGenerator(domain, differentiate_constant_objects=True)
+    assert (
+        ilg_generator.get_n_features() == 1 + len(domain.predicates) * 5
+    )  # also include neg goals
+    assert ilg_generator.get_n_relations() == max(p.arity for p in domain.predicates)
 
 
 def test_nilg():
@@ -72,8 +84,7 @@ def test_nilg():
             ilg_generator.set_problem(problem)
             graph = ilg_generator.to_graph(state)
             nx_graph = to_networkx(graph)  # just checks to see no crash
-            if nx_graph:
-                pass
+            assert nx_graph is not None
 
 
 if __name__ == "__main__":

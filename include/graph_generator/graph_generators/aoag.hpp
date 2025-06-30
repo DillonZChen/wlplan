@@ -22,12 +22,20 @@ namespace graph_generator {
    public:
     AOAGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
 
-    // Extends ILG methods
+    // Graph generation
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
     std::shared_ptr<Graph> to_graph(const planning::State &state,
                                     const std::vector<planning::Action> &actions);
     std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
     void reset_graph() const override;
+
+    // Graph features
+    int get_n_features() const override {
+      throw std::runtime_error("AOAGGenerator.get_n_features() not implemented yet");
+    };
+    int get_n_relations() const override {
+      throw std::runtime_error("AOAGGenerator.get_n_relations() not implemented yet");
+    };
   };
 }  // namespace graph_generator
 
