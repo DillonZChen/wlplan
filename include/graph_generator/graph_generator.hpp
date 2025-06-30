@@ -51,7 +51,7 @@ namespace graph_generator {
     std::map<int, std::string> colour_to_description;
 
     // Domain specific variables
-    const planning::Domain &domain;
+    const planning::Domain domain;
     bool differentiate_constant_objects;
 
     // Problem specific variables

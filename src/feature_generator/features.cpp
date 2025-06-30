@@ -639,7 +639,5 @@ namespace feature_generator {
     // Save to file
     std::ofstream o(filename);
     o << std::setw(4) << j << std::endl;
-
-    std::cout << "Saved feature generator to " << filename << std::endl;
   }
 }  // namespace feature_generator

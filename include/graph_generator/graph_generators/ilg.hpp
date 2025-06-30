@@ -50,8 +50,6 @@ namespace graph_generator {
     int get_n_relations() const override { return domain.get_predicate_arity(); };
 
    protected:
-    const std::unordered_map<std::string, int> predicate_to_colour;
-
     int fact_colour(const int predicate_idx, const ILGFactDescription &fact_description) const;
     int fact_colour(const planning::Atom &atom, const ILGFactDescription &fact_description) const;
 
@@ -75,7 +73,7 @@ namespace graph_generator {
 
   inline int ILGGenerator::fact_colour(const planning::Atom &atom,
                                        const ILGFactDescription &fact_description) const {
-    return fact_colour(predicate_to_colour.at(atom.predicate->name), fact_description);
+    return fact_colour(domain.predicate_to_colour.at(atom.predicate->name), fact_description);
   }
 }  // namespace graph_generator
 

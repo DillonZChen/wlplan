@@ -1,6 +1,7 @@
 #include "../../include/planning/domain.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 namespace planning {
   Domain::Domain(const std::string &name,
