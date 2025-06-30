@@ -3,6 +3,7 @@
 
 #include "object.hpp"
 #include "predicate.hpp"
+#include "schema.hpp"
 
 #include <memory>
 #include <string>
@@ -11,10 +12,10 @@
 namespace planning {
   class Action {  // Currently same as Atom as effects are not used in WLPlan
    public:
-    const std::shared_ptr<Predicate> predicate;
+    const std::shared_ptr<Schema> schema;
     const std::vector<Object> objects;
 
-    Action(const Predicate &predicate, const std::vector<Object> &objects);
+    Action(const Schema &schema, const std::vector<Object> &objects);
 
     std::string to_string() const;
 

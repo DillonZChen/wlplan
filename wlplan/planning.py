@@ -8,6 +8,7 @@ from pddl.core import Domain as PDDLDomain
 from pddl.core import Problem as PDDLProblem
 
 from _wlplan.planning import (
+    Action,
     Atom,
     ComparatorType,
     ConstantExpression,

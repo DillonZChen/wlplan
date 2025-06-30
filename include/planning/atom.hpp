@@ -16,6 +16,7 @@ namespace planning {
 
     Atom(const Predicate &predicate, const std::vector<Object> &objects);
 
+    std::string to_pddl() const;
     std::string to_string() const;
 
     bool operator==(const Atom &other) const { return to_string() == other.to_string(); }

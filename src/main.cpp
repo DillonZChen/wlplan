@@ -124,6 +124,7 @@ R"(Parameters
   .def_readonly("name", &planning::Domain::name)
   .def_readonly("predicates", &planning::Domain::predicates)
   .def_readonly("functions", &planning::Domain::functions)
+  .def_readonly("schemata", &planning::Domain::schemata)
   .def_readonly("constant_objects", &planning::Domain::constant_objects)
   .def("__repr__", &::planning::Domain::to_string)
   .def("__eq__", &::planning::Domain::operator==)
@@ -135,6 +136,22 @@ R"(Parameters
 py::class_<planning::Object>(planning_m, "Object",
 R"(Object is a type alias for a str. WLPlan does not exploit object types.
 )")
+;
+
+// Action
+py::class_<planning::Action>(planning_m, "Action",
+R"(Parameters
+----------
+    schema : Schema
+        Schema object.
+
+    objects : list[Object]
+        List of object names.
+)")
+  .def(py::init<planning::Schema &, std::vector<std::string> &>(),
+        "schema"_a, "objects"_a)
+  .def("__repr__", &::planning::Action::to_string)
+  .def("__eq__", &::planning::Action::operator==)
 ;
 
 // Atom
@@ -149,6 +166,7 @@ R"(Parameters
 )")
   .def(py::init<planning::Predicate &, std::vector<std::string> &>(),
         "predicate"_a, "objects"_a)
+  .def("to_pddl", &planning::Atom::to_pddl)
   .def("__repr__", &::planning::Atom::to_string)
   .def("__eq__", &::planning::Atom::operator==)
 ;
