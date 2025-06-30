@@ -56,12 +56,19 @@ R"(Parameters
     arity : int
         Predicate arity.
 )")
-  .def(py::init<std::string &, int>(),
+  .def(py::init<const std::string &, int>(),
         "name"_a, "arity"_a)
   .def_readonly("name", &planning::Predicate::name)
   .def_readonly("arity", &planning::Predicate::arity)
   .def("__repr__", &::planning::Predicate::to_string)
   .def("__eq__", &::planning::Predicate::operator==)
+  .def(py::pickle(
+    [](const planning::Predicate &p) {
+        return py::make_tuple(p.name, p.arity);
+    },
+    [](py::tuple t) {
+        return planning::Predicate(t[0].cast<std::string>(), t[1].cast<int>());
+    }))
 ;
 
 // Function
@@ -74,15 +81,22 @@ R"(Parameters
     arity : int
         Function arity.
 )")
-  .def(py::init<std::string &, int>(),
+  .def(py::init<const std::string &, int>(),
         "name"_a, "arity"_a)
   .def_readonly("name", &planning::Function::name)
   .def_readonly("arity", &planning::Function::arity)
   .def("__repr__", &::planning::Function::to_string)
   .def("__eq__", &::planning::Function::operator==)
+  .def(py::pickle(
+    [](const planning::Function &f) {
+        return py::make_tuple(f.name, f.arity);
+    },
+    [](py::tuple t) {
+        return planning::Function(t[0].cast<std::string>(), t[1].cast<int>());
+    }))
 ;
 
-// Function
+// Schema
 py::class_<planning::Schema>(planning_m, "Schema",
 R"(Parameters
 ----------
@@ -92,12 +106,19 @@ R"(Parameters
     arity : int
         Schema arity.
 )")
-  .def(py::init<std::string &, int>(),
+  .def(py::init<const std::string &, int>(),
         "name"_a, "arity"_a)
   .def_readonly("name", &planning::Schema::name)
   .def_readonly("arity", &planning::Schema::arity)
   .def("__repr__", &::planning::Schema::to_string)
   .def("__eq__", &::planning::Schema::operator==)
+  .def(py::pickle(
+    [](const planning::Schema &s) {
+        return py::make_tuple(s.name, s.arity);
+    },
+    [](py::tuple t) {
+        return planning::Schema(t[0].cast<std::string>(), t[1].cast<int>());
+    }))
 ;
 
 // Domain
@@ -119,7 +140,11 @@ R"(Parameters
     constant_objects : list[Object], optional
         List of constant objects.
 )")
-  .def(py::init<std::string &, std::vector<planning::Predicate>, std::vector<planning::Function>, std::vector<planning::Schema>, std::vector<planning::Object>>(),
+  .def(py::init<const std::string &,
+                const std::vector<planning::Predicate>,
+                const std::vector<planning::Function>,
+                const std::vector<planning::Schema>,
+                const std::vector<planning::Object>>(),
         "name"_a, "predicates"_a, "functions"_a, "schemata"_a, "constant_objects"_a)
   .def_readonly("name", &planning::Domain::name)
   .def_readonly("predicates", &planning::Domain::predicates)
@@ -128,6 +153,23 @@ R"(Parameters
   .def_readonly("constant_objects", &planning::Domain::constant_objects)
   .def("__repr__", &::planning::Domain::to_string)
   .def("__eq__", &::planning::Domain::operator==)
+  .def(py::pickle(
+    [](const planning::Domain &d) {
+        return py::make_tuple(
+            d.name,
+            d.predicates,
+            d.functions,
+            d.schemata,
+            d.constant_objects);
+    },
+    [](py::tuple t) {
+        return planning::Domain(
+            t[0].cast<std::string>(),
+            t[1].cast<std::vector<planning::Predicate>>(),
+            t[2].cast<std::vector<planning::Function>>(),
+            t[3].cast<std::vector<planning::Schema>>(),
+            t[4].cast<std::vector<planning::Object>>());
+    }))
 ;
 
 /* Task components */
@@ -148,10 +190,17 @@ R"(Parameters
     objects : list[Object]
         List of object names.
 )")
-  .def(py::init<planning::Schema &, std::vector<std::string> &>(),
+  .def(py::init<const planning::Schema &, const std::vector<std::string> &>(),
         "schema"_a, "objects"_a)
   .def("__repr__", &::planning::Action::to_string)
   .def("__eq__", &::planning::Action::operator==)
+  .def(py::pickle(
+    [](const planning::Action &a) {
+        return py::make_tuple(a.schema, a.objects);
+    },
+    [](py::tuple t) {
+        return planning::Action(t[0].cast<planning::Schema>(), t[1].cast<std::vector<std::string>>());
+    }))
 ;
 
 // Atom
@@ -164,11 +213,18 @@ R"(Parameters
     objects : list[Object]
         List of object names.
 )")
-  .def(py::init<planning::Predicate &, std::vector<std::string> &>(),
+  .def(py::init<const planning::Predicate &, const std::vector<std::string> &>(),
         "predicate"_a, "objects"_a)
   .def("to_pddl", &planning::Atom::to_pddl)
   .def("__repr__", &::planning::Atom::to_string)
   .def("__eq__", &::planning::Atom::operator==)
+  .def(py::pickle(
+    [](const planning::Atom &a) {
+        return py::make_tuple(a.predicate, a.objects);
+    },
+    [](py::tuple t) {
+        return planning::Atom(t[0].cast<planning::Predicate>(), t[1].cast<std::vector<std::string>>());
+    }))
 ;
 
 // Fluent
@@ -181,10 +237,17 @@ R"(Parameters
     objects : list[Object]
         List of object names.
 )")
-  .def(py::init<planning::Function &, std::vector<std::string> &>(),
+  .def(py::init<const planning::Function &, const std::vector<std::string> &>(),
         "function"_a, "objects"_a)
   .def("__repr__", &::planning::Fluent::to_string)
   .def("__eq__", &::planning::Fluent::operator==)
+  .def(py::pickle(
+    [](const planning::Fluent &f) {
+        return py::make_tuple(f.function, f.objects);
+    },
+    [](py::tuple t) {
+        return planning::Fluent(t[0].cast<planning::Function>(), t[1].cast<std::vector<std::string>>());
+    }))
 ;
 
 // OperatorType
@@ -298,14 +361,14 @@ R"(Parameters
     numeric_goals : list[NumericCondition], optional
         List of numeric goals.
 )")
-  .def(py::init<planning::Domain &,
-                std::vector<std::string> &,
-                std::vector<planning::Atom> &,
-                std::vector<planning::Fluent> &,
-                std::vector<double> &,
-                std::vector<planning::Atom> &,
-                std::vector<planning::Atom> &,
-                std::vector<planning::NumericCondition> &>(),
+  .def(py::init<const planning::Domain &,
+                const std::vector<planning::Object> &,
+                const std::vector<planning::Atom> &,
+                const std::vector<planning::Fluent> &,
+                const std::vector<double> &,
+                const std::vector<planning::Atom> &,
+                const std::vector<planning::Atom> &,
+                const std::vector<planning::NumericCondition> &>(),
         "domain"_a,
         "objects"_a,
         "statics"_a,
@@ -314,13 +377,13 @@ R"(Parameters
         "positive_goals"_a,
         "negative_goals"_a,
         "numeric_goals"_a)
-  .def(py::init<planning::Domain &,
-                std::vector<std::string> &,
-                std::vector<planning::Fluent> &,
-                std::vector<double> &,
-                std::vector<planning::Atom> &,
-                std::vector<planning::Atom> &,
-                std::vector<planning::NumericCondition> &>(),
+  .def(py::init<const planning::Domain &,
+                const std::vector<planning::Object> &,
+                const std::vector<planning::Fluent> &,
+                const std::vector<double> &,
+                const std::vector<planning::Atom> &,
+                const std::vector<planning::Atom> &,
+                const std::vector<planning::NumericCondition> &>(),
         "domain"_a,
         "objects"_a,
         "fluents"_a,
@@ -328,10 +391,10 @@ R"(Parameters
         "positive_goals"_a,
         "negative_goals"_a,
         "numeric_goals"_a)
-  .def(py::init<planning::Domain &,
-                std::vector<std::string> &,
-                std::vector<planning::Atom> &,
-                std::vector<planning::Atom> &>(),
+  .def(py::init<const planning::Domain &,
+                const std::vector<planning::Object> &,
+                const std::vector<planning::Atom> &,
+                const std::vector<planning::Atom> &>(),
         "domain"_a,
         "objects"_a,
         "positive_goals"_a,
@@ -347,6 +410,39 @@ R"(Parameters
   .def_property_readonly("negative_goals", &planning::Problem::get_negative_goals)
   .def_property_readonly("numeric_goals", &planning::Problem::get_numeric_goals)
   .def("dump", &planning::Problem::dump)
+  .def(py::pickle(
+    [](const planning::Problem &p) {
+        return py::make_tuple(
+            p.get_domain(),
+            p.get_problem_objects(),
+            p.get_positive_goals(),
+            p.get_negative_goals()
+            // p.get_domain(),
+            // p.get_problem_objects(),
+            // p.get_statics(),
+            // p.get_fluents(),
+            // p.get_fluent_values(),
+            // p.get_positive_goals(),
+            // p.get_negative_goals(),
+            // p.get_numeric_goals()
+        );
+    },
+    [](py::tuple t) {
+        return planning::Problem(
+            t[0].cast<planning::Domain>(),
+            t[1].cast<std::vector<std::string>>(),
+            t[2].cast<std::vector<planning::Atom>>(),
+            t[3].cast<std::vector<planning::Atom>>()
+            // t[0].cast<planning::Domain>(),
+            // t[1].cast<std::vector<std::string>>(),
+            // t[2].cast<std::vector<planning::Atom>>(),
+            // t[3].cast<std::vector<planning::Fluent>>(),
+            // t[4].cast<std::vector<double>>(),
+            // t[5].cast<std::vector<planning::Atom>>(),
+            // t[6].cast<std::vector<planning::Atom>>(),
+            // t[7].cast<std::vector<planning::NumericCondition>>()
+        );
+    }))
 ;
 
 // State
@@ -359,15 +455,22 @@ R"(Parameters
     values : list[float], optional
         List of values for fluents defined in the problem.
 )")
-  .def(py::init<std::vector<planning::Atom> &>(),
+  .def(py::init<const std::vector<planning::Atom> &>(),
         "atoms"_a)
-  .def(py::init<std::vector<planning::Atom> &, std::vector<double> &>(),
+  .def(py::init<const std::vector<planning::Atom> &, const std::vector<double> &>(),
         "atoms"_a, "values"_a)
   .def_property_readonly("atoms", &planning::State::get_atoms)
   .def_readonly("values", &planning::State::values)
   .def("__repr__", &::planning::State::to_string)
   .def("__eq__", &::planning::State::operator==)
   .def("__hash__", &::planning::State::hash)
+  .def(py::pickle(
+    [](const planning::State &s) {
+        return py::make_tuple(s.atoms, s.values);
+    },
+    [](py::tuple t) {
+        return planning::State(t[0].cast<std::vector<planning::Atom>>(), t[1].cast<std::vector<double>>());
+    }))
 ;
 
 
@@ -391,7 +494,7 @@ Parameters
     data : list[ProblemDataset]
         List of problem states.
 )")
-  .def(py::init<planning::Domain &, std::vector<data::ProblemDataset> &>(),
+  .def(py::init<const planning::Domain &, const std::vector<data::ProblemDataset> &>(),
         "domain"_a, "data"_a)
   .def_readonly("domain", &data::DomainDataset::domain)
   .def_readonly("data", &data::DomainDataset::data)
@@ -414,9 +517,9 @@ Parameters
     actions : list[list[Action]], optional
         List of actions for each state.
 )")
-  .def(py::init<planning::Problem &, std::vector<planning::State> &>(),
+  .def(py::init<const planning::Problem &, const std::vector<planning::State> &>(),
         "problem"_a, "states"_a)
-  .def(py::init<planning::Problem &, std::vector<planning::State> &, std::vector<std::vector<planning::Action>>>(),
+  .def(py::init<const planning::Problem &, const std::vector<planning::State> &, const std::vector<std::vector<planning::Action>>>(),
         "problem"_a, "states"_a, "actions"_a)
   .def_readonly("problem", &data::ProblemDataset::problem)
   .def_readonly("states", &data::ProblemDataset::states)
