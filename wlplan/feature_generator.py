@@ -14,6 +14,7 @@ from _wlplan.feature_generator import (
 )
 from _wlplan.planning import Domain
 
+
 __all__ = [
     "init_feature_generator",
     "get_available_feature_algorithms",

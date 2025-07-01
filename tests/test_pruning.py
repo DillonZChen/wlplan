@@ -6,6 +6,7 @@ from colours import DOMAINS, colours_test
 
 from wlplan.feature_generator import PruningOptions
 
+
 LOGGER = logging.getLogger(__name__)
 
 

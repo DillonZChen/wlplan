@@ -8,6 +8,7 @@ from util import print_mat
 
 from wlplan.feature_generator import init_feature_generator
 
+
 LOGGER = logging.getLogger(__name__)
 
 REPEATS = 10

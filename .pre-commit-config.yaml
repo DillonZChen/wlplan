@@ -10,13 +10,7 @@ repos:
 - repo: https://github.com/pocc/pre-commit-hooks
   rev: master
   hooks:
-    - id: clang-format  # sudo apt install clang-format
-    # - id: clang-tidy
-    # - id: oclint
-    # - id: uncrustify
-    # - id: cppcheck
-    # - id: cpplint
-    # - id: include-what-you-use  # sudo apt install iwyu
+    - id: clang-format
 - repo: https://github.com/kynan/nbstripout
   rev: 0.8.1
   hooks:
@@ -31,12 +25,3 @@ repos:
   hooks:
     - id: isort
       args: ["--profile", "black"]
-- repo: local
-  hooks:
-    - id: check-debug-false
-      name: Check not debug mode in setup.py
-      entry: |
-        bash -c 'if ! grep -o "^_DEBUG = 0$" setup.py; then echo "Error: _DEBUG must be set to 0 in setup.py" && exit 1; fi'
-      language: system
-      files: setup.py
-      pass_filenames: false

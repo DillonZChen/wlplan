@@ -1,6 +1,7 @@
 import networkx as nx
 
 from _wlplan.graph_generator import (
+    AOAGGenerator,
     Graph,
     GraphGenerator,
     ILGGenerator,
@@ -8,6 +9,7 @@ from _wlplan.graph_generator import (
     PLOIGGenerator,
 )
 from _wlplan.planning import Domain
+
 
 __all__ = [
     "init_graph_generator",
@@ -17,10 +19,10 @@ __all__ = [
 ]
 
 _GRAPH_REPRESENTATIONS = {
+    "aoag": AOAGGenerator,
     "ilg": ILGGenerator,
     "nilg": NILGGenerator,
     "ploig": PLOIGGenerator,
-    # "aoag": AOAGGenerator,  # TODO
 }
 
 

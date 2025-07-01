@@ -9,6 +9,7 @@ from ipc23lt import get_dataset
 
 from wlplan.feature_generator import init_feature_generator, load_feature_generator
 
+
 LOGGER = logging.getLogger(__name__)
 
 DOMAINS = ["blocksworld", "childsnack", "ferry"]

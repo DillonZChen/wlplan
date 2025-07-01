@@ -5,6 +5,7 @@ from ipc23lt import DOMAINS, get_domain_pddl, get_problem_pddl
 
 from wlplan.planning import parse_problem
 
+
 LOGGER = logging.getLogger(__name__)
 
 

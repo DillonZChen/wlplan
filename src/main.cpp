@@ -8,6 +8,7 @@
 #include "../include/feature_generator/feature_generators/wl.hpp"
 #include "../include/feature_generator/features.hpp"
 #include "../include/feature_generator/pruning_options.hpp"
+#include "../include/graph_generator/graph_generators/aoag.hpp"
 #include "../include/graph_generator/graph_generators/ilg.hpp"
 #include "../include/graph_generator/graph_generators/nilg.hpp"
 #include "../include/graph_generator/graph_generators/ploig.hpp"
@@ -577,6 +578,11 @@ Methods
   // PLOIGGenerator
   py::class_<graph_generator::PLOIGGenerator, graph_generator::GraphGenerator>(graph_generator_m,
                                                                                "PLOIGGenerator")
+      .def(py::init<planning::Domain &, bool>(), "domain"_a, "differentiate_constant_objects"_a);
+
+  // AOAGGenerator
+  py::class_<graph_generator::AOAGGenerator, graph_generator::GraphGenerator>(graph_generator_m,
+                                                                              "AOAGGenerator")
       .def(py::init<planning::Domain &, bool>(), "domain"_a, "differentiate_constant_objects"_a);
 
   //////////////////////////////////////////////////////////////////////////////

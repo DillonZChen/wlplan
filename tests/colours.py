@@ -6,6 +6,7 @@ from util import print_mat
 
 from wlplan.feature_generator import init_feature_generator
 
+
 ## https://dillonzchen.github.io/publications/chen-trevizan-thiebaux-icaps2024.pdf
 FD_COLOURS = {
     "blocksworld": 10444,

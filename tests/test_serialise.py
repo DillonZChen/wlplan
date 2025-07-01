@@ -3,10 +3,11 @@ import pickle
 from typing import Any
 
 import pytest
-from ipc23lt import DOMAINS as IPC23LT_DOMAINS
-from ipc23lt import get_domain_problem as get_ipc23lt_domain_problem
-from neurips24 import DOMAINS as NEURIPS24_DOMAINS
-from neurips24 import get_domain_problem as get_neurips24_domain_problem
+from ipc23lt import DOMAINS as IPC23LT_DOMAINS, get_domain_problem as get_ipc23lt_domain_problem
+from neurips24 import (
+    DOMAINS as NEURIPS24_DOMAINS,
+    get_domain_problem as get_neurips24_domain_problem,
+)
 
 
 def save_then_load(input: Any):

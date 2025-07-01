@@ -3,6 +3,7 @@
 import argparse
 import subprocess
 
+
 exec(open("wlplan/__version__.py").read())
 
 

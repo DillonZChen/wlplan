@@ -4,13 +4,13 @@ import random
 import networkx as nx
 import numpy as np
 import pytest
-from ipc23lt import get_domain_pddl
-from ipc23lt import get_raw_dataset as get_ipc23lt_dataset
+from ipc23lt import get_domain_pddl, get_raw_dataset as get_ipc23lt_dataset
 from neurips24 import get_raw_dataset as get_neurips24_dataset
 
 from wlplan.feature_generator import init_feature_generator
 from wlplan.graph_generator import ILGGenerator, NILGGenerator, from_networkx, to_networkx
 from wlplan.planning import parse_domain
+
 
 LOGGER = logging.getLogger(__name__)
 

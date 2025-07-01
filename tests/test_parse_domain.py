@@ -1,10 +1,8 @@
 import logging
 
 import pytest
-from ipc23lt import DOMAINS as IPC23LT_DOMAINS
-from ipc23lt import get_domain_pddl as get_ipc23lt_domain_pddl
-from neurips24 import DOMAINS as NEURIPS24_DOMAINS
-from neurips24 import get_domain_pddl as get_neurips24_domain_pddl
+from ipc23lt import DOMAINS as IPC23LT_DOMAINS, get_domain_pddl as get_ipc23lt_domain_pddl
+from neurips24 import DOMAINS as NEURIPS24_DOMAINS, get_domain_pddl as get_neurips24_domain_pddl
 
 from wlplan.planning import parse_domain
 

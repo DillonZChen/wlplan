@@ -8,6 +8,7 @@ import wlplan
 from wlplan.data import DomainDataset, ProblemDataset
 from wlplan.planning import Predicate, State, parse_domain, parse_problem
 
+
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
     "blocksworld",

@@ -15,6 +15,7 @@ import wlplan
 from wlplan.feature_generator import init_feature_generator, load_feature_generator
 from wlplan.planning import State, parse_problem
 
+
 LOGGER = logging.getLogger(__name__)
 
 PROBLEM = "p1_01"  # 149 expansions

@@ -3,6 +3,7 @@ import logging
 import pytest
 from colours import DOMAINS, colours_test
 
+
 LOGGER = logging.getLogger(__name__)
 
 

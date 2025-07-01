@@ -7,6 +7,7 @@ import pymimir
 from wlplan.data import DomainDataset, ProblemDataset
 from wlplan.planning import parse_domain, parse_problem
 
+
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
     "blocksworld",

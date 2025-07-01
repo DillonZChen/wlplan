@@ -4,8 +4,7 @@ from typing import Optional
 import pddl
 import pddl.logic
 import pddl.logic.functions
-from pddl.core import Domain as PDDLDomain
-from pddl.core import Problem as PDDLProblem
+from pddl.core import Domain as PDDLDomain, Problem as PDDLProblem
 
 from _wlplan.planning import (
     Action,
@@ -25,6 +24,7 @@ from _wlplan.planning import (
     Schema,
     State,
 )
+
 
 __all__ = ["parse_domain", "parse_problem"]
 
@@ -106,7 +106,9 @@ def _convert_pddl_to_wlplan_expression(
 
 
 def to_wlplan_domain(
-    pddl_domain: PDDLDomain, domain_name: Optional[str] = None, keep_statics: bool = True
+    pddl_domain: PDDLDomain,
+    domain_name: Optional[str] = None,
+    keep_statics: bool = True,
 ) -> Domain:
     """Converts a Domain object from the pddl library to a Domain object in wlplan."""
 
