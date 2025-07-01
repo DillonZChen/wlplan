@@ -22,9 +22,6 @@ namespace planning {
 
     Atom(const Predicate &predicate, const std::vector<Object> &objects);
 
-    static py::tuple __getstate__(const Atom &input);
-    static Atom __setstate__(py::tuple t);
-
     Predicate get_predicate() const { return *predicate; }
     std::vector<Object> get_objects() const { return objects; }
 

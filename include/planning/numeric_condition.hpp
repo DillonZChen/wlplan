@@ -35,6 +35,8 @@ namespace planning {
     std::pair<bool, double> evaluate_formula_and_error(const std::vector<double> &values) const;
 
     std::string to_string() const;
+
+    bool operator==(const NumericCondition &other) const;
   };
 }  // namespace planning
 

@@ -1,6 +1,6 @@
 #include "../../include/planning/problem.hpp"
 
-#include "../../include/utils/tokenise.hpp"
+#include "../../include/utils/strings.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -77,63 +77,60 @@ namespace planning {
                    const std::vector<Atom> &negative_goals)
       : Problem(domain, objects, {}, {}, {}, positive_goals, negative_goals, {}) {}
 
-  py::tuple Problem::__getstate__(const planning::Problem &input) {
-    return py::make_tuple(Domain::__getstate__(input.get_domain()),
-                          input.get_problem_objects(),
-                          input.get_statics(),
-                          input.get_fluents(),
-                          input.get_fluent_values(),
-                          input.get_positive_goals(),
-                          input.get_negative_goals(),
-                          input.get_numeric_goals());
-  }
+  std::string Problem::to_string() const {
+    std::string t1 = "\n  ";
+    std::string t2 = "\n    ";
 
-  Problem Problem::__setstate__(py::tuple t) {
-    if (t.size() != 8) {
-      throw std::runtime_error("Invalid state for Problem: expected 8 elements, got " +
-                               std::to_string(t.size()));
-    }
-    return Problem(Domain::__setstate__(t[0].cast<py::tuple>()),
-                   t[1].cast<std::vector<Object>>(),
-                   t[2].cast<std::vector<Atom>>(),
-                   t[3].cast<std::vector<Fluent>>(),
-                   t[4].cast<std::vector<double>>(),
-                   t[5].cast<std::vector<Atom>>(),
-                   t[6].cast<std::vector<Atom>>(),
-                   t[7].cast<std::vector<NumericCondition>>());
-  }
+    std::string repr = "wlplan.planning.Problem(";
 
-  void Problem::dump() const {
-    std::cout << "domain=" << domain->to_string() << std::endl;
-    std::cout << "objects=[" << std::endl;
-    for (const auto &object : problem_objects) {
-      std::cout << "  " << object << std::endl;
+    repr += t1 + "domain=" + domain->to_string() + ",";
+
+    repr += t1 + "objects=[";
+    for (size_t i = 0; i < problem_objects.size(); i++) {
+      repr += t2 + problem_objects[i] + ",";
     }
-    std::cout << "]" << std::endl;
-    std::cout << "statics=[" << std::endl;
-    for (const auto &static_atom : statics) {
-      std::cout << "  " << static_atom.to_string() << std::endl;
+    repr += t1 + "],";
+
+    repr += t1 + "statics=[";
+    for (size_t i = 0; i < statics.size(); i++) {
+      repr += t2 + statics[i].to_string() + ",";
     }
-    std::cout << "]" << std::endl;
-    std::cout << "fluents=[" << std::endl;
+    repr += t1 + "],";
+
+    repr += t1 + "fluents=[";
     for (size_t i = 0; i < fluents.size(); i++) {
-      std::cout << "  " << fluents[i].to_string() << " = " << fluent_values[i] << std::endl;
+      repr += t2 + fluents[i].to_string() + ": " + std::to_string(fluent_values[i]) + ",";
     }
-    std::cout << "]" << std::endl;
-    std::cout << "positive_goals=[" << std::endl;
-    for (const auto &positive_goal : positive_goals) {
-      std::cout << "  " << positive_goal.to_string() << std::endl;
+    repr += t1 + "],";
+
+    repr += t1 + "positive_goals=[";
+    for (size_t i = 0; i < positive_goals.size(); i++) {
+      repr += t2 + positive_goals[i].to_string() + ",";
     }
-    std::cout << "]" << std::endl;
-    std::cout << "negative_goals=[" << std::endl;
-    for (const auto &negative_goal : negative_goals) {
-      std::cout << "  " << negative_goal.to_string() << std::endl;
+    repr += t1 + "],";
+
+    repr += t1 + "negative_goals=[";
+    for (size_t i = 0; i < negative_goals.size(); i++) {
+      repr += t2 + negative_goals[i].to_string() + ",";
     }
-    std::cout << "]" << std::endl;
-    std::cout << "numeric_goals=[" << std::endl;
-    for (const auto &numeric_goal : numeric_goals) {
-      std::cout << "  " << numeric_goal.to_string() << std::endl;
+    repr += t1 + "],";
+
+    repr += t1 + "numeric_goals=[";
+    for (size_t i = 0; i < numeric_goals.size(); i++) {
+      repr += t2 + numeric_goals[i].to_string() + ",";
     }
-    std::cout << "]" << std::endl;
+    repr += t1 + "],";
+
+    repr += "\n)";
+
+    return repr;
+  }
+
+  bool Problem::operator==(const Problem &other) const {
+    return *domain == *other.domain && problem_objects == other.problem_objects &&
+           constant_objects == other.constant_objects && statics == other.statics &&
+           fluents == other.fluents && fluent_values == other.fluent_values &&
+           positive_goals == other.positive_goals && negative_goals == other.negative_goals &&
+           numeric_goals == other.numeric_goals;
   }
 }  // namespace planning

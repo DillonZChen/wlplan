@@ -21,20 +21,6 @@ namespace planning {
     this->values = values;
   }
 
-  py::tuple State::__getstate__(const planning::State &input) {
-    std::vector<Atom> atoms = input.get_atoms();
-    std::vector<double> values = input.get_values();
-    return py::make_tuple(atoms, values);
-  }
-
-  State State::__setstate__(py::tuple t) {
-    if (t.size() != 2) {
-      throw std::runtime_error("Invalid state for State: expected 2 elements, got " +
-                               std::to_string(t.size()));
-    }
-    return State(t[0].cast<std::vector<Atom>>(), t[1].cast<std::vector<double>>());
-  }
-
   std::vector<Atom> State::get_atoms() const {
     std::vector<Atom> ret;
     for (const std::shared_ptr<Atom> &atom : atoms) {

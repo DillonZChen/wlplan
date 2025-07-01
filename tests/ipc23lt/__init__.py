@@ -6,7 +6,7 @@ import pymimir
 
 import wlplan
 from wlplan.data import DomainDataset, ProblemDataset
-from wlplan.planning import Predicate, State, parse_domain
+from wlplan.planning import Predicate, State, parse_domain, parse_problem
 
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
@@ -58,6 +58,15 @@ def get_problem_pddl(domain_name: str, problem_name: str):
     problem_pddl = f"{benchmark_dir}/testing/p{problem_name}.pddl"
     assert os.path.exists(problem_pddl), problem_pddl
     return problem_pddl
+
+
+def get_domain_problem(domain_name: str, problem_name: str):
+    domain_pddl = get_domain_pddl(domain_name)
+    problem_pddl = get_problem_pddl(domain_name, problem_name)
+
+    domain = parse_domain(domain_pddl)
+    problem = parse_problem(domain_pddl, problem_pddl)
+    return domain, problem
 
 
 def get_predicates(mimir_domain: pymimir.Domain, keep_statics: bool):

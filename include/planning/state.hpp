@@ -16,9 +16,6 @@ namespace planning {
     State(const std::vector<Atom> &atoms, const std::vector<double> &values);
     State(const std::vector<Atom> &atoms);
 
-    static py::tuple __getstate__(const State &input);
-    static State __setstate__(py::tuple t);
-
     std::vector<Atom> get_atoms() const;
     std::vector<double> get_values() const;
 

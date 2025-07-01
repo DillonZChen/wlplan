@@ -54,4 +54,9 @@ namespace planning {
 
     return expression->to_string() + " " + comparator + " 0";
   }
+
+  bool NumericCondition::operator==(const NumericCondition &other) const {
+    return comparator_type == other.comparator_type &&
+           expression->to_string() == other.expression->to_string();
+  }
 }  // namespace planning

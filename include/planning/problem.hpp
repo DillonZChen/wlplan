@@ -35,8 +35,6 @@ namespace planning {
     const std::vector<Atom> negative_goals;
     std::vector<NumericCondition> numeric_goals;
 
-    void update_fluent_map();
-
    public:
     Problem(const Domain &domain,
             const std::vector<Object> &objects,
@@ -60,9 +58,6 @@ namespace planning {
             const std::vector<Atom> &positive_goals,
             const std::vector<Atom> &negative_goals);
 
-    static py::tuple __getstate__(const planning::Problem &input);
-    static Problem __setstate__(py::tuple t);
-
     Domain get_domain() const { return *domain; }
 
     std::vector<Object> get_problem_objects() const { return problem_objects; }
@@ -85,7 +80,9 @@ namespace planning {
       return constant_objects_set.count(object);
     }
 
-    void dump() const;
+    std::string to_string() const;
+
+    bool operator==(const Problem &other) const;
   };
 
 }  // namespace planning

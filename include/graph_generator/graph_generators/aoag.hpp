@@ -8,6 +8,7 @@
 // Link:
 // https://arxiv.org/abs/2504.20318
 
+#include "../../utils/exceptions.hpp"
 #include "ilg.hpp"
 
 #include <map>
@@ -31,10 +32,10 @@ namespace graph_generator {
 
     // Graph features
     int get_n_features() const override {
-      throw std::runtime_error("AOAGGenerator.get_n_features() not implemented yet");
+      throw NotImplementedException("AOAGGenerator.get_n_features()");
     };
     int get_n_relations() const override {
-      throw std::runtime_error("AOAGGenerator.get_n_relations() not implemented yet");
+      throw NotImplementedException("AOAGGenerator.get_n_relations()");
     };
   };
 }  // namespace graph_generator

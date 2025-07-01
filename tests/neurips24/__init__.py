@@ -5,7 +5,7 @@ import zipfile
 import pymimir
 
 from wlplan.data import DomainDataset, ProblemDataset
-from wlplan.planning import parse_domain
+from wlplan.planning import parse_domain, parse_problem
 
 LOGGER = logging.getLogger(__name__)
 DOMAINS = {
@@ -56,7 +56,7 @@ def get_domain_problem(domain_name: str, problem_name: str):
     problem_pddl = get_problem_pddl(domain_name, problem_name)
 
     domain = parse_domain(domain_pddl)
-    problem = parse_domain(problem_pddl)
+    problem = parse_problem(domain_pddl, problem_pddl)
     return domain, problem
 
 

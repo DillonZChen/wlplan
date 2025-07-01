@@ -41,9 +41,6 @@ namespace planning {
            const std::vector<Predicate> &predicates,
            const std::vector<Function> &functions);
 
-    static py::tuple __getstate__(const planning::Domain &input);
-    static Domain __setstate__(py::tuple t);
-
     std::unordered_map<std::string, Predicate> get_name_to_predicate() const;
     std::unordered_map<std::string, Function> get_name_to_function() const;
     std::unordered_map<std::string, Schema> get_name_to_schema() const;
@@ -56,10 +53,7 @@ namespace planning {
 
     std::string to_string() const;
 
-    bool operator==(const Domain &other) const {
-      return name == other.name && predicates == other.predicates &&
-             constant_objects == other.constant_objects;
-    }
+    bool operator==(const Domain &other) const;
   };
 }  // namespace planning
 

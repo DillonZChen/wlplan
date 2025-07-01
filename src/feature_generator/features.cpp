@@ -6,6 +6,7 @@
 #include "../../include/feature_generator/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../include/graph_generator/graph_generator_factory.hpp"
 #include "../../include/utils/nlohmann/json.hpp"
+#include "../../include/utils/exceptions.hpp"
 
 #include <chrono>
 #include <filesystem>
@@ -68,7 +69,7 @@ namespace feature_generator {
     } else if (feature_name == "2-lwl") {
       neighbour_container = std::make_shared<LWL2NeighbourContainer>(multiset_hash);
     } else {
-      throw std::runtime_error("Neighbour container not yet implemented for feature_name=" +
+      throw NotImplementedException("Neighbour container for feature_name=" +
                                feature_name);
     }
   }

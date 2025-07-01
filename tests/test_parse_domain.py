@@ -8,18 +8,16 @@ from neurips24 import get_domain_pddl as get_neurips24_domain_pddl
 
 from wlplan.planning import parse_domain
 
-LOGGER = logging.getLogger(__name__)
-
 
 @pytest.mark.parametrize("domain_name", sorted(IPC23LT_DOMAINS))
-def test_profile(domain_name):
+def test_classic(domain_name):
     domain_pddl = get_ipc23lt_domain_pddl(domain_name)
     domain = parse_domain(domain_pddl)
-    LOGGER.info(domain)
+    logging.info(domain)
 
 
 @pytest.mark.parametrize("domain_name", sorted(NEURIPS24_DOMAINS))
-def test_profile(domain_name):
+def test_numeric(domain_name):
     domain_pddl = get_neurips24_domain_pddl(domain_name)
     domain = parse_domain(domain_pddl)
-    LOGGER.info(domain)
+    logging.info(domain)

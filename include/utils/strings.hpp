@@ -1,5 +1,5 @@
-#ifndef UTILS_TOKENISE
-#define UTILS_TOKENISE
+#ifndef UTILS_STRINGS
+#define UTILS_STRINGS
 
 #include <regex>
 #include <string>
@@ -17,6 +17,17 @@ namespace utils {
 
     return tokens;
   }
+
+  std::string join(const std::vector<std::string> &tokens, const std::string &delim) {
+    std::ostringstream oss;
+    for (size_t i = 0; i < tokens.size(); ++i) {
+      oss << tokens[i];
+      if (i < tokens.size() - 1) {
+        oss << delim;
+      }
+    }
+    return oss.str();
+  }
 }  // namespace utils
 
-#endif  // UTILS_TOKENISE
+#endif  // UTILS_STRINGS

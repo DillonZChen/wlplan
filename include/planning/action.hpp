@@ -22,9 +22,6 @@ namespace planning {
 
     Action(const Schema &schema, const std::vector<Object> &objects);
 
-    static py::tuple __getstate__(const Action &input);
-    static Action __setstate__(py::tuple t);
-
     Schema get_schema() const { return *schema; }
     std::vector<Object> get_objects() const { return objects; }
 

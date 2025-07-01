@@ -12,7 +12,7 @@ namespace graph_generator {
                                                  const std::vector<planning::Action> &actions) {
     std::shared_ptr<Graph> graph = ILGGenerator::to_graph(state);
     // TODO add action nodes
-    throw std::runtime_error("AOAG.to_graph() not yet implemented");
+    throw NotImplementedException("AOAGGenerator.to_graph()");
     return graph;
   }
 
@@ -21,6 +21,6 @@ namespace graph_generator {
   }
 
   void AOAGGenerator::reset_graph() const {
-    throw std::runtime_error("AOAG.reset_graph() not yet implemented.");
+    throw NotImplementedException("AOAGGenerator.reset_graph()");
   }
 }  // namespace graph_generator
