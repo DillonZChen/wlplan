@@ -26,7 +26,7 @@ repos:
     - id: check-debug-false
       name: Check not debug mode in setup.py
       entry: |
-        bash -c 'if ! grep -q "_DEBUG = 0" setup.py; then echo "Error: _DEBUG must be set to 0 in setup.py" && exit 1; fi'
+        bash -c 'if ! grep -o "^_DEBUG = 0$" setup.py; then echo "Error: _DEBUG must be set to 0 in setup.py" && exit 1; fi'
       language: system
       files: setup.py
       pass_filenames: false
