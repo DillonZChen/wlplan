@@ -8,17 +8,19 @@
 namespace planning {
   class State {
    public:
-    std::vector<std::shared_ptr<planning::Atom>> atoms;
+    std::vector<std::shared_ptr<Atom>> atoms;
     std::vector<double> values;
 
-    State(const std::vector<std::shared_ptr<planning::Atom>> &atoms,
-          const std::vector<double> &values);
-    State(const std::vector<std::shared_ptr<planning::Atom>> &atoms);
-    State(const std::vector<planning::Atom> &atoms, const std::vector<double> &values);
-    State(const std::vector<planning::Atom> &atoms);
+    State(const std::vector<std::shared_ptr<Atom>> &atoms, const std::vector<double> &values);
+    State(const std::vector<std::shared_ptr<Atom>> &atoms);
+    State(const std::vector<Atom> &atoms, const std::vector<double> &values);
+    State(const std::vector<Atom> &atoms);
 
-    // for Python bindings
-    std::vector<planning::Atom> get_atoms() const;
+    static py::tuple __getstate__(const State &input);
+    static State __setstate__(py::tuple t);
+
+    std::vector<Atom> get_atoms() const;
+    std::vector<double> get_values() const;
 
     std::string to_string() const;
 

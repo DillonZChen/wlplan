@@ -21,3 +21,12 @@ repos:
   hooks:
     - id: isort
       args: ["--profile", "black"]
+- repo: local
+  hooks:
+    - id: check-debug-false
+      name: Check not debug mode in setup.py
+      entry: |
+        bash -c 'if ! grep -q "_DEBUG = 0" setup.py; then echo "Error: _DEBUG must be set to 0 in setup.py" && exit 1; fi'
+      language: system
+      files: setup.py
+      pass_filenames: false

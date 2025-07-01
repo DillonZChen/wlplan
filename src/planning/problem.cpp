@@ -5,9 +5,11 @@
 #include <algorithm>
 #include <iostream>
 
+#define PYBIND11_DETAILED_ERROR_MESSAGES 1
+
 namespace planning {
   Problem::Problem(const Domain &domain,
-                   const std::vector<std::string> &objects,
+                   const std::vector<Object> &objects,
                    const std::vector<Atom> &statics,
                    const std::vector<Fluent> &fluents,
                    const std::vector<double> &fluent_values,
@@ -54,7 +56,7 @@ namespace planning {
   }
 
   Problem::Problem(const Domain &domain,
-                   const std::vector<std::string> &objects,
+                   const std::vector<Object> &objects,
                    const std::vector<Fluent> &fluents,
                    const std::vector<double> &fluent_values,
                    const std::vector<Atom> &positive_goals,
@@ -70,10 +72,36 @@ namespace planning {
                 numeric_goals) {}
 
   Problem::Problem(const Domain &domain,
-                   const std::vector<std::string> &objects,
+                   const std::vector<Object> &objects,
                    const std::vector<Atom> &positive_goals,
                    const std::vector<Atom> &negative_goals)
       : Problem(domain, objects, {}, {}, {}, positive_goals, negative_goals, {}) {}
+
+  py::tuple Problem::__getstate__(const planning::Problem &input) {
+    return py::make_tuple(Domain::__getstate__(input.get_domain()),
+                          input.get_problem_objects(),
+                          input.get_statics(),
+                          input.get_fluents(),
+                          input.get_fluent_values(),
+                          input.get_positive_goals(),
+                          input.get_negative_goals(),
+                          input.get_numeric_goals());
+  }
+
+  Problem Problem::__setstate__(py::tuple t) {
+    if (t.size() != 8) {
+      throw std::runtime_error("Invalid state for Problem: expected 8 elements, got " +
+                               std::to_string(t.size()));
+    }
+    return Problem(Domain::__setstate__(t[0].cast<py::tuple>()),
+                   t[1].cast<std::vector<Object>>(),
+                   t[2].cast<std::vector<Atom>>(),
+                   t[3].cast<std::vector<Fluent>>(),
+                   t[4].cast<std::vector<double>>(),
+                   t[5].cast<std::vector<Atom>>(),
+                   t[6].cast<std::vector<Atom>>(),
+                   t[7].cast<std::vector<NumericCondition>>());
+  }
 
   void Problem::dump() const {
     std::cout << "domain=" << domain->to_string() << std::endl;

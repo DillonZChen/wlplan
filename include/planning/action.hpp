@@ -2,21 +2,33 @@
 #define PLANNING_ACTION_HPP
 
 #include "object.hpp"
-#include "predicate.hpp"
 #include "schema.hpp"
 
 #include <memory>
+#include <pybind11/functional.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/typing.h>
 #include <string>
 #include <vector>
 
+namespace py = pybind11;
+
 namespace planning {
-  class Action {  // Currently same as Atom as effects are not used in WLPlan
+  class Action {
    public:
     const std::shared_ptr<Schema> schema;
     const std::vector<Object> objects;
 
     Action(const Schema &schema, const std::vector<Object> &objects);
 
+    static py::tuple __getstate__(const Action &input);
+    static Action __setstate__(py::tuple t);
+
+    Schema get_schema() const { return *schema; }
+    std::vector<Object> get_objects() const { return objects; }
+
+    std::string to_pddl() const;
     std::string to_string() const;
 
     bool operator==(const Action &other) const { return to_string() == other.to_string(); }

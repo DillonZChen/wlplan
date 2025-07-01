@@ -3,32 +3,47 @@
 #include <algorithm>
 
 namespace planning {
-  State::State(const std::vector<std::shared_ptr<planning::Atom>> &atoms,
-               const std::vector<double> &values)
+  State::State(const std::vector<std::shared_ptr<Atom>> &atoms, const std::vector<double> &values)
       : atoms(atoms), values(values) {}
 
-  State::State(const std::vector<std::shared_ptr<planning::Atom>> &atoms) : atoms(atoms) {}
+  State::State(const std::vector<std::shared_ptr<Atom>> &atoms) : atoms(atoms) {}
 
-  State::State(const std::vector<planning::Atom> &atoms) {
-    for (const planning::Atom &atom : atoms) {
-      this->atoms.push_back(std::make_shared<planning::Atom>(atom));
+  State::State(const std::vector<Atom> &atoms) {
+    for (const Atom &atom : atoms) {
+      this->atoms.push_back(std::make_shared<Atom>(atom));
     }
   }
 
-  State::State(const std::vector<planning::Atom> &atoms, const std::vector<double> &values) {
-    for (const planning::Atom &atom : atoms) {
-      this->atoms.push_back(std::make_shared<planning::Atom>(atom));
+  State::State(const std::vector<Atom> &atoms, const std::vector<double> &values) {
+    for (const Atom &atom : atoms) {
+      this->atoms.push_back(std::make_shared<Atom>(atom));
     }
     this->values = values;
   }
 
-  std::vector<planning::Atom> State::get_atoms() const {
-    std::vector<planning::Atom> ret;
-    for (const std::shared_ptr<planning::Atom> &atom : atoms) {
+  py::tuple State::__getstate__(const planning::State &input) {
+    std::vector<Atom> atoms = input.get_atoms();
+    std::vector<double> values = input.get_values();
+    return py::make_tuple(atoms, values);
+  }
+
+  State State::__setstate__(py::tuple t) {
+    if (t.size() != 2) {
+      throw std::runtime_error("Invalid state for State: expected 2 elements, got " +
+                               std::to_string(t.size()));
+    }
+    return State(t[0].cast<std::vector<Atom>>(), t[1].cast<std::vector<double>>());
+  }
+
+  std::vector<Atom> State::get_atoms() const {
+    std::vector<Atom> ret;
+    for (const std::shared_ptr<Atom> &atom : atoms) {
       ret.push_back(*atom);
     }
     return ret;
   }
+
+  std::vector<double> State::get_values() const { return values; }
 
   std::string State::to_string() const {
     std::string ret = "State(atoms=[";

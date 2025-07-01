@@ -153,23 +153,7 @@ R"(Parameters
   .def_readonly("constant_objects", &planning::Domain::constant_objects)
   .def("__repr__", &::planning::Domain::to_string)
   .def("__eq__", &::planning::Domain::operator==)
-  .def(py::pickle(
-    [](const planning::Domain &d) {
-        return py::make_tuple(
-            d.name,
-            d.predicates,
-            d.functions,
-            d.schemata,
-            d.constant_objects);
-    },
-    [](py::tuple t) {
-        return planning::Domain(
-            t[0].cast<std::string>(),
-            t[1].cast<std::vector<planning::Predicate>>(),
-            t[2].cast<std::vector<planning::Function>>(),
-            t[3].cast<std::vector<planning::Schema>>(),
-            t[4].cast<std::vector<planning::Object>>());
-    }))
+  .def(py::pickle(&planning::Domain::__getstate__, &planning::Domain::__setstate__))
 ;
 
 /* Task components */
@@ -192,15 +176,12 @@ R"(Parameters
 )")
   .def(py::init<const planning::Schema &, const std::vector<std::string> &>(),
         "schema"_a, "objects"_a)
+  .def_property_readonly("schema", &planning::Action::get_schema)
+  .def_property_readonly("objects", &planning::Action::get_objects)
+  .def("to_pddl", &planning::Action::to_pddl)
   .def("__repr__", &::planning::Action::to_string)
   .def("__eq__", &::planning::Action::operator==)
-  .def(py::pickle(
-    [](const planning::Action &a) {
-        return py::make_tuple(a.schema, a.objects);
-    },
-    [](py::tuple t) {
-        return planning::Action(t[0].cast<planning::Schema>(), t[1].cast<std::vector<std::string>>());
-    }))
+  .def(py::pickle(&planning::Action::__getstate__, &planning::Action::__setstate__))
 ;
 
 // Atom
@@ -215,16 +196,12 @@ R"(Parameters
 )")
   .def(py::init<const planning::Predicate &, const std::vector<std::string> &>(),
         "predicate"_a, "objects"_a)
+  .def_property_readonly("predicate", &planning::Atom::get_predicate)
+  .def_property_readonly("objects", &planning::Atom::get_objects)
   .def("to_pddl", &planning::Atom::to_pddl)
   .def("__repr__", &::planning::Atom::to_string)
   .def("__eq__", &::planning::Atom::operator==)
-  .def(py::pickle(
-    [](const planning::Atom &a) {
-        return py::make_tuple(a.predicate, a.objects);
-    },
-    [](py::tuple t) {
-        return planning::Atom(t[0].cast<planning::Predicate>(), t[1].cast<std::vector<std::string>>());
-    }))
+  .def(py::pickle(&planning::Atom::__getstate__, &planning::Atom::__setstate__))
 ;
 
 // Fluent
@@ -410,39 +387,7 @@ R"(Parameters
   .def_property_readonly("negative_goals", &planning::Problem::get_negative_goals)
   .def_property_readonly("numeric_goals", &planning::Problem::get_numeric_goals)
   .def("dump", &planning::Problem::dump)
-  .def(py::pickle(
-    [](const planning::Problem &p) {
-        return py::make_tuple(
-            p.get_domain(),
-            p.get_problem_objects(),
-            p.get_positive_goals(),
-            p.get_negative_goals()
-            // p.get_domain(),
-            // p.get_problem_objects(),
-            // p.get_statics(),
-            // p.get_fluents(),
-            // p.get_fluent_values(),
-            // p.get_positive_goals(),
-            // p.get_negative_goals(),
-            // p.get_numeric_goals()
-        );
-    },
-    [](py::tuple t) {
-        return planning::Problem(
-            t[0].cast<planning::Domain>(),
-            t[1].cast<std::vector<std::string>>(),
-            t[2].cast<std::vector<planning::Atom>>(),
-            t[3].cast<std::vector<planning::Atom>>()
-            // t[0].cast<planning::Domain>(),
-            // t[1].cast<std::vector<std::string>>(),
-            // t[2].cast<std::vector<planning::Atom>>(),
-            // t[3].cast<std::vector<planning::Fluent>>(),
-            // t[4].cast<std::vector<double>>(),
-            // t[5].cast<std::vector<planning::Atom>>(),
-            // t[6].cast<std::vector<planning::Atom>>(),
-            // t[7].cast<std::vector<planning::NumericCondition>>()
-        );
-    }))
+  .def(py::pickle(&planning::Problem::__getstate__, &planning::Problem::__setstate__))
 ;
 
 // State
@@ -464,13 +409,7 @@ R"(Parameters
   .def("__repr__", &::planning::State::to_string)
   .def("__eq__", &::planning::State::operator==)
   .def("__hash__", &::planning::State::hash)
-  .def(py::pickle(
-    [](const planning::State &s) {
-        return py::make_tuple(s.atoms, s.values);
-    },
-    [](py::tuple t) {
-        return planning::State(t[0].cast<std::vector<planning::Atom>>(), t[1].cast<std::vector<double>>());
-    }))
+  .def(py::pickle(&planning::State::__getstate__, &planning::State::__setstate__))
 ;
 
 

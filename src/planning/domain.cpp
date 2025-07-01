@@ -43,6 +43,23 @@ namespace planning {
                std::vector<Schema>(),
                std::vector<Object>()) {}
 
+  py::tuple Domain::__getstate__(const planning::Domain &input) {
+    return py::make_tuple(
+        input.name, input.predicates, input.functions, input.schemata, input.constant_objects);
+  }
+
+  Domain Domain::__setstate__(py::tuple t) {
+    if (t.size() != 5) {
+      throw std::runtime_error("Invalid state for Domain: expected 5 elements, got " +
+                               std::to_string(t.size()));
+    }
+    return Domain(t[0].cast<std::string>(),
+                  t[1].cast<std::vector<Predicate>>(),
+                  t[2].cast<std::vector<Function>>(),
+                  t[3].cast<std::vector<Schema>>(),
+                  t[4].cast<std::vector<Object>>());
+  }
+
   std::unordered_map<std::string, Predicate> Domain::get_name_to_predicate() const {
     std::unordered_map<std::string, Predicate> name_to_predicate;
     for (const auto &pred : predicates) {

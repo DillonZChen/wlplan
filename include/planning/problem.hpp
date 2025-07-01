@@ -39,7 +39,7 @@ namespace planning {
 
    public:
     Problem(const Domain &domain,
-            const std::vector<std::string> &objects,
+            const std::vector<Object> &objects,
             const std::vector<Atom> &statics,
             const std::vector<Fluent> &fluents,
             const std::vector<double> &fluent_values,
@@ -48,7 +48,7 @@ namespace planning {
             const std::vector<NumericCondition> &numeric_goals);
 
     Problem(const Domain &domain,
-            const std::vector<std::string> &objects,
+            const std::vector<Object> &objects,
             const std::vector<Fluent> &fluents,
             const std::vector<double> &fluent_values,
             const std::vector<Atom> &positive_goals,
@@ -56,9 +56,12 @@ namespace planning {
             const std::vector<NumericCondition> &numeric_goals);
 
     Problem(const Domain &domain,
-            const std::vector<std::string> &objects,
+            const std::vector<Object> &objects,
             const std::vector<Atom> &positive_goals,
             const std::vector<Atom> &negative_goals);
+
+    static py::tuple __getstate__(const planning::Problem &input);
+    static Problem __setstate__(py::tuple t);
 
     Domain get_domain() const { return *domain; }
 
