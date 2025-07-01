@@ -4,10 +4,20 @@ namespace graph_generator {
   AOAGGenerator::AOAGGenerator(const planning::Domain &domain,
                                const bool differentiate_constant_objects)
       : ILGGenerator(domain, differentiate_constant_objects, "AOAGGenerator") {
+
     // add schema colours
+    schema_to_graph_colour = std::unordered_map<std::string, int>();
     int colour = 0;
+    for (const auto &[col, _] : colour_to_description) {
+      colour = std::max(colour, col);
+    }
+    colour++;
+
     for (size_t i = 0; i < domain.schemata.size(); i++) {
-      int colour = 0;
+      std::string schema_name = domain.schemata[i].name;
+      colour_to_description[colour] = schema_name;
+      schema_to_graph_colour[schema_name] = colour;
+      colour++;
     }
   }
 
@@ -26,7 +36,7 @@ namespace graph_generator {
       // add node
       action_node_str = action->to_string();
       schema_name = action->schema->name;
-      action_node = graph->add_node(action_node_str, schema_to_graph_colour[schema_name]);
+      action_node = graph->add_node(action_node_str, schema_to_graph_colour.at(schema_name));
 
       // add edges
       for (size_t r = 0; r < action->objects.size(); r++) {
