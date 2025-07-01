@@ -31,9 +31,11 @@ namespace graph_generator {
     // Graph generation
     void set_problem(const planning::Problem &problem) override;
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
+    std::shared_ptr<Graph> to_graph(const planning::State &state,
+                                    const planning::Actions &actions) override;
     // TODO implement optimised variant
     std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
-    void reset_graph() const override{};
+    void reset_graph() const override {};
 
     // Graph features
     int get_n_features() const override { return colour_to_description.size(); }

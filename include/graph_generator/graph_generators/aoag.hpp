@@ -25,18 +25,18 @@ namespace graph_generator {
 
     // Graph generation
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph(const planning::State &state,
-                                    const std::vector<planning::Action> &actions);
+    std::shared_ptr<Graph> to_graph(const planning::State &state, const planning::Actions &actions);
     std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
     void reset_graph() const override;
 
     // Graph features
-    int get_n_features() const override {
-      throw NotImplementedError("AOAGGenerator.get_n_features()");
-    };
+    int get_n_features() const override { return colour_to_description.size(); };
     int get_n_relations() const override {
-      throw NotImplementedError("AOAGGenerator.get_n_relations()");
+      return std::max(domain.get_predicate_arity(), domain.get_schemata_arity());
     };
+
+   private:
+    std::unordered_map<std::string, int> schema_to_graph_colour;
   };
 }  // namespace graph_generator
 

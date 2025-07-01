@@ -41,11 +41,6 @@ namespace graph_generator {
     return graphs;
   }
 
-  std::shared_ptr<Graph> GraphGenerator::to_graph(const planning::State &state,
-                                                  const std::vector<planning::Action> &actions) {
-    throw NotSupportedError(graph_generator_name + ".to_graph(state, actions)");
-  }
-
   int GraphGenerator::get_n_features() const { return colour_to_description.size(); }
 
   void GraphGenerator::print_init_colours() const {

@@ -164,6 +164,12 @@ namespace graph_generator {
     return std::make_shared<Graph>(graph);
   }
 
+  std::shared_ptr<Graph> PLOIGGenerator::to_graph(const planning::State &state,
+                                                  const planning::Actions &actions) {
+    // action-agnostic
+    return to_graph(state);
+  }
+
   std::shared_ptr<Graph> PLOIGGenerator::to_graph_opt(const planning::State &state) {
     // TODO optimise
     return to_graph(state);

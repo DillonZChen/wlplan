@@ -466,7 +466,7 @@ Parameters
            "states"_a)
       .def(py::init<const planning::Problem &,
                     const std::vector<planning::State> &,
-                    const std::vector<std::vector<planning::Action>>>(),
+                    const std::vector<planning::Actions> &>(),
            "problem"_a,
            "states"_a,
            "actions"_a)
@@ -560,7 +560,7 @@ Methods
            py::overload_cast<const planning::State &>(&graph_generator::GraphGenerator::to_graph),
            "state"_a)
       .def("to_graph",
-           py::overload_cast<const planning::State &, const std::vector<planning::Action> &>(
+           py::overload_cast<const planning::State &, const planning::Actions &>(
                &graph_generator::GraphGenerator::to_graph),
            "state"_a,
            "actions"_a);

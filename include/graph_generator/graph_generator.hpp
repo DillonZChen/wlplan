@@ -17,6 +17,7 @@
 #include <vector>
 
 namespace graph_generator {
+
   class GraphGenerator {
    public:
     GraphGenerator(const planning::Domain &domain,
@@ -31,8 +32,8 @@ namespace graph_generator {
     // Makes a copy of the base graph and makes the necessary modifications. Assumes the state is
     // from the problem that is set but does not check this.
     virtual std::shared_ptr<Graph> to_graph(const planning::State &state) = 0;
-    std::shared_ptr<Graph> to_graph(const planning::State &state,
-                                    const std::vector<planning::Action> &actions);
+    virtual std::shared_ptr<Graph> to_graph(const planning::State &state,
+                                            const planning::Actions &actions) = 0;
     std::vector<graph_generator::Graph> to_graphs(const data::DomainDataset dataset);
 
     // Optimised variant of to_graph() but requires calling reset_graph() after. Does not make a

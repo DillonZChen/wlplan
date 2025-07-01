@@ -171,6 +171,12 @@ namespace graph_generator {
     return graph;
   }
 
+  std::shared_ptr<Graph> ILGGenerator::to_graph(const planning::State &state,
+                                                const planning::Actions &actions) {
+    // action-agnostic
+    return to_graph(state);
+  }
+
   std::shared_ptr<Graph> ILGGenerator::to_graph_opt(const planning::State &state) {
     base_graph = modify_graph_from_state(state, base_graph, true);
     return base_graph;

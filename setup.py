@@ -40,7 +40,7 @@ def main():
         version=__version__,
         author="Dillon Z. Chen",
         author_email="dillon.chen1@gmail.com",
-        description="WLPlan:  Features for PDDL Planning",
+        description="WLPlan: Features for PDDL Planning",
         long_description=open("README.md").read(),
         long_description_content_type="text/markdown",
         packages=["wlplan", "_wlplan"],

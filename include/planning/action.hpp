@@ -25,6 +25,8 @@ namespace planning {
     bool operator==(const Action &other) const { return to_string() == other.to_string(); }
   };
 
+  using Actions = std::vector<std::shared_ptr<planning::Action>>;
+
 }  // namespace planning
 
 #endif  // PLANNING_ACTION_HPP

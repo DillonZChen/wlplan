@@ -4,22 +4,22 @@
 
 namespace data {
   ProblemDataset::ProblemDataset(const planning::Problem &problem,
-                               const std::vector<planning::State> &states)
+                                 const std::vector<planning::State> &states)
       : problem(problem),
         states(states),
-        actions(std::vector<std::vector<planning::Action>>(states.size(),
-                                                           std::vector<planning::Action>())) {}
+        actions(std::vector<planning::Actions>(states.size(), planning::Actions())) {}
 
   ProblemDataset::ProblemDataset(const planning::Problem &problem,
-                               const std::vector<planning::State> &states,
-                               const std::vector<std::vector<planning::Action>> &actions)
+                                 const std::vector<planning::State> &states,
+                                 const std::vector<planning::Actions> &actions)
       : problem(problem), states(states), actions(actions) {
     if (states.size() != actions.size()) {
       throw std::runtime_error("States and actions must have the same size");
     }
   }
 
-  DomainDataset::DomainDataset(const planning::Domain &domain, const std::vector<ProblemDataset> &data)
+  DomainDataset::DomainDataset(const planning::Domain &domain,
+                               const std::vector<ProblemDataset> &data)
       : domain(domain), data(data) {
     for (const auto &predicate : domain.predicates) {
       predicate_to_arity[predicate.name] = predicate.arity;
@@ -64,7 +64,7 @@ namespace data {
   }
 
   void DomainDataset::check_good_atom(const planning::Atom &atom,
-                                const std::unordered_set<planning::Object> &objects) const {
+                                      const std::unordered_set<planning::Object> &objects) const {
     if (predicate_to_arity.find(atom.predicate->name) == predicate_to_arity.end()) {
       throw std::runtime_error("Unknown predicate " + atom.predicate->name);
     }

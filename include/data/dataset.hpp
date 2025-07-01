@@ -15,12 +15,12 @@ namespace data {
    public:
     const planning::Problem problem;
     const std::vector<planning::State> states;
-    const std::vector<std::vector<planning::Action>> actions;
+    const std::vector<planning::Actions> actions;
 
     ProblemDataset(const planning::Problem &problem, const std::vector<planning::State> &states);
     ProblemDataset(const planning::Problem &problem,
                    const std::vector<planning::State> &states,
-                   const std::vector<std::vector<planning::Action>> &actions);
+                   const std::vector<planning::Actions> &actions);
   };
 
   class DomainDataset {
