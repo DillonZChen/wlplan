@@ -7,6 +7,16 @@ repos:
   -   id: check-yaml
   -   id: debug-statements
   -   id: requirements-txt-fixer
+- repo: https://github.com/pocc/pre-commit-hooks
+  rev: master
+  hooks:
+    - id: clang-format  # sudo apt install clang-format
+    # - id: clang-tidy
+    # - id: oclint
+    # - id: uncrustify
+    # - id: cppcheck
+    # - id: cpplint
+    # - id: include-what-you-use  # sudo apt install iwyu
 - repo: https://github.com/kynan/nbstripout
   rev: 0.8.1
   hooks:

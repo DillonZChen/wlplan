@@ -5,14 +5,8 @@
 #include "predicate.hpp"
 
 #include <memory>
-#include <pybind11/functional.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/typing.h>
 #include <string>
 #include <vector>
-
-namespace py = pybind11;
 
 namespace planning {
   class Atom {

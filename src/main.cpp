@@ -21,7 +21,7 @@
 #include "../include/planning/predicate.hpp"
 #include "../include/planning/problem.hpp"
 #include "../include/planning/schema.hpp"
-#include "../include/utils/serialise.hpp"
+#include "../include/serialise.hpp"
 
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
