@@ -16,7 +16,7 @@ namespace graph_generator {
   }
 
   std::shared_ptr<Graph> AOAGGenerator::to_graph(const planning::State &state,
-                                                 const planning::Actions &actions) {
+                                                 const planning::ActionPointers &actions) {
     std::shared_ptr<Graph> graph = ILGGenerator::to_graph(state);
 
     int action_node, object_node;

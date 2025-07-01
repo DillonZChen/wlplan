@@ -5,9 +5,9 @@
 namespace data {
   ProblemDataset::ProblemDataset(const planning::Problem &problem,
                                  const std::vector<planning::State> &states)
-      : problem(problem),
-        states(states),
-        actions(std::vector<planning::Actions>(states.size(), planning::Actions())) {}
+      : ProblemDataset(problem,
+                       states,
+                       std::vector<planning::Actions>(states.size(), planning::Actions())) {}
 
   ProblemDataset::ProblemDataset(const planning::Problem &problem,
                                  const std::vector<planning::State> &states,

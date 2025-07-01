@@ -34,7 +34,11 @@ namespace graph_generator {
       const auto &actions = d.actions;
       set_problem(problem);
       for (size_t j = 0; j < states.size(); j++) {
-        graphs.push_back(*(to_graph(states.at(j), actions.at(j))));
+        planning::ActionPointers action_pointers;
+        for (const auto &action : actions.at(j)) {
+          action_pointers.push_back(std::make_shared<planning::Action>(action));
+        }
+        graphs.push_back(*(to_graph(states.at(j), action_pointers)));
       }
     }
 

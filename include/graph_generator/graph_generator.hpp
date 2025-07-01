@@ -33,7 +33,7 @@ namespace graph_generator {
     // from the problem that is set but does not check this.
     virtual std::shared_ptr<Graph> to_graph(const planning::State &state) = 0;
     virtual std::shared_ptr<Graph> to_graph(const planning::State &state,
-                                            const planning::Actions &actions) = 0;
+                                            const planning::ActionPointers &actions) = 0;
     std::vector<graph_generator::Graph> to_graphs(const data::DomainDataset dataset);
 
     // Optimised variant of to_graph() but requires calling reset_graph() after. Does not make a

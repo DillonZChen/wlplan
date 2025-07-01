@@ -25,7 +25,8 @@ namespace graph_generator {
 
     // Graph generation
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph(const planning::State &state, const planning::Actions &actions);
+    std::shared_ptr<Graph> to_graph(const planning::State &state,
+                                    const planning::ActionPointers &actions);
     std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
     void reset_graph() const override;
 

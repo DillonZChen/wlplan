@@ -560,7 +560,7 @@ Methods
            py::overload_cast<const planning::State &>(&graph_generator::GraphGenerator::to_graph),
            "state"_a)
       .def("to_graph",
-           py::overload_cast<const planning::State &, const planning::Actions &>(
+           py::overload_cast<const planning::State &, const planning::ActionPointers &>(
                &graph_generator::GraphGenerator::to_graph),
            "state"_a,
            "actions"_a);

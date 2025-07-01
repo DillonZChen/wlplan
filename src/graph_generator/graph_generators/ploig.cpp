@@ -165,7 +165,7 @@ namespace graph_generator {
   }
 
   std::shared_ptr<Graph> PLOIGGenerator::to_graph(const planning::State &state,
-                                                  const planning::Actions &actions) {
+                                                  const planning::ActionPointers &actions) {
     // action-agnostic
     return to_graph(state);
   }
