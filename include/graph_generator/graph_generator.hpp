@@ -19,7 +19,9 @@
 namespace graph_generator {
   class GraphGenerator {
    public:
-    GraphGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
+    GraphGenerator(const planning::Domain &domain,
+                   const bool differentiate_constant_objects,
+                   const std::string &graph_generator_name);
 
     virtual ~GraphGenerator() = default;
 
@@ -47,12 +49,12 @@ namespace graph_generator {
     void print_init_colours() const;
 
    protected:
-    // Do not use a vector here because colours can be negative, i.e. constant objects
-    std::map<int, std::string> colour_to_description;
-
-    // Domain specific variables
     const planning::Domain domain;
     bool differentiate_constant_objects;
+    const std::string graph_generator_name;
+
+    // Do not use a vector here because colours can be negative, i.e. constant objects
+    std::map<int, std::string> colour_to_description;
 
     // Problem specific variables
     std::shared_ptr<Graph> base_graph;

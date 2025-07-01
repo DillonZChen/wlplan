@@ -5,8 +5,8 @@
 #include "../../include/feature_generator/neighbour_containers/lwl2_neighbour_container.hpp"
 #include "../../include/feature_generator/neighbour_containers/wl_neighbour_container.hpp"
 #include "../../include/graph_generator/graph_generator_factory.hpp"
-#include "../../include/utils/nlohmann/json.hpp"
 #include "../../include/utils/exceptions.hpp"
+#include "../../include/utils/nlohmann/json.hpp"
 
 #include <chrono>
 #include <filesystem>
@@ -50,8 +50,8 @@ namespace feature_generator {
     // check pruning support
     if (pruning != PruningOptions::NONE &&
         !std::set<std::string>({"wl", "2-lwl"}).count(feature_name)) {
-      throw std::runtime_error("Pruning option `" + pruning +
-                               "` not supported for feature option `" + feature_name + "`.");
+      throw NotSupportedError("Pruning option `" + pruning + "` for feature option `" +
+                              feature_name + "`");
     }
   }
 
@@ -69,8 +69,7 @@ namespace feature_generator {
     } else if (feature_name == "2-lwl") {
       neighbour_container = std::make_shared<LWL2NeighbourContainer>(multiset_hash);
     } else {
-      throw NotImplementedException("Neighbour container for feature_name=" +
-                               feature_name);
+      throw NotImplementedError("Neighbour container for feature_name=" + feature_name);
     }
   }
 

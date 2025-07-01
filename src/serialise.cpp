@@ -92,12 +92,12 @@ planning::Function __setstate__(py::tuple t) {
 // NumericCondition
 template <>
 py::tuple __getstate__(const planning::NumericCondition &input) {
-  throw NotImplementedException("NumericCondition serialisation");
+  throw NotImplementedError("NumericCondition serialisation");
 }
 
 template <>
 planning::NumericCondition __setstate__(py::tuple t) {
-  throw NotImplementedException("NumericCondition serialisation");
+  throw NotImplementedError("NumericCondition serialisation");
 }
 
 // Predicate

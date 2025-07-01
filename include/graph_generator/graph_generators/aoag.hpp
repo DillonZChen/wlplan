@@ -21,7 +21,7 @@
 namespace graph_generator {
   class AOAGGenerator : public ILGGenerator {
    public:
-    AOAGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
+    AOAGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
 
     // Graph generation
     std::shared_ptr<Graph> to_graph(const planning::State &state) override;
@@ -32,10 +32,10 @@ namespace graph_generator {
 
     // Graph features
     int get_n_features() const override {
-      throw NotImplementedException("AOAGGenerator.get_n_features()");
+      throw NotImplementedError("AOAGGenerator.get_n_features()");
     };
     int get_n_relations() const override {
-      throw NotImplementedException("AOAGGenerator.get_n_relations()");
+      throw NotImplementedError("AOAGGenerator.get_n_relations()");
     };
   };
 }  // namespace graph_generator

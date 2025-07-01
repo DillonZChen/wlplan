@@ -22,6 +22,7 @@
 #include "../include/planning/problem.hpp"
 #include "../include/planning/schema.hpp"
 #include "../include/serialise.hpp"
+#include "../include/utils/exceptions.hpp"
 
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -36,6 +37,17 @@ using namespace py::literals;
 
 PYBIND11_MODULE(_wlplan, m) {
   m.doc() = "WLPlan: WL Features for PDDL Planning";
+
+  py::register_exception_translator([](std::exception_ptr p) {
+    try {
+      if (p)
+        std::rethrow_exception(p);
+    } catch (const NotImplementedError &e) {
+      PyErr_SetString(PyExc_NotImplementedError, e.what());
+    } catch (const NotSupportedError &e) {
+      PyErr_SetString(PyExc_ValueError, e.what());
+    }
+  });
 
   //////////////////////////////////////////////////////////////////////////////
   // Planning

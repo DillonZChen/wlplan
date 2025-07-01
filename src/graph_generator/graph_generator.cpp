@@ -1,9 +1,14 @@
 #include "../../include/graph_generator/graph_generator.hpp"
 
+#include "../../include/utils/exceptions.hpp"
+
 namespace graph_generator {
   GraphGenerator::GraphGenerator(const planning::Domain &domain,
-                                 bool differentiate_constant_objects)
-      : domain(domain), differentiate_constant_objects(differentiate_constant_objects) {
+                                 const bool differentiate_constant_objects,
+                                 const std::string &graph_generator_name)
+      : domain(domain),
+        differentiate_constant_objects(differentiate_constant_objects),
+        graph_generator_name(graph_generator_name) {
     /* We assume all graphs have object nodes */
 
     // add constant object colours
@@ -38,7 +43,7 @@ namespace graph_generator {
 
   std::shared_ptr<Graph> GraphGenerator::to_graph(const planning::State &state,
                                                   const std::vector<planning::Action> &actions) {
-    return to_graph(state);
+    throw NotSupportedError(graph_generator_name + ".to_graph(state, actions)");
   }
 
   int GraphGenerator::get_n_features() const { return colour_to_description.size(); }

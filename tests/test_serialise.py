@@ -16,11 +16,8 @@ def save_then_load(input: Any):
             pickle.dump(input, f)
         with open(pkl_file, "rb") as f:
             output = pickle.load(f)
-    except RuntimeError as e:
-        if "not yet implemented" in e.args[0]:
-            pytest.skip()
-        else:
-            raise e
+    except NotImplementedError:
+        pytest.skip()
     assert input == output, f"Serialisation failed for {type(input).__name__}\n{input=}\n{output=}"
 
 

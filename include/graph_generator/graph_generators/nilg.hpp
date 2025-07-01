@@ -19,7 +19,7 @@
 namespace graph_generator {
   class NILGGenerator : public ILGGenerator {
    public:
-    NILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
+    NILGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
 
     // Graph generation
     void set_problem(const planning::Problem &problem) override;

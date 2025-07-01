@@ -4,10 +4,16 @@
 #include <stdexcept>
 #include <string>
 
-class NotImplementedException : public std::logic_error {
+class NotImplementedError : public std::logic_error {
  public:
-  NotImplementedException(const std::string &description)
+  NotImplementedError(const std::string &description)
       : std::logic_error(description + " not yet implemented."){};
+};
+
+class NotSupportedError : public std::logic_error {
+ public:
+  NotSupportedError(const std::string &description)
+      : std::logic_error(description + " not supported."){};
 };
 
 #endif  // UTILS_EXCEPTIONS_HPP

@@ -1,5 +1,7 @@
 #include "../../include/feature_generator/maxsat.hpp"
 
+#include "../../include/utils/exceptions.hpp"
+
 #include <chrono>
 #include <iostream>
 
@@ -133,7 +135,7 @@ namespace feature_generator {
     }
     return solution;
 #else
-    throw std::runtime_error("MaxSAT feature pruning is not supported in the C++ interface.");
+    throw NotSupportedError("MaxSAT feature pruning for C++ interface");
 #endif
   }
 
@@ -148,7 +150,7 @@ namespace feature_generator {
       return call_solver();
     }
 #else
-    throw std::runtime_error("MaxSAT feature pruning is not supported in the C++ interface.");
+    throw NotSupportedError("MaxSAT feature pruning for C++ interface");
 #endif
   }
 }  // namespace feature_generator

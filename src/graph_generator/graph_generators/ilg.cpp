@@ -5,8 +5,14 @@ char const *fact_description_name[] = {ILG_FACT_DESCRIPTIONS};
 #undef X
 
 namespace graph_generator {
-  ILGGenerator::ILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects)
-      : GraphGenerator(domain, differentiate_constant_objects) {
+  ILGGenerator::ILGGenerator(const planning::Domain &domain,
+                             const bool differentiate_constant_objects)
+      : ILGGenerator(domain, differentiate_constant_objects, "ILGGenerator") {}
+
+  ILGGenerator::ILGGenerator(const planning::Domain &domain,
+                             const bool differentiate_constant_objects,
+                             const std::string &derived_graph_generator_name)
+      : GraphGenerator(domain, differentiate_constant_objects, derived_graph_generator_name) {
     // add predicate colours
     for (size_t i = 0; i < domain.predicates.size(); i++) {
       for (int j = 0; j < (int)ILGFactDescription::_LAST; j++) {

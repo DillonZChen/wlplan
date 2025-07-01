@@ -2,8 +2,8 @@
 
 namespace graph_generator {
   PLOIGGenerator::PLOIGGenerator(const planning::Domain &domain,
-                                 bool differentiate_constant_objects)
-      : GraphGenerator(domain, differentiate_constant_objects) {
+                                 const bool differentiate_constant_objects)
+      : GraphGenerator(domain, differentiate_constant_objects, "PLOIGGenerator") {
     // Note that there are edge colours here.
     // The only node (object) colours are already handled in GraphGenerator.
     n_relations = 0;

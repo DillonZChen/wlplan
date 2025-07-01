@@ -37,7 +37,10 @@ enum class ILGFactDescription { ILG_FACT_DESCRIPTIONS };
 namespace graph_generator {
   class ILGGenerator : public GraphGenerator {
    public:
-    ILGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
+    ILGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
+    ILGGenerator(const planning::Domain &domain,
+                 const bool differentiate_constant_objects,
+                 const std::string &derived_graph_generator_name);
 
     // Graph generation
     void set_problem(const planning::Problem &problem) override;

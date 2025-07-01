@@ -26,7 +26,7 @@
 namespace graph_generator {
   class PLOIGGenerator : public GraphGenerator {
    public:
-    PLOIGGenerator(const planning::Domain &domain, bool differentiate_constant_objects);
+    PLOIGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
 
     // Graph generation
     void set_problem(const planning::Problem &problem) override;
