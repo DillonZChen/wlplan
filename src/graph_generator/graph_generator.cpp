@@ -23,8 +23,17 @@ namespace graph_generator {
     colour_to_description[0] = "_OBJECT_";
   }
 
-  std::vector<graph_generator::Graph> GraphGenerator::to_graphs(const data::DomainDataset dataset) {
-    std::vector<graph_generator::Graph> graphs;
+  std::shared_ptr<Graph> GraphGenerator::to_graph(const planning::State &state,
+                                                  const planning::Actions &actions) {
+    planning::ActionPointers action_pointers;
+    for (const auto &action : actions) {
+      action_pointers.push_back(std::make_shared<planning::Action>(action));
+    }
+    return to_graph(state, action_pointers);
+  }
+
+  std::vector<Graph> GraphGenerator::to_graphs(const data::DomainDataset dataset) {
+    std::vector<Graph> graphs;
 
     const std::vector<data::ProblemDataset> &data = dataset.data;
     for (size_t i = 0; i < data.size(); i++) {
