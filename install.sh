@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Show commands
-set -x
 # Exit on the first error
 set -e
 
