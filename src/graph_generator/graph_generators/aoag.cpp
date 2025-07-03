@@ -22,6 +22,7 @@ namespace graph_generator {
   }
 
   std::shared_ptr<Graph> AOAGGenerator::to_graph(const planning::State &state) {
+    (void)state;
     throw NotSupportedError("AOAGGenerator.to_graph(state)");
   }
 
@@ -50,6 +51,7 @@ namespace graph_generator {
   }
 
   std::shared_ptr<Graph> AOAGGenerator::to_graph_opt(const planning::State &state) {
+    (void)state;
     throw NotSupportedError("AOAGGenerator.to_graph_opt(state)");
   }
 

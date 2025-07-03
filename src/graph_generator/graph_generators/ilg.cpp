@@ -174,6 +174,7 @@ namespace graph_generator {
   std::shared_ptr<Graph> ILGGenerator::to_graph(const planning::State &state,
                                                 const planning::ActionPointers &actions) {
     // action-agnostic
+    (void)actions;
     return to_graph(state);
   }
 
