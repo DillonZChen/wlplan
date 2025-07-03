@@ -130,7 +130,6 @@ namespace feature_generator {
     Embedding embed_state(const planning::State &state);
     Embedding embed(const std::shared_ptr<graph_generator::Graph> &graph);
 
-
     void add_colour_to_x(int colour, int iteration, Embedding &x);
 
     /* Pruning functions */
@@ -144,11 +143,11 @@ namespace feature_generator {
 
     std::set<int> prune_collapse_layer(int iteration, std::vector<std::vector<int>> &cur_colours);
     std::set<int> prune_collapse_layer_greedy(int iteration,
-                                         const std::vector<graph_generator::Graph> &graphs);
+                                              const std::vector<graph_generator::Graph> &graphs);
     std::set<int> prune_collapse_layer_maxsat(int iteration,
-                                         const std::vector<graph_generator::Graph> &graphs);
+                                              const std::vector<graph_generator::Graph> &graphs);
     std::set<int> prune_collapse_layer_frequency(int iteration,
-                                         const std::vector<graph_generator::Graph> &graphs);
+                                                 const std::vector<graph_generator::Graph> &graphs);
     std::set<int> prune_maxsat(std::vector<Embedding> X);
     std::set<int> prune_maxsat(std::vector<Embedding> X, const int maxsat_iterations);
 
@@ -192,7 +191,8 @@ namespace feature_generator {
     StrColourHash int_to_str_colour_hash(VecColourHash int_colour_hash) const;
 
     // statistics functions
-    int get_n_features() const;
+    int get_n_colours() const;
+    virtual int get_n_features() const = 0;
     std::vector<long> get_seen_counts() const { return seen_colour_statistics[1]; };
     std::vector<long> get_unseen_counts() const { return seen_colour_statistics[0]; };
     std::vector<long> get_layer_to_n_colours() const;
@@ -202,6 +202,7 @@ namespace feature_generator {
     std::unordered_map<int, int> get_colour_to_layer() const { return colour_to_layer; };
 
     void save(const std::string &filename);
+    void save(const std::string &filename, const std::vector<double> &weights);
   };
 }  // namespace feature_generator
 

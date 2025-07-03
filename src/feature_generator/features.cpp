@@ -193,7 +193,7 @@ namespace feature_generator {
 #endif
       return UNSEEN_COLOUR;
     } else if (collecting && !colour_hash[iteration].count(colour)) {
-      int hash = get_n_features();
+      int hash = get_n_colours();
       colour_hash[iteration][colour] = hash;
       colour_to_layer[hash] = iteration;
       layer_to_colours[iteration].insert(hash);
@@ -381,7 +381,7 @@ namespace feature_generator {
     collecting = false;
 
     // check features have been collected
-    if (get_n_features() == 0) {
+    if (get_n_colours() == 0) {
       std::cout << "WARNING: no features have been collected" << std::endl;
     }
   }
@@ -572,7 +572,9 @@ namespace feature_generator {
 
   void Features::set_weights(const std::vector<double> &weights) {
     if (((int)weights.size()) != get_n_features()) {
-      throw std::runtime_error("Number of weights must match number of features.");
+      std::string msg = "Number of weights (" + std::to_string(weights.size()) + ") " +
+                        "must match number of features (" + std::to_string(get_n_features()) + ").";
+      throw std::runtime_error(msg);
     }
     store_weights = true;
     this->weights = weights;
@@ -587,7 +589,7 @@ namespace feature_generator {
 
   void Features::print_init_colours() const { graph_generator->print_init_colours(); }
 
-  int Features::get_n_features() const {
+  int Features::get_n_colours() const {
     int ret = 0;
     for (int i = 0; i < iterations + 1; i++) {
       ret += colour_hash[i].size();
@@ -639,5 +641,10 @@ namespace feature_generator {
     // Save to file
     std::ofstream o(filename);
     o << std::setw(4) << j << std::endl;
+  }
+
+  void Features::save(const std::string &filename, const std::vector<double> &weights) {
+    set_weights(weights);
+    save(filename);
   }
 }  // namespace feature_generator

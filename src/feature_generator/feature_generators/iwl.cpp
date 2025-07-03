@@ -106,7 +106,7 @@ namespace feature_generator {
 
   Embedding IWLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
     /* 1. Initialise embedding */
-    Embedding x0(get_n_features(), 0);
+    Embedding x0(get_n_colours(), 0);
     int n_nodes = graph->nodes.size();
 
     /* Individualisation */

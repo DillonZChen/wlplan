@@ -23,9 +23,9 @@ namespace feature_generator {
 
     CCWLaFeatures(const std::string &filename, bool quiet);
 
-    Embedding embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) override;
+    int get_n_features() const override;
 
-    void set_weights(const std::vector<double> &weights);
+    Embedding embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) override;
   };
 }  // namespace feature_generator
 

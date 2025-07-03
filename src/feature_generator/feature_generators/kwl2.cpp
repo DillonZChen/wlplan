@@ -28,6 +28,8 @@ namespace feature_generator {
 
   KWL2Features::KWL2Features(const std::string &filename, bool quiet) : Features(filename, quiet) {}
 
+  int KWL2Features::get_n_features() const { return get_n_colours(); }
+
   int kwl2_pair_to_index_map(int n, int i, int j) {
     // map pair where 0 <= i, j < n to vec index
     return i * n + j;
@@ -145,7 +147,7 @@ namespace feature_generator {
 
   Embedding KWL2Features::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
     /* 1. Initialise embedding before pruning */
-    Embedding x0(get_n_features(), 0);
+    Embedding x0(get_n_colours(), 0);
 
     int n_nodes = graph->nodes.size();
     int n_pairs = get_n_kwl2_pairs(n_nodes);

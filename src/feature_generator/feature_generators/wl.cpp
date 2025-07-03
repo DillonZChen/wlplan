@@ -30,6 +30,8 @@ namespace feature_generator {
 
   WLFeatures::WLFeatures(const std::string &filename, bool quiet) : Features(filename, quiet) {}
 
+  int WLFeatures::get_n_features() const { return get_n_colours(); }
+
   void WLFeatures::refine(const std::shared_ptr<graph_generator::Graph> &graph,
                           std::set<int> &nodes,
                           std::vector<int> &colours,
@@ -122,7 +124,7 @@ namespace feature_generator {
 
   Embedding WLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
     /* 1. Initialise embedding before pruning, and set up memory */
-    Embedding x0(get_n_features(), 0);
+    Embedding x0(get_n_colours(), 0);
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::set<int> nodes = graph->get_nodes_set();

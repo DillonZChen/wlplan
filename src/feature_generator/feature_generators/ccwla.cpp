@@ -22,9 +22,16 @@ namespace feature_generator {
   CCWLaFeatures::CCWLaFeatures(const std::string &filename, bool quiet)
       : CCWLFeatures(filename, quiet) {}
 
+  int CCWLaFeatures::get_n_features() const {
+    int n_cat_features = get_n_colours();
+    int n_con_features = get_n_colours();
+    int n_sub_features = n_con_features * (n_con_features - 1);
+    return n_cat_features + n_con_features + n_sub_features;
+  }
+
   Embedding CCWLaFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
     Embedding ccwl_embedding = CCWLFeatures::embed_impl(graph);
-    int n_con_features = get_n_features();  // = n_cat_features
+    int n_con_features = get_n_colours();  // = n_cat_features
     for (int i = 0; i < n_con_features; i++) {
       for (int j = 0; j < n_con_features; j++) {
         if (i == j)
@@ -34,22 +41,5 @@ namespace feature_generator {
     }
 
     return ccwl_embedding;
-  }
-
-  void CCWLaFeatures::set_weights(const std::vector<double> &weights) {
-    int n_cat_features = get_n_features();
-    int n_con_features = get_n_features();
-    int n_sub_features = n_con_features * (n_con_features - 1);
-
-    int n_expected_features = n_cat_features + n_con_features + n_sub_features;
-    int n_weights = ((int)weights.size());
-
-    if (n_weights != n_expected_features) {
-      throw std::runtime_error("Number of weights " + std::to_string(n_weights) +
-                               " does not match the number of features " +
-                               std::to_string(n_expected_features) + ".");
-    }
-    store_weights = true;
-    this->weights = weights;
   }
 }  // namespace feature_generator

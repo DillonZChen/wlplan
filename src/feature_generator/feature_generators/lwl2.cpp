@@ -103,7 +103,8 @@ namespace feature_generator {
     return pair_to_edge_label;
   }
 
-  std::vector<std::set<int>> get_lwl2_pair_to_neighbours(std::shared_ptr<graph_generator::Graph> graph) {
+  std::vector<std::set<int>>
+  get_lwl2_pair_to_neighbours(std::shared_ptr<graph_generator::Graph> graph) {
     int n_nodes = graph->nodes.size();
     int n_pairs = get_n_lwl2_pairs(n_nodes);
     std::vector<std::set<int>> node_to_neighbours = graph->get_node_to_neighbours();
@@ -177,7 +178,7 @@ namespace feature_generator {
 
   Embedding LWL2Features::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
     /* 1. Initialise embedding before pruning */
-    Embedding x0(get_n_features(), 0);
+    Embedding x0(get_n_colours(), 0);
 
     int n_nodes = graph->nodes.size();
     int n_pairs = get_n_lwl2_pairs(n_nodes);

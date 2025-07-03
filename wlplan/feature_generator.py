@@ -33,7 +33,7 @@ _FEATURE_ALGORITHMS = {
 
 
 def get_available_graph_choices() -> list[str]:
-    return ["custom", "ilg", "nilg", "ploig"]
+    return ["custom", "ilg", "nilg", "ploig", "aoag"]
 
 
 def get_available_pruning_methods() -> list[str]:

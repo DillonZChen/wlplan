@@ -1,5 +1,6 @@
 #include "../../include/graph_generator/graph_generator_factory.hpp"
 
+#include "../../include/graph_generator/graph_generators/aoag.hpp"
 #include "../../include/graph_generator/graph_generators/ilg.hpp"
 #include "../../include/graph_generator/graph_generators/nilg.hpp"
 #include "../../include/graph_generator/graph_generators/ploig.hpp"
@@ -14,6 +15,8 @@ namespace graph_generator {
       graph_generator = std::make_shared<NILGGenerator>(domain, true);
     } else if (name == "ploig") {
       graph_generator = std::make_shared<PLOIGGenerator>(domain, true);
+    } else if (name == "aoag") {
+      graph_generator = std::make_shared<AOAGGenerator>(domain, true);
     } else if (name == "custom") {
       graph_generator = NULL;
     } else {

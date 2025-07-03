@@ -27,6 +27,8 @@ namespace feature_generator {
 
     WLFeatures(const std::string &filename, bool quiet);
 
+    int get_n_features() const override;
+
     Embedding embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) override;
 
    protected:

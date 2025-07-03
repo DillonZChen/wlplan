@@ -30,14 +30,16 @@ namespace feature_generator {
   CCWLFeatures::CCWLFeatures(const std::string &filename, bool quiet)
       : WLFeatures(filename, quiet) {}
 
+  int CCWLFeatures::get_n_features() const { return get_n_colours() * 2; }
+
   Embedding CCWLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
     // New additions to the WL algorithm are indicated with the [NUMERIC] comments.
     // We use a sum function for the pool operator as described in the ccWL algorithm.
     // To change this to max, we just need to replace += occurrences with std::max.
 
     /* 1. Initialise embedding before pruning, and set up memory */
-    int categorical_size = get_n_features();
-    Embedding x0(categorical_size * 2, 0);
+    int categorical_size = get_n_colours();
+    Embedding x0(get_n_features(), 0);
     int n_nodes = graph->nodes.size();
     std::vector<int> colours(n_nodes);
     std::set<int> nodes = graph->get_nodes_set();
@@ -71,13 +73,5 @@ namespace feature_generator {
     }
 
     return x0;
-  }
-
-  void CCWLFeatures::set_weights(const std::vector<double> &weights) {
-    if (((int)weights.size()) != 2 * get_n_features()) {
-      throw std::runtime_error("Number of weights must match twice the number of features.");
-    }
-    store_weights = true;
-    this->weights = weights;
   }
 }  // namespace feature_generator

@@ -631,6 +631,7 @@ Methods
            py::overload_cast<const planning::State &>(&feature_generator::Features::embed_state),
            "state"_a)
       .def("get_n_features", &feature_generator::Features::get_n_features)
+      .def("get_n_colours", &feature_generator::Features::get_n_colours)
       .def("get_seen_counts", &feature_generator::Features::get_seen_counts)
       .def("get_unseen_counts", &feature_generator::Features::get_unseen_counts)
       .def("get_layer_to_n_colours", &feature_generator::Features::get_layer_to_n_colours)
@@ -650,7 +651,14 @@ Methods
       .def("predict",
            py::overload_cast<const planning::State &>(&feature_generator::Features::predict),
            "state"_a)
-      .def("save", &feature_generator::Features::save);
+      .def("save",
+           py::overload_cast<const std::string &>(&feature_generator::Features::save),
+           "filename"_a)
+      .def("save",
+           py::overload_cast<const std::string &, const std::vector<double> &>(
+               &feature_generator::Features::save),
+           "filename"_a,
+           "weights"_a);
 
   // WLFeatures
   py::class_<feature_generator::WLFeatures, feature_generator::Features>(feature_generator_m,
@@ -722,8 +730,7 @@ Methods
            "graph_representation"_a,
            "iterations"_a,
            "pruning"_a,
-           "multiset_hash"_a)
-      .def("set_weights", &feature_generator::CCWLFeatures::set_weights, "weights"_a);
+           "multiset_hash"_a);
 
   // CCWLaFeatures
   py::class_<feature_generator::CCWLaFeatures, feature_generator::WLFeatures>(feature_generator_m,
@@ -735,8 +742,7 @@ Methods
            "graph_representation"_a,
            "iterations"_a,
            "pruning"_a,
-           "multiset_hash"_a)
-      .def("set_weights", &feature_generator::CCWLaFeatures::set_weights, "weights"_a);
+           "multiset_hash"_a);
 
 //////////////////////////////////////////////////////////////////////////////
 // Version
