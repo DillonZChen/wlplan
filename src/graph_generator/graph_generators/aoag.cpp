@@ -22,8 +22,7 @@ namespace graph_generator {
   }
 
   std::shared_ptr<Graph> AOAGGenerator::to_graph(const planning::State &state) {
-    (void)state;
-    throw NotSupportedError("AOAGGenerator.to_graph(state)");
+    return ILGGenerator::to_graph(state);
   }
 
   std::shared_ptr<Graph> AOAGGenerator::to_graph(const planning::State &state,
