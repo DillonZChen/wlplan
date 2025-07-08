@@ -362,6 +362,16 @@ namespace feature_generator {
     collect(graphs);
   }
 
+  void Features::collect(const planning::State &state) {
+    if (graph_generator == nullptr) {
+      throw std::runtime_error("No graph generator is set. Use graph input instead of state.");
+    }
+    std::shared_ptr<graph_generator::Graph> graph = graph_generator->to_graph(state);
+    collecting = true;
+    collect_impl({*graph});
+    collecting = false;
+  }
+
   void Features::collect(const std::vector<graph_generator::Graph> &graphs) {
     if (pruning != PruningOptions::NONE && pruned) {
       throw std::runtime_error("Collect with pruning can only be called at most once");

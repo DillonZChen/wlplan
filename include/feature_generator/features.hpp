@@ -120,6 +120,7 @@ namespace feature_generator {
 
     // collect training colours
     void collect_from_dataset(const data::DomainDataset dataset);
+    void collect(const planning::State &state);
     void collect(const std::vector<graph_generator::Graph> &graphs);
     void layer_redundancy_check();
 
