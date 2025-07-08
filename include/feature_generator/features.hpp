@@ -76,6 +76,9 @@ namespace feature_generator {
     bool collecting;
     bool pruned;
 
+    // logger variables
+    bool quiet;
+
     // runtime statistics; int is faster than long but could cause overflow
     // [i][j] denotes seen count if i=1, and unseen count if i=0
     // for iteration j = 0, ..., iterations - 1
@@ -176,9 +179,8 @@ namespace feature_generator {
 
     /* Util functions */
 
-    void log_iteration(int iteration) const {
-      std::cout << "[Iteration " << iteration << "]\nCollecting." << std::endl;
-    };
+    void log_iteration(int iteration) const;
+    void be_quiet();
 
     // get string representation of WL colours agnostic to the number of collected colours
     std::string get_string_representation(const Embedding &embedding);

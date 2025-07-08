@@ -31,6 +31,7 @@ namespace feature_generator {
         iterations(iterations),
         pruning(pruning),
         multiset_hash(multiset_hash) {
+    quiet = false;
     check_valid_configuration();
 
     this->domain = std::make_shared<planning::Domain>(domain);
@@ -500,6 +501,11 @@ namespace feature_generator {
   }
 
   /* Util functions */
+  void Features::log_iteration(int iteration) const {
+    if (!quiet)
+      std::cout << "[Iteration " << iteration << "]\nCollecting." << std::endl;
+  };
+  void Features::be_quiet() { quiet = true; }
 
   std::string Features::get_string_representation(const Embedding &embedding) {
     std::string str_embed = "";
