@@ -370,6 +370,7 @@ namespace feature_generator {
     std::shared_ptr<graph_generator::Graph> graph = graph_generator->to_graph(state);
     collecting = true;
     collect_impl({*graph});
+    collected = true;
     collecting = false;
   }
 
