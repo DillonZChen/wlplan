@@ -1,6 +1,7 @@
 #include "../../../include/feature_generator/feature_generators/wl.hpp"
 
 #include "../../../include/graph_generator/graph_generator_factory.hpp"
+#include "../../../include/utils/exceptions.hpp"
 #include "../../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>
@@ -120,6 +121,50 @@ namespace feature_generator {
       // layer pruning
       prune_this_iteration(itr, graphs, graph_colours);
     }
+  }
+
+  std::unordered_map<int, int> WLFeatures::collect_embed(const planning::State &state) {
+    if (graph_generator == nullptr) {
+      throw std::runtime_error("No graph generator is set. Use graph input instead of state.");
+    }
+    if (pruning != PruningOptions::NONE) {
+      throw NotSupportedError(
+          "Cannot collect_embed() with pruning enabled. Use collect() instead.");
+    }
+
+    std::unordered_map<int, int> features;
+
+    collecting = true;
+
+    // init colours
+    std::shared_ptr<graph_generator::Graph> graph = graph_generator->to_graph_opt(state);
+    int n_nodes = graph->nodes.size();
+
+    std::vector<int> colours(n_nodes, 0);
+    for (int node_i = 0; node_i < n_nodes; node_i++) {
+      int col = get_colour_hash({graph->nodes[node_i]}, 0);
+      colours[node_i] = col;
+
+      if (features.count(col) == 0)
+        features[col] = 0;
+      features[col]++;
+    }
+
+    // main WL loop
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      std::set<int> nodes = graph->get_nodes_set();
+      refine(graph, nodes, colours, itr);
+
+      for (const int col : colours) {
+        if (features.count(col) == 0)
+          features[col] = 0;
+        features[col]++;
+      }
+    }
+
+    graph_generator->reset_graph();
+
+    return features;
   }
 
   Embedding WLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
