@@ -16,10 +16,7 @@ namespace planning {
   std::string Atom::to_string() const {
     std::string repr = predicate->name + "(";
     for (size_t i = 0; i < objects.size(); i++) {
-      repr += objects[i];
-      if (i < objects.size() - 1) {
-        repr += ", ";
-      }
+      repr += objects[i] + ",";
     }
     repr += ")";
     return repr;
