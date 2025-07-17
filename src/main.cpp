@@ -630,6 +630,13 @@ Methods
       .def("embed",
            py::overload_cast<const planning::State &>(&feature_generator::Features::embed_state),
            "state"_a)
+      .def("collect_embed",
+           py::overload_cast<const graph_generator::Graph &>(
+               &feature_generator::Features::collect_embed),
+           "graph"_a)
+      .def("collect_embed",
+           py::overload_cast<const planning::State &>(&feature_generator::Features::collect_embed),
+           "state"_a)
       .def("get_n_features", &feature_generator::Features::get_n_features)
       .def("get_n_colours", &feature_generator::Features::get_n_colours)
       .def("get_seen_counts", &feature_generator::Features::get_seen_counts)
@@ -665,6 +672,7 @@ Methods
                                                                          "WLFeatures")
       .def(py::init<const std::string &>(), "filename"_a)
       .def(py::init<const std::string &, bool>(), "filename"_a, "quiet"_a)
+      .def(py::init<int, std::string, bool>(), "iterations"_a, "pruning"_a, "multiset_hash"_a)
       .def(py::init<planning::Domain &, std::string, int, std::string, bool>(),
            "domain"_a,
            "graph_representation"_a,

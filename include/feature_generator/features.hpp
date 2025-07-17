@@ -110,6 +110,11 @@ namespace feature_generator {
              std::string pruning,
              bool multiset_hash);
 
+    Features(const std::string feature_name,
+             int iterations,
+             std::string pruning,
+             bool multiset_hash);
+
     Features(const std::string &filename);
 
     Features(const std::string &filename, const bool quiet);
@@ -126,6 +131,8 @@ namespace feature_generator {
     void collect(const std::vector<graph_generator::Graph> &graphs);
     std::unordered_map<int, int>
     collect_embed(const planning::State &state);  // for novelty heuristics
+    std::unordered_map<int, int>
+    collect_embed(const std::shared_ptr<graph_generator::Graph> &graph);  // for ltl
     void layer_redundancy_check();
 
     // embedding assumes training is done, and returns a feature matrix X

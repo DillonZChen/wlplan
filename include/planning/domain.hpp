@@ -41,6 +41,8 @@ namespace planning {
            const std::vector<Predicate> &predicates,
            const std::vector<Function> &functions);
 
+    Domain() = default;
+
     std::unordered_map<std::string, Predicate> get_name_to_predicate() const;
     std::unordered_map<std::string, Function> get_name_to_function() const;
     std::unordered_map<std::string, Schema> get_name_to_schema() const;

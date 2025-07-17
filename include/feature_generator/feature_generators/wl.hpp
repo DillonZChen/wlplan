@@ -23,6 +23,8 @@ namespace feature_generator {
                std::string pruning,
                bool multiset_hash);
 
+    WLFeatures(int iterations, std::string pruning, bool multiset_hash);
+
     WLFeatures(const std::string &filename);
 
     WLFeatures(const std::string &filename, bool quiet);
@@ -30,6 +32,8 @@ namespace feature_generator {
     int get_n_features() const override;
 
     std::unordered_map<int, int> collect_embed(const planning::State &state);
+    std::unordered_map<int, int>
+    collect_embed(const std::shared_ptr<graph_generator::Graph> &graph);
     Embedding embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) override;
 
    protected:

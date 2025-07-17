@@ -47,6 +47,19 @@ namespace feature_generator {
     initialise_variables();
   }
 
+  Features::Features(const std::string feature_name,
+                     int iterations,
+                     std::string pruning,
+                     bool multiset_hash)
+      : Features(feature_name,
+                 planning::Domain("empty",
+                                  std::vector<planning::Predicate>(),
+                                  std::vector<planning::Object>()),
+                 "custom",
+                 iterations,
+                 pruning,
+                 multiset_hash) {}
+
   void Features::check_valid_configuration() {
     // check pruning support
     if (pruning != PruningOptions::NONE &&
@@ -389,6 +402,13 @@ namespace feature_generator {
 
   std::unordered_map<int, int> Features::collect_embed(const planning::State &state) {
     (void)state;  // unused in this implementation
+    throw NotImplementedError("collect_embed() is not implemented for this feature generator. "
+                              "Use collect() and embed() instead.");
+  }
+
+  std::unordered_map<int, int>
+  Features::collect_embed(const std::shared_ptr<graph_generator::Graph> &graph) {
+    (void)graph;  // unused in this implementation
     throw NotImplementedError("collect_embed() is not implemented for this feature generator. "
                               "Use collect() and embed() instead.");
   }

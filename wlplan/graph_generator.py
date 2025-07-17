@@ -1,5 +1,4 @@
 import networkx as nx
-
 from _wlplan.graph_generator import (
     AOAGGenerator,
     Graph,

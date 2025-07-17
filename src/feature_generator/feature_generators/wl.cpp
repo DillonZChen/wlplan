@@ -27,6 +27,9 @@ namespace feature_generator {
                          bool multiset_hash)
       : Features("wl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
+  WLFeatures::WLFeatures(int iterations, std::string pruning, bool multiset_hash)
+      : Features("wl", iterations, pruning, multiset_hash) {}
+
   WLFeatures::WLFeatures(const std::string &filename) : Features(filename) {}
 
   WLFeatures::WLFeatures(const std::string &filename, bool quiet) : Features(filename, quiet) {}
@@ -132,14 +135,28 @@ namespace feature_generator {
           "Cannot collect_embed() with pruning enabled. Use collect() instead.");
     }
 
+    std::shared_ptr<graph_generator::Graph> graph = graph_generator->to_graph_opt(state);
+
+    std::unordered_map<int, int> features = collect_embed(graph);
+
+    graph_generator->reset_graph();
+
+    return features;
+  }
+
+  std::unordered_map<int, int>
+  WLFeatures::collect_embed(const std::shared_ptr<graph_generator::Graph> &graph) {
+    if (pruning != PruningOptions::NONE) {
+      throw NotSupportedError(
+          "Cannot collect_embed() with pruning enabled. Use collect() instead.");
+    }
+
     std::unordered_map<int, int> features;
 
     collecting = true;
-
-    // init colours
-    std::shared_ptr<graph_generator::Graph> graph = graph_generator->to_graph_opt(state);
     int n_nodes = graph->nodes.size();
 
+    // init colours
     std::vector<int> colours(n_nodes, 0);
     for (int node_i = 0; node_i < n_nodes; node_i++) {
       int col = get_colour_hash({graph->nodes[node_i]}, 0);
@@ -161,8 +178,6 @@ namespace feature_generator {
         features[col]++;
       }
     }
-
-    graph_generator->reset_graph();
 
     return features;
   }
