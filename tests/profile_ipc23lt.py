@@ -3,8 +3,8 @@ import time
 
 import numpy as np
 import pytest
-from goose.util import print_mat
 from ipc23lt import DOMAINS, get_dataset
+from util import print_mat
 
 from wlplan.feature_generator import init_feature_generator
 
