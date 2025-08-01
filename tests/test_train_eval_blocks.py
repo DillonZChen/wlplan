@@ -6,10 +6,10 @@ from heapq import heappop, heappush
 
 import numpy as np
 import pymimir  # pip install pymdzcf==0.1.0
+from goose.util import print_mat
 from ipc23lt import get_dataset, get_domain_benchmark_dir, get_mimir_problem, get_predicates
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct
-from util import print_mat
 
 import wlplan
 from wlplan.feature_generator import init_feature_generator, load_feature_generator

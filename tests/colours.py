@@ -1,8 +1,8 @@
 import logging
 
 import numpy as np
+from goose.util import print_mat
 from ipc23lt import get_dataset
-from util import print_mat
 
 from wlplan.feature_generator import init_feature_generator
 
