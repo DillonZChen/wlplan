@@ -631,7 +631,7 @@ Methods
            py::overload_cast<const planning::State &>(&feature_generator::Features::embed_state),
            "state"_a)
       .def("collect_embed",
-           py::overload_cast<const graph_generator::Graph &>(
+           py::overload_cast<const std::shared_ptr<graph_generator::Graph> &>(
                &feature_generator::Features::collect_embed),
            "graph"_a)
       .def("collect_embed",
