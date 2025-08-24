@@ -678,7 +678,15 @@ Methods
            "graph_representation"_a,
            "iterations"_a,
            "pruning"_a,
-           "multiset_hash"_a);
+           "multiset_hash"_a)
+      .def("collect_embed",
+           py::overload_cast<const std::shared_ptr<graph_generator::Graph> &>(
+               &feature_generator::WLFeatures::collect_embed),
+           "graph"_a)
+      .def(
+          "collect_embed",
+          py::overload_cast<const planning::State &>(&feature_generator::WLFeatures::collect_embed),
+          "state"_a);
 
   // LWL2Features
   py::class_<feature_generator::LWL2Features, feature_generator::Features>(feature_generator_m,
