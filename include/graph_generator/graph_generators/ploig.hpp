@@ -35,7 +35,7 @@ namespace graph_generator {
                                     const planning::ActionPointers &actions) override;
     // TODO implement optimised variant
     std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
-    void reset_graph() const override {};
+    void reset_graph() const override;
 
     // Graph features
     int get_n_features() const override { return colour_to_description.size(); }
@@ -46,6 +46,10 @@ namespace graph_generator {
     std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ag_to_e_col;
     std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ug_to_e_col;
     std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ap_to_e_col;
+
+    /* For modifying the base graph and redoing its changes */
+    std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
+                                                   const std::shared_ptr<Graph> graph);
   };
 }  // namespace graph_generator
 

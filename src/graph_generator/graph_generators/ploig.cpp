@@ -57,22 +57,19 @@ namespace graph_generator {
       std::cerr << "PLOIGGenerator does not support negative goals. "
                 << "Please use ILGGenerator instead." << std::endl;
       exit(1);
-      throw std::runtime_error("PLOIG does not yet support negative");
+      throw std::runtime_error("PLOIG does not yet support negative goals");
     }
     for (const auto &atom : problem.get_positive_goals()) {
       positive_goal_names.insert(atom.to_string());
     }
-  }
 
-  std::shared_ptr<Graph> PLOIGGenerator::to_graph(const planning::State &state) {
-    // reset graph and variables
     Graph graph = Graph(/*store_node_names=*/true);
 
     /* add nodes */
     int colour;
 
     // add constant object nodes
-    for (size_t i = 0; i < problem->get_constant_objects().size(); i++) {
+    for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
       std::string node = domain.constant_objects[i];
       if (differentiate_constant_objects) {
         colour = -(i + 1);
@@ -83,11 +80,19 @@ namespace graph_generator {
     }
 
     // objects
-    for (const auto &object : problem->get_problem_objects()) {
+    for (const auto &object : problem.get_problem_objects()) {
       std::string node = object;
       colour = 0;
       graph.add_node(node, colour);
     }
+
+    /* set pointer */
+    base_graph = std::make_shared<Graph>(graph);
+  }
+
+  std::shared_ptr<Graph>
+  PLOIGGenerator::modify_graph_from_state(const planning::State &state,
+                                          const std::shared_ptr<Graph> graph) {
 
     /* add edges */
 
@@ -125,8 +130,8 @@ namespace graph_generator {
         for (int j = i + 1; j < arity; j++) {
           std::string object_node_i = objects[i];
           std::string object_node_j = objects[j];
-          graph.add_edge(object_node_i, mapper[std::make_pair(i, j)], object_node_j);
-          graph.add_edge(object_node_j, mapper[std::make_pair(j, i)], object_node_i);
+          graph->add_edge(object_node_i, mapper[std::make_pair(i, j)], object_node_j);
+          graph->add_edge(object_node_j, mapper[std::make_pair(j, i)], object_node_i);
         }
       }
     }
@@ -140,8 +145,8 @@ namespace graph_generator {
         for (int j = i + 1; j < arity; j++) {
           std::string object_node_i = objects[i];
           std::string object_node_j = objects[j];
-          graph.add_edge(object_node_i, mapper[std::make_pair(i, j)], object_node_j);
-          graph.add_edge(object_node_j, mapper[std::make_pair(j, i)], object_node_i);
+          graph->add_edge(object_node_i, mapper[std::make_pair(i, j)], object_node_j);
+          graph->add_edge(object_node_j, mapper[std::make_pair(j, i)], object_node_i);
         }
       }
     }
@@ -155,13 +160,26 @@ namespace graph_generator {
         for (int j = i + 1; j < arity; j++) {
           std::string object_node_i = objects[i];
           std::string object_node_j = objects[j];
-          graph.add_edge(object_node_i, mapper[std::make_pair(i, j)], object_node_j);
-          graph.add_edge(object_node_j, mapper[std::make_pair(j, i)], object_node_i);
+          graph->add_edge(object_node_i, mapper[std::make_pair(i, j)], object_node_j);
+          graph->add_edge(object_node_j, mapper[std::make_pair(j, i)], object_node_i);
         }
       }
     }
 
-    return std::make_shared<Graph>(graph);
+    return graph;
+  }
+
+  void PLOIGGenerator::reset_graph() const {
+    // Delete all edges, keep nodes
+    for (size_t i = 0; i < base_graph->nodes.size(); i++) {
+      base_graph->edges[i].clear();
+    }
+  }
+
+  std::shared_ptr<Graph> PLOIGGenerator::to_graph(const planning::State &state) {
+    std::shared_ptr<Graph> graph = std::make_shared<Graph>(*base_graph);
+    graph = modify_graph_from_state(state, graph);
+    return graph;
   }
 
   std::shared_ptr<Graph> PLOIGGenerator::to_graph(const planning::State &state,
@@ -172,7 +190,8 @@ namespace graph_generator {
   }
 
   std::shared_ptr<Graph> PLOIGGenerator::to_graph_opt(const planning::State &state) {
-    // TODO optimise
-    return to_graph(state);
+    base_graph = modify_graph_from_state(state, base_graph);
+    return base_graph;
   }
+
 }  // namespace graph_generator
