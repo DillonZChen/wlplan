@@ -30,6 +30,7 @@ namespace feature_generator {
 
     IWLFeatures(const std::string &filename, bool quiet);
 
+    std::unordered_map<int, int> collect_embed(const planning::State &state) override;
     Embedding embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) override;
 
    protected:

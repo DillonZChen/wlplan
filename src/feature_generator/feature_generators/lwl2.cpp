@@ -1,6 +1,7 @@
 #include "../../../include/feature_generator/feature_generators/lwl2.hpp"
 
 #include "../../../include/graph_generator/graph_generator_factory.hpp"
+#include "../../../include/utils/exceptions.hpp"
 #include "../../../include/utils/nlohmann/json.hpp"
 
 #include <fstream>
@@ -174,6 +175,55 @@ namespace feature_generator {
       // layer pruning
       prune_this_iteration(itr, graphs, graph_colours);
     }
+  }
+
+  std::unordered_map<int, int> LWL2Features::collect_embed(const planning::State &state) {
+    if (graph_generator == nullptr) {
+      throw std::runtime_error("No graph generator is set. Use graph input instead of state.");
+    }
+    if (pruning != PruningOptions::NONE) {
+      throw NotSupportedError(
+          "Cannot collect_embed() with pruning enabled. Use collect() instead.");
+    }
+
+    std::unordered_map<int, int> features;
+
+    collecting = true;
+
+    // init colours
+    std::shared_ptr<graph_generator::Graph> graph = graph_generator->to_graph_opt(state);
+    int n_nodes = graph->nodes.size();
+    int n_pairs = get_n_lwl2_pairs(n_nodes);
+    std::vector<int> colours(n_pairs);
+
+    std::vector<int> pair_to_edge_label = get_lwl2_pair_to_edge_label(graph);
+    std::vector<std::set<int>> pair_to_neighbours = get_lwl2_pair_to_neighbours(graph);
+
+    for (int u = 0; u < n_nodes; u++) {
+      for (int v = u + 1; v < n_nodes; v++) {
+        int index = lwl2_pair_to_index_map(n_nodes, u, v);
+        int col = get_initial_colour(index, u, v, graph, pair_to_edge_label);
+        colours[index] = col;
+
+        if (features.count(col) == 0)
+          features[col] = 0;
+        features[col]++;
+      }
+    }
+
+    for (int itr = 1; itr < iterations + 1; itr++) {
+      refine(graph, pair_to_neighbours, colours, itr);
+
+      for (const int col : colours) {
+        if (features.count(col) == 0)
+          features[col] = 0;
+        features[col]++;
+      }
+    }
+
+    graph_generator->reset_graph();
+
+    return features;
   }
 
   Embedding LWL2Features::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {

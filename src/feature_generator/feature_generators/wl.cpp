@@ -151,8 +151,8 @@ namespace feature_generator {
     }
 
     // main WL loop
+    std::set<int> nodes = graph->get_nodes_set();
     for (int itr = 1; itr < iterations + 1; itr++) {
-      std::set<int> nodes = graph->get_nodes_set();
       refine(graph, nodes, colours, itr);
 
       for (const int col : colours) {

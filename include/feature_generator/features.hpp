@@ -124,8 +124,8 @@ namespace feature_generator {
     // collect training colours
     void collect_from_dataset(const data::DomainDataset dataset);
     void collect(const std::vector<graph_generator::Graph> &graphs);
-    std::unordered_map<int, int>
-    collect_embed(const planning::State &state);  // for novelty heuristics
+    // for novelty heuristics
+    std::unordered_map<int, int> virtual collect_embed(const planning::State &state);
     void layer_redundancy_check();
 
     // embedding assumes training is done, and returns a feature matrix X
