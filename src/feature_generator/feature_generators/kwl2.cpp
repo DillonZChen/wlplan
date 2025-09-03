@@ -93,7 +93,7 @@ namespace feature_generator {
     int n_pairs = get_n_kwl2_pairs(n_nodes);
     std::vector<int> pair_to_edge_label(n_pairs, NO_EDGE_COLOUR);
     for (int u = 0; u < n_nodes; u++) {
-      for (const auto &[v, edge_label] : graph->edges[u]) {
+      for (const auto &[edge_label, v] : graph->edges[u]) {
         pair_to_edge_label[kwl2_pair_to_index_map(n_nodes, u, v)] = edge_label;
         pair_to_edge_label[kwl2_pair_to_index_map(n_nodes, v, u)] = edge_label;
       }
