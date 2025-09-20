@@ -8,70 +8,76 @@
 
 using json = nlohmann::json;
 
-namespace feature_generator {
-  CCWLFeatures::CCWLFeatures(const std::string feature_name,
-                             const planning::Domain &domain,
-                             std::string graph_representation,
-                             int iterations,
-                             std::string pruning,
-                             bool multiset_hash)
-      : WLFeatures(feature_name, domain, graph_representation, iterations, pruning, multiset_hash) {
-  }
+namespace wlplan {
+  namespace feature_generator {
+    CCWLFeatures::CCWLFeatures(const std::string feature_name,
+                               const planning::Domain &domain,
+                               std::string graph_representation,
+                               int iterations,
+                               std::string pruning,
+                               bool multiset_hash)
+        : WLFeatures(feature_name,
+                     domain,
+                     graph_representation,
+                     iterations,
+                     pruning,
+                     multiset_hash) {}
 
-  CCWLFeatures::CCWLFeatures(const planning::Domain &domain,
-                             std::string graph_representation,
-                             int iterations,
-                             std::string pruning,
-                             bool multiset_hash)
-      : CCWLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
+    CCWLFeatures::CCWLFeatures(const planning::Domain &domain,
+                               std::string graph_representation,
+                               int iterations,
+                               std::string pruning,
+                               bool multiset_hash)
+        : CCWLFeatures("ccwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
-  CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
+    CCWLFeatures::CCWLFeatures(const std::string &filename) : WLFeatures(filename) {}
 
-  CCWLFeatures::CCWLFeatures(const std::string &filename, bool quiet)
-      : WLFeatures(filename, quiet) {}
+    CCWLFeatures::CCWLFeatures(const std::string &filename, bool quiet)
+        : WLFeatures(filename, quiet) {}
 
-  int CCWLFeatures::get_n_features() const { return get_n_colours() * 2; }
+    int CCWLFeatures::get_n_features() const { return get_n_colours() * 2; }
 
-  Embedding CCWLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
-    // New additions to the WL algorithm are indicated with the [NUMERIC] comments.
-    // We use a sum function for the pool operator as described in the ccWL algorithm.
-    // To change this to max, we just need to replace += occurrences with std::max.
+    Embedding CCWLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
+      // New additions to the WL algorithm are indicated with the [NUMERIC] comments.
+      // We use a sum function for the pool operator as described in the ccWL algorithm.
+      // To change this to max, we just need to replace += occurrences with std::max.
 
-    /* 1. Initialise embedding before pruning, and set up memory */
-    int categorical_size = get_n_colours();
-    Embedding x0(get_n_features(), 0);
-    int n_nodes = graph->nodes.size();
-    std::vector<int> colours(n_nodes);
-    std::set<int> nodes = graph->get_nodes_set();
+      /* 1. Initialise embedding before pruning, and set up memory */
+      int categorical_size = get_n_colours();
+      Embedding x0(get_n_features(), 0);
+      int n_nodes = graph->nodes.size();
+      std::vector<int> colours(n_nodes);
+      std::set<int> nodes = graph->get_nodes_set();
 
-    /* 2. Compute initial colours */
-    int col;
-    int is_seen_colour;
-    for (int node_i = 0; node_i < n_nodes; node_i++) {
-      col = get_colour_hash({graph->nodes[node_i]}, 0);
-      colours[node_i] = col;
-      is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-      seen_colour_statistics[is_seen_colour][0]++;
-      if (is_seen_colour) {
-        x0[col]++;
-        x0[col + categorical_size] += graph->node_values[node_i];  // [NUMERIC]
-      }
-    }
-
-    /* 3. Main WL loop */
-    for (int itr = 1; itr < iterations + 1; itr++) {
-      refine(graph, nodes, colours, itr);
+      /* 2. Compute initial colours */
+      int col;
+      int is_seen_colour;
       for (int node_i = 0; node_i < n_nodes; node_i++) {
-        col = colours[node_i];
+        col = get_colour_hash({graph->nodes[node_i]}, 0);
+        colours[node_i] = col;
         is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
-        seen_colour_statistics[is_seen_colour][itr]++;
+        seen_colour_statistics[is_seen_colour][0]++;
         if (is_seen_colour) {
           x0[col]++;
           x0[col + categorical_size] += graph->node_values[node_i];  // [NUMERIC]
         }
       }
-    }
 
-    return x0;
-  }
-}  // namespace feature_generator
+      /* 3. Main WL loop */
+      for (int itr = 1; itr < iterations + 1; itr++) {
+        refine(graph, nodes, colours, itr);
+        for (int node_i = 0; node_i < n_nodes; node_i++) {
+          col = colours[node_i];
+          is_seen_colour = (col != UNSEEN_COLOUR);  // prevent branch prediction
+          seen_colour_statistics[is_seen_colour][itr]++;
+          if (is_seen_colour) {
+            x0[col]++;
+            x0[col + categorical_size] += graph->node_values[node_i];  // [NUMERIC]
+          }
+        }
+      }
+
+      return x0;
+    }
+  }  // namespace feature_generator
+}  // namespace wlplan

@@ -34,52 +34,54 @@
 enum class ILGFactDescription { ILG_FACT_DESCRIPTIONS };
 #undef X
 
-namespace graph_generator {
-  class ILGGenerator : public GraphGenerator {
-   public:
-    ILGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
-    ILGGenerator(const planning::Domain &domain,
-                 const bool differentiate_constant_objects,
-                 const std::string &derived_graph_generator_name);
+namespace wlplan {
+  namespace graph_generator {
+    class ILGGenerator : public GraphGenerator {
+     public:
+      ILGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
+      ILGGenerator(const planning::Domain &domain,
+                   const bool differentiate_constant_objects,
+                   const std::string &derived_graph_generator_name);
 
-    // Graph generation
-    void set_problem(const planning::Problem &problem) override;
-    std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph(const planning::State &state,
-                                    const planning::ActionPointers &actions) override;
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
-    void reset_graph() const override;
+      // Graph generation
+      void set_problem(const planning::Problem &problem) override;
+      std::shared_ptr<Graph> to_graph(const planning::State &state) override;
+      std::shared_ptr<Graph> to_graph(const planning::State &state,
+                                      const planning::ActionPointers &actions) override;
+      std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
+      void reset_graph() const override;
 
-    // Graph features
-    int get_n_features() const override { return colour_to_description.size(); };
-    int get_n_relations() const override { return domain.get_predicate_arity(); };
+      // Graph features
+      int get_n_features() const override { return colour_to_description.size(); };
+      int get_n_relations() const override { return domain.get_predicate_arity(); };
 
-   protected:
-    int fact_colour(const int predicate_idx, const ILGFactDescription &fact_description) const;
-    int fact_colour(const planning::Atom &atom, const ILGFactDescription &fact_description) const;
+     protected:
+      int fact_colour(const int predicate_idx, const ILGFactDescription &fact_description) const;
+      int fact_colour(const planning::Atom &atom, const ILGFactDescription &fact_description) const;
 
-    /* For modifying the base graph and redoing its changes */
-    int n_nodes_added;
-    std::vector<int> n_edges_added;
-    std::vector<int> pos_goal_changed;
-    std::vector<int> neg_goal_changed;
-    std::vector<int> pos_goal_changed_pred;
-    std::vector<int> neg_goal_changed_pred;
-    std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
-                                                   const std::shared_ptr<Graph> graph,
-                                                   bool store_changes);
-  };
+      /* For modifying the base graph and redoing its changes */
+      int n_nodes_added;
+      std::vector<int> n_edges_added;
+      std::vector<int> pos_goal_changed;
+      std::vector<int> neg_goal_changed;
+      std::vector<int> pos_goal_changed_pred;
+      std::vector<int> neg_goal_changed_pred;
+      std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
+                                                     const std::shared_ptr<Graph> graph,
+                                                     bool store_changes);
+    };
 
-  inline int ILGGenerator::fact_colour(const int predicate_idx,
-                                       const ILGFactDescription &fact_description) const {
-    int pred_idx = predicate_idx * ((int)ILGFactDescription::_LAST);
-    return 1 + pred_idx + (int)fact_description;
-  }
+    inline int ILGGenerator::fact_colour(const int predicate_idx,
+                                         const ILGFactDescription &fact_description) const {
+      int pred_idx = predicate_idx * ((int)ILGFactDescription::_LAST);
+      return 1 + pred_idx + (int)fact_description;
+    }
 
-  inline int ILGGenerator::fact_colour(const planning::Atom &atom,
-                                       const ILGFactDescription &fact_description) const {
-    return fact_colour(domain.predicate_to_colour.at(atom.predicate->name), fact_description);
-  }
-}  // namespace graph_generator
+    inline int ILGGenerator::fact_colour(const planning::Atom &atom,
+                                         const ILGFactDescription &fact_description) const {
+      return fact_colour(domain.predicate_to_colour.at(atom.predicate->name), fact_description);
+    }
+  }  // namespace graph_generator
+}  // namespace wlplan
 
 #endif  // GRAPH_GENERATOR_GRAPH_GENERATORS_ILG

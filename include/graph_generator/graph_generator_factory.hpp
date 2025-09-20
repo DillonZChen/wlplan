@@ -7,13 +7,15 @@
 #include <memory>
 #include <string>
 
-namespace graph_generator {
-  std::shared_ptr<GraphGenerator> init_feature_generator(const std::string &name,
-                                                         const planning::Domain &domain);
+namespace wlplan {
+  namespace graph_generator {
+    std::shared_ptr<GraphGenerator> init_feature_generator(const std::string &name,
+                                                           const planning::Domain &domain);
 
-  std::shared_ptr<GraphGenerator> init_feature_generator(const std::string &name,
-                                                         const planning::Domain &domain,
-                                                         bool differentiate_constant_objects);
-}  // namespace graph_generator
+    std::shared_ptr<GraphGenerator> init_feature_generator(const std::string &name,
+                                                           const planning::Domain &domain,
+                                                           bool differentiate_constant_objects);
+  }  // namespace graph_generator
+}  // namespace wlplan
 
 #endif  // GRAPH_GENERATOR_GRAPH_GENERATOR_FACTORY_HPP

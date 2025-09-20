@@ -3,27 +3,30 @@
 
 #include <string>
 
-namespace planning {
-  class Schema {
-   public:
-    std::string name;
-    int arity;
+namespace wlplan {
+  namespace planning {
+    class Schema {
+     public:
+      std::string name;
+      int arity;
 
-    Schema() = default;
+      Schema() = default;
 
-    Schema(const std::string &name, const int arity);
+      Schema(const std::string &name, const int arity);
 
-    std::string to_string() const;
+      std::string to_string() const;
 
-    bool operator==(const Schema &other) const { return to_string() == other.to_string(); }
+      bool operator==(const Schema &other) const { return to_string() == other.to_string(); }
 
-    bool operator<(const Schema &other) const { return to_string() < other.to_string(); }
-  };
+      bool operator<(const Schema &other) const { return to_string() < other.to_string(); }
+    };
 
-}  // namespace planning
+  }  // namespace planning
+}  // namespace wlplan
 
-template <> class std::hash<planning::Schema> {
-  std::size_t operator()(const planning::Schema &k) const {
+template <>
+class std::hash<wlplan::planning::Schema> {
+  std::size_t operator()(const wlplan::planning::Schema &k) const {
     // Compute individual hash values for first,
     // second and third and combine them using XOR
     // and bit shifting:

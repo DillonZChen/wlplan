@@ -13,6 +13,8 @@
 #include "../include/planning/state.hpp"
 #include "../include/utils/exceptions.hpp"
 
+using namespace wlplan;
+
 void check_state_validity(py::tuple t, std::string cls, size_t expected_size) {
   if (t.size() != expected_size) {
     throw std::runtime_error("Invalid state for " + cls + ": expected " +

@@ -10,34 +10,36 @@
 #include <string>
 #include <vector>
 
-namespace data {
-  class ProblemDataset {
-   public:
-    const planning::Problem problem;
-    const std::vector<planning::State> states;
-    const std::vector<planning::Actions> actions;
+namespace wlplan {
+  namespace data {
+    class ProblemDataset {
+     public:
+      const planning::Problem problem;
+      const std::vector<planning::State> states;
+      const std::vector<planning::Actions> actions;
 
-    ProblemDataset(const planning::Problem &problem, const std::vector<planning::State> &states);
-    ProblemDataset(const planning::Problem &problem,
-                   const std::vector<planning::State> &states,
-                   const std::vector<planning::Actions> &actions);
-  };
+      ProblemDataset(const planning::Problem &problem, const std::vector<planning::State> &states);
+      ProblemDataset(const planning::Problem &problem,
+                     const std::vector<planning::State> &states,
+                     const std::vector<planning::Actions> &actions);
+    };
 
-  class DomainDataset {
-   public:
-    const planning::Domain domain;
-    const std::vector<ProblemDataset> data;
+    class DomainDataset {
+     public:
+      const planning::Domain domain;
+      const std::vector<ProblemDataset> data;
 
-    DomainDataset(const planning::Domain &domain, const std::vector<ProblemDataset> &data);
+      DomainDataset(const planning::Domain &domain, const std::vector<ProblemDataset> &data);
 
-    size_t get_size() const;
+      size_t get_size() const;
 
-   private:
-    std::unordered_map<std::string, int> predicate_to_arity;
+     private:
+      std::unordered_map<std::string, int> predicate_to_arity;
 
-    void check_good_atom(const planning::Atom &atom,
-                         const std::unordered_set<planning::Object> &objects) const;
-  };
-}  // namespace data
+      void check_good_atom(const planning::Atom &atom,
+                           const std::unordered_set<planning::Object> &objects) const;
+    };
+  }  // namespace data
+}  // namespace wlplan
 
 #endif  // DATA_DATASET_HPP

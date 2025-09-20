@@ -8,25 +8,27 @@
 
 using json = nlohmann::json;
 
-namespace feature_generator {
-  NIWLFeatures::NIWLFeatures(const planning::Domain &domain,
-                             std::string graph_representation,
-                             int iterations,
-                             std::string pruning,
-                             bool multiset_hash)
-      : IWLFeatures("niwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
+namespace wlplan {
+  namespace feature_generator {
+    NIWLFeatures::NIWLFeatures(const planning::Domain &domain,
+                               std::string graph_representation,
+                               int iterations,
+                               std::string pruning,
+                               bool multiset_hash)
+        : IWLFeatures("niwl", domain, graph_representation, iterations, pruning, multiset_hash) {}
 
-  NIWLFeatures::NIWLFeatures(const std::string &filename) : IWLFeatures(filename) {}
+    NIWLFeatures::NIWLFeatures(const std::string &filename) : IWLFeatures(filename) {}
 
-  NIWLFeatures::NIWLFeatures(const std::string &filename, bool quiet)
-      : IWLFeatures(filename, quiet) {}
+    NIWLFeatures::NIWLFeatures(const std::string &filename, bool quiet)
+        : IWLFeatures(filename, quiet) {}
 
-  Embedding NIWLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
-    Embedding iwl_embedding = IWLFeatures::embed_impl(graph);
-    double n = (double)graph->get_n_nodes();
-    for (size_t i = 0; i < iwl_embedding.size(); i++) {
-      iwl_embedding[i] = iwl_embedding[i] / n;
+    Embedding NIWLFeatures::embed_impl(const std::shared_ptr<graph_generator::Graph> &graph) {
+      Embedding iwl_embedding = IWLFeatures::embed_impl(graph);
+      double n = (double)graph->get_n_nodes();
+      for (size_t i = 0; i < iwl_embedding.size(); i++) {
+        iwl_embedding[i] = iwl_embedding[i] / n;
+      }
+      return iwl_embedding;
     }
-    return iwl_embedding;
-  }
-}  // namespace feature_generator
+  }  // namespace feature_generator
+}  // namespace wlplan

@@ -35,6 +35,7 @@
 
 namespace py = pybind11;
 using namespace py::literals;
+using namespace wlplan;
 
 PYBIND11_MODULE(_wlplan, m) {
   m.doc() = "WLPlan: WL Features for PDDL Planning";

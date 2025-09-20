@@ -23,34 +23,36 @@
 #include <unordered_set>
 #include <vector>
 
-namespace graph_generator {
-  class PLOIGGenerator : public GraphGenerator {
-   public:
-    PLOIGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
+namespace wlplan {
+  namespace graph_generator {
+    class PLOIGGenerator : public GraphGenerator {
+     public:
+      PLOIGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
 
-    // Graph generation
-    void set_problem(const planning::Problem &problem) override;
-    std::shared_ptr<Graph> to_graph(const planning::State &state) override;
-    std::shared_ptr<Graph> to_graph(const planning::State &state,
-                                    const planning::ActionPointers &actions) override;
-    // TODO implement optimised variant
-    std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
-    void reset_graph() const override;
+      // Graph generation
+      void set_problem(const planning::Problem &problem) override;
+      std::shared_ptr<Graph> to_graph(const planning::State &state) override;
+      std::shared_ptr<Graph> to_graph(const planning::State &state,
+                                      const planning::ActionPointers &actions) override;
+      // TODO implement optimised variant
+      std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
+      void reset_graph() const override;
 
-    // Graph features
-    int get_n_features() const override { return colour_to_description.size(); }
-    int get_n_relations() const override { return n_relations; };
+      // Graph features
+      int get_n_features() const override { return colour_to_description.size(); }
+      int get_n_relations() const override { return n_relations; };
 
-   protected:
-    int n_relations;
-    std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ag_to_e_col;
-    std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ug_to_e_col;
-    std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ap_to_e_col;
+     protected:
+      int n_relations;
+      std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ag_to_e_col;
+      std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ug_to_e_col;
+      std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ap_to_e_col;
 
-    /* For modifying the base graph and redoing its changes */
-    std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
-                                                   const std::shared_ptr<Graph> graph);
-  };
-}  // namespace graph_generator
+      /* For modifying the base graph and redoing its changes */
+      std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
+                                                     const std::shared_ptr<Graph> graph);
+    };
+  }  // namespace graph_generator
+}  // namespace wlplan
 
 #endif  // GRAPH_GENERATOR_GRAPH_GENERATORS_PLOIG_GENERATOR_HPP

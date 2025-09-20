@@ -3,8 +3,10 @@
 
 #include <string>
 
-namespace planning {
-  using Object = std::string;
-}  // namespace planning
+namespace wlplan {
+  namespace planning {
+    using Object = std::string;
+  }  // namespace planning
+}  // namespace wlplan
 
 #endif  // PLANNING_OBJECT_HPP
