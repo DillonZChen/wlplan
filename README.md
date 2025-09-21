@@ -7,7 +7,7 @@ WLPlan
 WLPlan is a package for generating embeddings of PDDL planning problems for machine learning tasks. It supports both classical and numeric planning problems.
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/image.png" alt="WLPlan" title="WLPlan"/>
+    <img src="wlplan.svg" alt="WLPlan" title="WLPlan"/>
 </p>
 
 ## Installation
