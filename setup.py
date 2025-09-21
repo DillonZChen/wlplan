@@ -6,14 +6,6 @@ from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup
 
 
-def check_env_flag(name: str, default: str = "") -> bool:
-    return os.getenv(name, default).upper() in ["ON", "1", "YES", "TRUE", "Y"]
-
-
-def check_negative_env_flag(name: str, default: str = "") -> bool:
-    return os.getenv(name, default).upper() in ["OFF", "0", "NO", "FALSE", "N"]
-
-
 def main():
     # Read version from wlplan/__version__.py file
     version_ns = {}
@@ -32,7 +24,7 @@ def main():
         source_files,
         define_macros=[("WLPLAN_VERSION", __version__)],
     )
-    if check_env_flag("DEBUG"):
+    if os.getenv(key="DEBUG", default="").upper() in ["ON", "1", "YES", "TRUE", "Y"]:
         ext_module._add_cflags(["-DDEBUGMODE", "-O0", "-g"])
 
     setup(

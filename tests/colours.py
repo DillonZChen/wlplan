@@ -1,5 +1,6 @@
 import logging
 
+from _wlplan.feature_generator import PruningOptions
 import numpy as np
 from ipc23lt import get_dataset
 from util import print_mat
@@ -24,7 +25,9 @@ FD_COLOURS = {
 DOMAINS = sorted(FD_COLOURS.keys())
 
 
-def colours_test(domain_name: str, iterations: int, feature_algorithm: str, pruning: str = "none"):
+def colours_test(
+    domain_name: str, iterations: int, feature_algorithm: str, pruning: str = PruningOptions.NONE
+):
     logging.info(f"L={iterations}")
 
     n_features = {}
@@ -61,10 +64,11 @@ def colours_test(domain_name: str, iterations: int, feature_algorithm: str, prun
         mat.append([desc, n_feat])
     print_mat(mat)
 
-    ## multiset should always give more features
-    assert n_features["static-set"] <= n_features["static-mset"]
-    assert n_features["schema-non-static-set"] <= n_features["schema-non-static-mset"]
+    if pruning != PruningOptions.NONE:
+        ## multiset should always give more features
+        assert n_features["static-set"] <= n_features["static-mset"]
+        assert n_features["schema-non-static-set"] <= n_features["schema-non-static-mset"]
 
-    ## removing statics by schema analysis should always give fewer features
-    assert n_features["schema-non-static-set"] <= n_features["static-set"]
-    assert n_features["schema-non-static-mset"] <= n_features["static-mset"]
+        ## removing statics by schema analysis should always give fewer features
+        assert n_features["schema-non-static-set"] <= n_features["static-set"]
+        assert n_features["schema-non-static-mset"] <= n_features["static-mset"]

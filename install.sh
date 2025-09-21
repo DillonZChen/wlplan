@@ -7,8 +7,6 @@ set -e
 export MAKEFLAGS="-j$(nproc)"
 
 # Install the package from sources
-mkdir -p _wlplan
-python setup.py build_ext --inplace -j $(nproc)
 pip install . -v
 
 # Make sure required tools are installed

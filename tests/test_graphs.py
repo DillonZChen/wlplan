@@ -8,7 +8,13 @@ from ipc23lt import get_domain_pddl, get_raw_dataset as get_ipc23lt_dataset
 from neurips24 import get_raw_dataset as get_neurips24_dataset
 
 from wlplan.feature_generator import init_feature_generator
-from wlplan.graph_generator import ILGGenerator, NILGGenerator, from_networkx, to_networkx
+from wlplan.graph_generator import (
+    ILGGenerator,
+    NILGGenerator,
+    PLOIGGenerator,
+    from_networkx,
+    to_networkx,
+)
 from wlplan.planning import parse_domain
 
 
@@ -86,6 +92,18 @@ def test_nilg():
             assert nx_graph is not None
 
 
+def test_ploig():
+    """Test PLOIG generator does not crash"""
+    domain, dataset, _ = get_ipc23lt_dataset(domain_name="blocksworld", keep_statics=False)
+    ploig_generator = PLOIGGenerator(domain, differentiate_constant_objects=True)
+    for problem, states in dataset:
+        for state in states:
+            ploig_generator.set_problem(problem)
+            graph = ploig_generator.to_graph(state)
+            nx_graph = to_networkx(graph)  # just checks to see no crash
+            assert nx_graph is not None
+
+
 if __name__ == "__main__":
     # Manually test drawing
     import matplotlib.pyplot as plt
@@ -93,6 +111,7 @@ if __name__ == "__main__":
     for generator, dataset_getter, descrition in [
         (ILGGenerator, get_ipc23lt_dataset, "ILG"),
         # (NILGGenerator, get_neurips24_dataset, "NILG"),
+        (PLOIGGenerator, get_ipc23lt_dataset, "PLOIG"),
     ]:
         domain, dataset, _ = dataset_getter(domain_name="blocksworld", keep_statics=False)
         ilg_generator = generator(domain)
