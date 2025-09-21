@@ -2,12 +2,12 @@ WLPlan
 ======
 
 [![PyPI version](https://badge.fury.io/py/wlplan.svg)](https://pypi.org/project/wlplan/)
-[![License](https://img.shields.io/pypi/l/wlplan)](LICENSE)
+[![License](https://img.shields.io/pypi/l/wlplan)](https://github.com/DillonZChen/wlplan/LICENSE)
 
 WLPlan is a package for generating embeddings of PDDL planning problems for machine learning tasks. It supports both classical and numeric planning problems.
 
 <p align="center">
-    <img src="image.png" alt="WLPlan" title="WLPlan"/>
+    <img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/image.png" alt="WLPlan" title="WLPlan"/>
 </p>
 
 ## Installation
@@ -31,7 +31,7 @@ and adding the following to the root CMakeLists.txt file of your project
     target_link_libraries(<your_project> PRIVATE wlplan)
 
 ## Usage
-Examples for how to use the package include this self-contained [notebook](docs/examples/blocksworld.ipynb) and [test](tests/test_train_eval_blocks.py), as well as the [GOOSE](https://github.com/DillonZChen/goose) framework.
+Examples for how to use the package include this self-contained [notebook](https://github.com/DillonZChen/wlplan/blob/main/docs/examples/blocksworld.ipynb) and [test](https://github.com/DillonZChen/wlplan/blob/main/tests/test_train_eval_blocks.py), as well as the [GOOSE](https://github.com/DillonZChen/goose) framework.
 
 ### Hyperparameters
 Further details of available hyperparameters are summarised in the ECAI'25 publication accessible [here](https://arxiv.org/abs/2508.18515).
