@@ -5,27 +5,28 @@
 
 #include <vector>
 
-namespace planning {
-  class State {
-   public:
-    std::vector<std::shared_ptr<planning::Atom>> atoms;
-    std::vector<double> values;
+namespace wlplan {
+  namespace planning {
+    class State {
+     public:
+      std::vector<std::shared_ptr<Atom>> atoms;
+      std::vector<double> values;
 
-    State(const std::vector<std::shared_ptr<planning::Atom>> &atoms,
-          const std::vector<double> &values);
-    State(const std::vector<std::shared_ptr<planning::Atom>> &atoms);
-    State(const std::vector<planning::Atom> &atoms, const std::vector<double> &values);
-    State(const std::vector<planning::Atom> &atoms);
+      State(const std::vector<std::shared_ptr<Atom>> &atoms, const std::vector<double> &values);
+      State(const std::vector<std::shared_ptr<Atom>> &atoms);
+      State(const std::vector<Atom> &atoms, const std::vector<double> &values);
+      State(const std::vector<Atom> &atoms);
 
-    // for Python bindings
-    std::vector<planning::Atom> get_atoms() const;
+      std::vector<Atom> get_atoms() const;
+      std::vector<double> get_values() const;
 
-    std::string to_string() const;
+      std::string to_string() const;
 
-    bool operator==(const State &other) const;
+      bool operator==(const State &other) const;
 
-    std::size_t hash() const;
-  };
-}  // namespace planning
+      std::size_t hash() const;
+    };
+  }  // namespace planning
+}  // namespace wlplan
 
 #endif  // PLANNING_STATE_HPP

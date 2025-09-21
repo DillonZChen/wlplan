@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Show commands
-set -x
 # Exit on the first error
 set -e
 
@@ -9,7 +7,6 @@ set -e
 export MAKEFLAGS="-j$(nproc)"
 
 # Install the package from sources
-mkdir -p _wlplan
 pip install . -v
 
 # Make sure required tools are installed

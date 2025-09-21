@@ -1,6 +1,7 @@
 ---
 AccessModifierOffset: '-1'
 AllowAllParametersOfDeclarationOnNextLine: false
+AlwaysBreakTemplateDeclarations: true
 BinPackArguments: false
 BinPackParameters: false
 ColumnLimit: '100'

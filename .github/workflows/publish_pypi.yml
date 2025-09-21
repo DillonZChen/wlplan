@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          
+
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
@@ -38,7 +38,6 @@ jobs:
           mkdir -p _wlplan
           python -m pip install -v .
           python -m pip install -r tests/test-requirements.txt
-          pytest tests/check_not_debug.py
           pytest
 
       - name: Install dependencies

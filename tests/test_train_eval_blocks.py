@@ -12,8 +12,9 @@ from sklearn.gaussian_process.kernels import DotProduct
 from util import print_mat
 
 import wlplan
-from wlplan.feature_generation import get_feature_generator, load_feature_generator
+from wlplan.feature_generator import init_feature_generator, load_feature_generator
 from wlplan.planning import State, parse_problem
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,12 +36,12 @@ def test_train_eval_blocks():
     ### Train
     ## collect features
     wlplan_domain, dataset, y = get_dataset("blocksworld", keep_statics=False)
-    feature_generator = get_feature_generator(
+    feature_generator = init_feature_generator(
         feature_algorithm="wl",
         domain=wlplan_domain,
         graph_representation="ilg",
         iterations=4,
-        pruning=None,
+        pruning="none",
         multiset_hash=False,
     )
     feature_generator.collect(dataset)

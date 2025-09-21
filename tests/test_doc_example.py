@@ -3,6 +3,7 @@ import pathlib
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
 
+
 path_to_dir = pathlib.Path(__file__).parent.absolute()
 
 

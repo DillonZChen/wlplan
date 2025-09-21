@@ -8,21 +8,23 @@
 #include <string>
 #include <vector>
 
-namespace planning {
-  class Fluent {
-   public:
-    std::shared_ptr<Function> function;
-    std::vector<Object> objects;
+namespace wlplan {
+  namespace planning {
+    class Fluent {
+     public:
+      std::shared_ptr<Function> function;
+      std::vector<Object> objects;
 
-    Fluent(const Function &function, const std::vector<Object> &objects);
+      Fluent(const Function &function, const std::vector<Object> &objects);
 
-    std::string to_string() const;
+      std::string to_string() const;
 
-    bool operator==(const Fluent &other) const {
-      return *function == *other.function && objects == other.objects;
-    }
-  };
+      bool operator==(const Fluent &other) const {
+        return *function == *other.function && objects == other.objects;
+      }
+    };
 
-}  // namespace planning
+  }  // namespace planning
+}  // namespace wlplan
 
 #endif  // PLANNING_FLUENT_HPP

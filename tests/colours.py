@@ -1,10 +1,12 @@
 import logging
 
+from _wlplan.feature_generator import PruningOptions
 import numpy as np
 from ipc23lt import get_dataset
 from util import print_mat
 
-from wlplan.feature_generation import get_feature_generator
+from wlplan.feature_generator import init_feature_generator
+
 
 ## https://dillonzchen.github.io/publications/chen-trevizan-thiebaux-icaps2024.pdf
 FD_COLOURS = {
@@ -23,7 +25,9 @@ FD_COLOURS = {
 DOMAINS = sorted(FD_COLOURS.keys())
 
 
-def colours_test(domain_name: str, iterations: int, feature_algorithm: str, pruning: str = None):
+def colours_test(
+    domain_name: str, iterations: int, feature_algorithm: str, pruning: str = PruningOptions.NONE
+):
     logging.info(f"L={iterations}")
 
     n_features = {}
@@ -40,7 +44,7 @@ def colours_test(domain_name: str, iterations: int, feature_algorithm: str, prun
         multiset_hash = config["multiset_hash"]
         logging.info(f"{keep_statics=}, {multiset_hash=}")
         domain, dataset, _ = get_dataset(domain_name, keep_statics=keep_statics)
-        feature_generator = get_feature_generator(
+        feature_generator = init_feature_generator(
             feature_algorithm=feature_algorithm,
             domain=domain,
             graph_representation="ilg",
@@ -60,10 +64,11 @@ def colours_test(domain_name: str, iterations: int, feature_algorithm: str, prun
         mat.append([desc, n_feat])
     print_mat(mat)
 
-    ## multiset should always give more features
-    assert n_features["static-set"] <= n_features["static-mset"]
-    assert n_features["schema-non-static-set"] <= n_features["schema-non-static-mset"]
+    if pruning != PruningOptions.NONE:
+        ## multiset should always give more features
+        assert n_features["static-set"] <= n_features["static-mset"]
+        assert n_features["schema-non-static-set"] <= n_features["schema-non-static-mset"]
 
-    ## removing statics by schema analysis should always give fewer features
-    assert n_features["schema-non-static-set"] <= n_features["static-set"]
-    assert n_features["schema-non-static-mset"] <= n_features["static-mset"]
+        ## removing statics by schema analysis should always give fewer features
+        assert n_features["schema-non-static-set"] <= n_features["static-set"]
+        assert n_features["schema-non-static-mset"] <= n_features["static-mset"]

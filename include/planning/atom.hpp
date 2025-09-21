@@ -8,19 +8,25 @@
 #include <string>
 #include <vector>
 
-namespace planning {
-  class Atom {
-   public:
-    const std::shared_ptr<Predicate> predicate;
-    const std::vector<Object> objects;
+namespace wlplan {
+  namespace planning {
+    class Atom {
+     public:
+      const std::shared_ptr<Predicate> predicate;
+      const std::vector<Object> objects;
 
-    Atom(const Predicate &predicate, const std::vector<Object> &objects);
+      Atom(const Predicate &predicate, const std::vector<Object> &objects);
 
-    std::string to_string() const;
+      Predicate get_predicate() const { return *predicate; }
+      std::vector<Object> get_objects() const { return objects; }
 
-    bool operator==(const Atom &other) const { return to_string() == other.to_string(); }
-  };
+      std::string to_pddl() const;
+      std::string to_string() const;
 
-}  // namespace planning
+      bool operator==(const Atom &other) const { return to_string() == other.to_string(); }
+    };
+
+  }  // namespace planning
+}  // namespace wlplan
 
 #endif  // PLANNING_ATOM_HPP
