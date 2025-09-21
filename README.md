@@ -58,6 +58,7 @@ The feature generators implemented thus far are listed as follows.
 ## References
 ### Academic Publications
 Some academic publications which use WLPlan are listed as follows.
+- Daniel Höller. **Learning Heuristic Functions for HTN Planning**. In ICAPS 2025 Workshop on Bridging the Gap Between AI Planning and Reinforcement Learning (PRL), 2025.
 - Dillon Z. Chen. **Symmetry-Invariant Novelty Heuristics via Unsupervised Weisfeiler-Leman Features**. In ICAPS 2025 Workshop on Heuristics and Search for Domain-independent Planning (HSDIP), 2025. 
 - Dillon Z. Chen. **Weisfeiler-Leman Features for Planning: A 1,000,000 Sample Size Hyperparameter Study**. In 28th European Conference on Artificial Intelligence (ECAI), 2025. 
 - Mingyu Hao, Dillon Z. Chen, Felipe Trevizan, and Sylvie Thiébaux. **Effective Data Generation and Feature Selection in Learning for Planning**. In 28th European Conference on Artificial Intelligence (ECAI), 2025. 
