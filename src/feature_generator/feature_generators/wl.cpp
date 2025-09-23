@@ -40,7 +40,6 @@ namespace wlplan {
                             int iteration) {
       // memory for storing string and hashed int representation of colours
       std::vector<int> new_colour;
-      std::vector<int> neighbour_vector;
       int new_colour_compressed;
 
       std::vector<int> new_colours(colours.size(), UNSEEN_COLOUR);
@@ -70,10 +69,8 @@ namespace wlplan {
         }
 
         // add current colour and sorted neighbours into sorted colour key
-        new_colour = {current_colour};
-        neighbour_vector = neighbour_container->to_vector();
-
-        new_colour.insert(new_colour.end(), neighbour_vector.begin(), neighbour_vector.end());
+        new_colour = neighbour_container->to_vector();
+        new_colour.push_back(current_colour);
 
         // hash seen colours
         new_colour_compressed = get_colour_hash(new_colour, iteration);
@@ -87,7 +84,34 @@ namespace wlplan {
         nodes.erase(u);
       }
 
-      colours = new_colours;
+      colours = std::move(new_colours);
+    }
+
+    void WLFeatures::refine_fast(const std::shared_ptr<graph_generator::Graph> &graph,
+                                 const std::set<int> &nodes,
+                                 std::vector<int> &colours,
+                                 int iteration) {
+      // memory for storing string and hashed int representation of colours
+      std::vector<int> new_colour;
+      std::vector<int> new_colours(colours.size(), UNSEEN_COLOUR);
+
+      for (const int u : nodes) {
+        neighbour_container->clear();
+
+        for (const auto &edge : graph->edges[u]) {
+          // add sorted neighbour (colour, edge_label) pair
+          neighbour_container->insert(colours[edge.second], edge.first);
+        }
+
+        // add current colour and sorted neighbours into sorted colour key
+        new_colour = neighbour_container->to_vector();
+        new_colour.push_back(colours[u]);
+
+        // hash
+        new_colours[u] = get_colour_hash_fast(new_colour, iteration);
+      }
+
+      colours = std::move(new_colours);
     }
 
     void WLFeatures::collect_impl(const std::vector<graph_generator::Graph> &graphs) {
@@ -116,7 +140,7 @@ namespace wlplan {
         for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
           const auto graph = std::make_shared<graph_generator::Graph>(graphs[graph_i]);
           std::set<int> nodes = graph->get_nodes_set();
-          refine(graph, nodes, graph_colours[graph_i], itr);
+          refine_fast(graph, nodes, graph_colours[graph_i], itr);
         }
 
         // layer pruning
@@ -146,19 +170,17 @@ namespace wlplan {
         int col = get_colour_hash({graph->nodes[node_i]}, 0);
         colours[node_i] = col;
 
-        if (features.count(col) == 0)
-          features[col] = 0;
+        features.try_emplace(col, 0);
         features[col]++;
       }
 
       // main WL loop
       std::set<int> nodes = graph->get_nodes_set();
       for (int itr = 1; itr < iterations + 1; itr++) {
-        refine(graph, nodes, colours, itr);
+        refine_fast(graph, nodes, colours, itr);
 
         for (const int col : colours) {
-          if (features.count(col) == 0)
-            features[col] = 0;
+          features.try_emplace(col, 0);
           features[col]++;
         }
       }

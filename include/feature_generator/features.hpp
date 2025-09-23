@@ -87,6 +87,8 @@ namespace wlplan {
 
       // get hashed colour if it exists, and constructs it if it doesn't
       int get_colour_hash(const std::vector<int> &colour, const int iteration);
+      // fast ver. that assumes no unseen colours (e.g. collecting), and does not store itr info
+      int get_colour_hash_fast(const std::vector<int> &colour, const int iteration);
 
       // reformat colour hash based on colours to throw out
       VecColourHash new_colour_hash() const;

@@ -10,15 +10,25 @@ namespace wlplan {
     void WLNeighbourContainer::clear() { neighbours.clear(); }
 
     void WLNeighbourContainer::insert(const int node_colour, const int edge_label) {
-      const std::pair<int, int> key = std::make_pair(edge_label, node_colour);
-      if (multiset_hash && neighbours.count(key) > 0)
-        neighbours[key]++;
-      else
-        neighbours[key] = 1;
+      const auto key = std::make_pair(edge_label, node_colour);
+      auto it = neighbours.lower_bound(key);
+
+      if (it != neighbours.end() && it->first == key) {
+        // Key already exists, update it.
+        if (multiset_hash) {
+          it->second++;
+        } else {
+          it->second = 1;
+        }
+      } else {
+        // Key does not exist, insert it with a hint.
+        neighbours.emplace_hint(it, key, 1);
+      }
     }
 
     std::vector<int> WLNeighbourContainer::to_vector() const {
       std::vector<int> vec;
+      vec.reserve(neighbours.size() * 3);
       for (const auto &[label_colour, count] : neighbours) {
         vec.push_back(label_colour.first);   // edge label
         vec.push_back(label_colour.second);  // node colour
@@ -39,7 +49,7 @@ namespace wlplan {
                                  " != 1 for multiset_hash=" + std::to_string(multiset_hash));
       }
 
-      for (size_t i = 1; i < colours.size(); i += inc) {
+      for (size_t i = 0; i < colours.size(); i += inc) {
         int edge_label = colours.at(i);
         int node_colour = colours.at(i + 1);
         int n_occurrences = colours.at(i + 2);
@@ -51,10 +61,11 @@ namespace wlplan {
 
     std::vector<int>
     WLNeighbourContainer::get_neighbour_colours(const std::vector<int> &colours) const {
-      std::vector<int> neighbour_colours = {colours.at(0)};
+      std::vector<int> neighbour_colours;
       for (const auto &[node_colour, edge_label, n_occurrences] : deconstruct(colours)) {
         neighbour_colours.push_back(node_colour);
       }
+      neighbour_colours.push_back(colours.at(colours.size() - 1));
       return neighbour_colours;
     }
 
@@ -62,16 +73,14 @@ namespace wlplan {
                                                  const std::map<int, int> &remap) {
       clear();
 
-      std::vector<int> output = {remap.at(input.at(0))};
-
       for (const auto &[node_colour, edge_label, n_occurrences] : deconstruct(input)) {
         for (int i = 0; i < n_occurrences; i++) {
           insert(remap.at(node_colour), edge_label);
         }
       }
 
-      std::vector<int> vec = to_vector();
-      output.insert(output.end(), vec.begin(), vec.end());
+      std::vector<int> output = to_vector();
+      output.push_back(remap.at(input.at(input.size() - 1)));
 
       return output;
     }
