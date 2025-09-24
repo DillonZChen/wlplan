@@ -17,8 +17,8 @@ rm -rf _wlplan/*.pyi
 pybind11-stubgen _wlplan -o .
 
 # Generate documentation
-pip install sphinx sphinx_rtd_theme
-cd docs
-rm -rf build/
+cd docs/
+sudo apt-get install pandoc
+pip install -r docs-requirements.txt
 make html
-cd ..
+cd -
