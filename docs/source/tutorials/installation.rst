@@ -3,7 +3,7 @@ Installation
 
 .. raw:: html
 
-    <p class="flex-wrapper"><img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/favicon.png" style="height:2em; display:inline; padding-right:0.1em;">Plan is supported for `Python 3.10` and above</p>
+    <p class="flex-wrapper"><img src="../_static/favicon.png" style="height:2em; display:inline; padding-right:0.1em;">Plan is supported for Python 3.10 and above</p>
 
 Python Interface
 ----------------

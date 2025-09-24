@@ -206,7 +206,9 @@ namespace wlplan {
 
     int Features::get_colour_hash_fast(const std::vector<int> &colour, const int iteration) {
       auto [it, inserted] = colour_hash[iteration].try_emplace(colour, get_n_colours());
-      return it->second;
+      int ret = it->second;
+      layer_to_colours[iteration].insert(ret);
+      return ret;
     }
 
     std::map<int, int> Features::remap_colour_hash(std::set<int> &to_prune) {

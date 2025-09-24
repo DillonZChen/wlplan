@@ -13,11 +13,14 @@ from _wlplan.feature_generator import (
     WLFeatures,
 )
 from _wlplan.planning import Domain
+from wlplan.graph_generator import get_available_graph_generators
 
 
 __all__ = [
     "init_feature_generator",
-    "get_available_feature_algorithms",
+    "get_available_feature_generators",
+    "get_available_graph_generators",
+    "get_available_pruning_methods",
     "Features",
 ]
 
@@ -32,16 +35,12 @@ _FEATURE_ALGORITHMS = {
 }
 
 
-def get_available_graph_choices() -> list[str]:
-    return ["custom", "ilg", "nilg", "ploig", "aoag"]
+def get_available_feature_generators() -> list[str]:
+    return list(_FEATURE_ALGORITHMS.keys())
 
 
 def get_available_pruning_methods() -> list[str]:
     return PruningOptions.get_all()
-
-
-def get_available_feature_algorithms() -> list[str]:
-    return list(_FEATURE_ALGORITHMS.keys())
 
 
 def init_feature_generator(
@@ -69,7 +68,7 @@ def init_feature_generator(
         iterations : int, default=2
             The number of WL iterations to perform.
 
-        pruning : str, default=None
+        pruning : str, default="none"
             How to detect and prune duplicate features. If `"none"`, no pruning is done.
 
         multiset_hash : bool, default=False
@@ -83,7 +82,7 @@ def init_feature_generator(
     ------
         ValueError: If a specified argument is unknown.
     """
-    feature_algorithm_choices = get_available_feature_algorithms()
+    feature_algorithm_choices = get_available_feature_generators()
     if feature_algorithm in _FEATURE_ALGORITHMS:
         FeatureGenerator = _FEATURE_ALGORITHMS[feature_algorithm]
     else:
@@ -91,7 +90,7 @@ def init_feature_generator(
             f"Unknown value {feature_algorithm=}. Must be from {feature_algorithm_choices}"
         )
 
-    graph_choices = get_available_graph_choices()
+    graph_choices = get_available_graph_generators()
     if graph_representation not in graph_choices:
         raise ValueError(f"Unknown value {graph_representation=}. Must be from {graph_choices}")
 

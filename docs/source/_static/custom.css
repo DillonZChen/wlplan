@@ -2,3 +2,13 @@
 .nboutput .prompt {
     display: none;
 }
+
+div.nbinput.container {
+    margin-bottom: 24px;
+}
+
+.center-img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

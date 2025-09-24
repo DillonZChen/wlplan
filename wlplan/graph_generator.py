@@ -13,12 +13,14 @@ from _wlplan.planning import Domain
 
 __all__ = [
     "init_graph_generator",
+    "get_available_graph_generators",
     "from_networkx",
     "to_networkx",
     "GraphGenerator",
 ]
 
 _GRAPH_REPRESENTATIONS = {
+    "custom": None,
     "aoag": AOAGGenerator,
     "ilg": ILGGenerator,
     "nilg": NILGGenerator,
@@ -26,7 +28,7 @@ _GRAPH_REPRESENTATIONS = {
 }
 
 
-def get_available_graph_representations() -> list[str]:
+def get_available_graph_generators() -> list[str]:
     return list(_GRAPH_REPRESENTATIONS.keys())
 
 
@@ -57,7 +59,11 @@ def init_graph_generator(
     ------
         ValueError: If a specified argument is unknown.
     """
-    graph_representation_choices = get_available_graph_representations()
+
+    if graph_representation == "custom":
+        raise ValueError("Cannot instantiate custom graph generator.")
+
+    graph_representation_choices = get_available_graph_generators()
     if graph_representation in _GRAPH_REPRESENTATIONS:
         GraphGenerator = _GRAPH_REPRESENTATIONS[graph_representation]
     else:
@@ -133,7 +139,7 @@ def to_networkx(graph: Graph) -> nx.Graph:
     -------
         Graph : Output NetworkX graph.
     """
-    G = nx.Graph()
+    G = nx.DiGraph()
     for u, colour in enumerate(graph.node_colours):
         node_name = graph.get_node_name(u)
         G.add_node(node_name, colour=colour)

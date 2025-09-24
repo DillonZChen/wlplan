@@ -453,7 +453,9 @@ Parameters
            "domain"_a,
            "data"_a)
       .def_readonly("domain", &wlplan::data::DomainDataset::domain)
-      .def_readonly("data", &wlplan::data::DomainDataset::data);
+      .def_readonly("data", &wlplan::data::DomainDataset::data)
+      .def(py::pickle(&__getstate__<wlplan::data::DomainDataset>,
+                      &__setstate__<wlplan::data::DomainDataset>));
 
   // ProblemDataset
   py::class_<wlplan::data::ProblemDataset>(data_m,
@@ -485,7 +487,9 @@ Parameters
            "actions"_a)
       .def_readonly("problem", &wlplan::data::ProblemDataset::problem)
       .def_readonly("states", &wlplan::data::ProblemDataset::states)
-      .def_readonly("actions", &wlplan::data::ProblemDataset::actions);
+      .def_readonly("actions", &wlplan::data::ProblemDataset::actions)
+      .def(py::pickle(&__getstate__<wlplan::data::ProblemDataset>,
+                      &__setstate__<wlplan::data::ProblemDataset>));
 
   //////////////////////////////////////////////////////////////////////////////
   // Graph

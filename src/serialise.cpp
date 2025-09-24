@@ -1,5 +1,6 @@
 #include "../include/serialise.hpp"
 
+#include "../include/data/dataset.hpp"
 #include "../include/planning/action.hpp"
 #include "../include/planning/atom.hpp"
 #include "../include/planning/domain.hpp"
@@ -23,6 +24,40 @@ void check_state_validity(py::tuple t, std::string cls, size_t expected_size) {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Data
+//////////////////////////////////////////////////////////////////////////////
+
+// ProblemDataset
+template <>
+py::tuple __getstate__(const data::ProblemDataset &input) {
+  return py::make_tuple(input.problem, input.states, input.actions);
+}
+
+template <>
+data::ProblemDataset __setstate__(py::tuple t) {
+  check_state_validity(t, "ProblemDataset", 3);
+  return data::ProblemDataset(t[0].cast<planning::Problem>(),
+                              t[1].cast<std::vector<planning::State>>(),
+                              t[2].cast<std::vector<planning::Actions>>());
+}
+
+// DomainDataset
+template <>
+py::tuple __getstate__(const data::DomainDataset &input) {
+  return py::make_tuple(input.domain, input.data);
+}
+
+template <>
+data::DomainDataset __setstate__(py::tuple t) {
+  check_state_validity(t, "DomainDataset", 2);
+  return data::DomainDataset(t[0].cast<planning::Domain>(),
+                             t[1].cast<std::vector<data::ProblemDataset>>());
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Planning
+//////////////////////////////////////////////////////////////////////////////
 // Action
 template <>
 py::tuple __getstate__(const planning::Action &input) {

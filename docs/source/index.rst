@@ -5,13 +5,21 @@ WLPlan Documentation
 
 .. raw:: html
 
-    <p class="flex-wrapper"><img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/favicon.png" style="height:2em; display:inline; padding-right:0.1em;">Plan is a library for generating embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
+    <p class="flex-wrapper"><img src="_static/favicon.png" style="height:2em; display:inline; padding-right:0.1em;">Plan is a library for generating embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
 
 .. toctree::
     :caption: Get Started
+    :maxdepth: 1
 
-    get_started/installation
-    get_started/blocksworld.ipynb
+    tutorials/installation
+    tutorials/1_introduction.ipynb
+
+.. toctree::
+    :caption: Tutorials
+    :maxdepth: 1
+
+    tutorials/2_graphs.ipynb
+    tutorials/3_gnns.ipynb
 
 .. toctree::
     :caption: Package Reference
