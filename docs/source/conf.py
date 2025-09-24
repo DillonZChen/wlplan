@@ -24,6 +24,7 @@ add_module_names = False
 language = "en"
 master_doc = "index"
 nbsphinx_execute = "never"
+pygments_style = "sphinx"
 templates_path = ["_templates"]
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
