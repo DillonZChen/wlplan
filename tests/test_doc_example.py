@@ -10,8 +10,8 @@ path_to_dir = pathlib.Path(__file__).parent.absolute()
 def test_notebook_exec():
     """Only tests that the notebook can be executed with no errors."""
 
-    notebook = f"{path_to_dir}/../docs/examples/blocksworld.ipynb"
-    run_path = f"{path_to_dir}/../docs/examples"
+    notebook = f"{path_to_dir}/../docs/source/get_started/blocksworld.ipynb"
+    run_path = f"{path_to_dir}/../docs/source/get_started"
 
     with open(notebook) as f:
         nb = nbformat.read(f, as_version=4)

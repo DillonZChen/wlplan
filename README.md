@@ -1,14 +1,24 @@
+<p align="center">
+    <img src="wlplan.png" alt="WLPlan Logo" style="height:256px; width:auto;">
+</p>
+
+------
+
 WLPlan
 ======
 
 [![PyPI version](https://badge.fury.io/py/wlplan.svg)](https://pypi.org/project/wlplan/)
 [![License](https://img.shields.io/pypi/l/wlplan)](https://github.com/DillonZChen/wlplan/LICENSE)
 
-WLPlan is a package for generating embeddings of PDDL planning problems for machine learning tasks. It supports both classical and numeric planning problems.
+<p class="flex-wrapper"><img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/favicon.png" style="height:1em; display:inline; padding-right:0.1em;">Plan is a library for generating embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
+
+The main pipeline in WLPlan consists of (1) converting planning problems and states into graphs, and (2) synthesising feature embeddings by running a variant of the Weisfeiler-Leman (WL) algorithm on the resulting graph.
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/wlplan.svg" alt="WLPlan" title="WLPlan"/>
 </p>
+
+Detailed documentation for WLPlan can be found in the official website available [here](https://dillonzchen.github.io/wlplan).
 
 ## Installation
 ### Python Interface
@@ -29,31 +39,6 @@ and adding the following to the root CMakeLists.txt file of your project
     find_package(wlplan)
     ...
     target_link_libraries(<your_project> PRIVATE wlplan)
-
-## Usage
-Examples for how to use the package include this self-contained [notebook](https://github.com/DillonZChen/wlplan/blob/main/docs/examples/blocksworld.ipynb) and [test](https://github.com/DillonZChen/wlplan/blob/main/tests/test_train_eval_blocks.py), as well as the [GOOSE](https://github.com/DillonZChen/goose) framework.
-
-### Hyperparameters
-Further details of available hyperparameters are summarised in the ECAI'25 publication accessible [here](https://arxiv.org/abs/2508.18515).
-
-#### Graph Representations
-The graph representations of planning tasks implemented thus far are listed as follows.
-| Name                                          | WLPlan shorthand | Description                                                     | Reference                                                                                                                            |
-| --------------------------------------------- | ---------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Instance Learning Graph (ILG)                 | `ilg`            | Atoms and objects as nodes, with object instantiations as edges | D. Z. Chen, F. Trevizan, S. Thiébaux:  Return to Tradition: Learning Reliable Heuristics with Classical Machine Learning. ICAPS 2024 |
-| Numeric Instance Learning Graph (νILG)        | `nilg`           | ILG for numeric planning problems                               | D. Z. Chen, S. Thiébaux:  Graph Learning for Numeric Planning. NeurIPS 2024                                                          |
-| Planning with Object Importance Graph (PLOIG) | `ploig`          | Objects as nodes, and atoms as edges                            | D. Z. Chen, S. Thiébaux:  Graph Learning for Numeric Planning. NeurIPS 2024                                                          |
-
-#### Feature Generators
-The feature generators implemented thus far are listed as follows.
-| Name                             | WLPlan shorthand | Reference                                                                                                                       |
-| -------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Relational Weisfeiler-Leman (WL) | `wl`             | P. Barceló, M. Galkin, C. Morris, M. A. Romero Orth: Weisfeiler and Leman Go Relational. LoG 2022                               |
-| 2-WL                             | `kwl2`           | J. Cai, M. Fürer, N. Immerman: An optimal lower bound on the number of variables for graph identification. Combinatorica (1992) |
-| Local 2-WL (2-LWL)               | `lwl2`           | C. Morris, K. Kersting, P. Mutzel: Glocalized Weisfeiler-Lehman Graph Kernels: Global-Local Feature Maps of Graphs. ICDM 2017   |
-| Continuous-Categorical WL (ccWL) | `ccwl`           | D. Z. Chen, S. Thiébaux: Graph Learning for Numeric Planning. NeurIPS 2024                                                      |
-| individualised WL (iWL)          | `iwl`            | D. Z. Chen: Weisfeiler-Leman Features for Planning: A 1,000,000 Sample Size Hyperparameter Study. ECAI 2025                     |
-| normalised iWL (niWL)            | `niwl`           | D. Z. Chen: Weisfeiler-Leman Features for Planning: A 1,000,000 Sample Size Hyperparameter Study. ECAI 2025                     |
 
 ## References
 ### Academic Publications

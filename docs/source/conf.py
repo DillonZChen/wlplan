@@ -20,11 +20,8 @@ project = "wlplan"
 copyright = "2025, Dillon Z. Chen"
 author = "Dillon Z. Chen"
 
-# -- General configuration ------------------------------------------------
+# -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
@@ -32,77 +29,21 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
     "myst_parser",
+    "nbsphinx",
 ]
 
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
+html_static_path = ['_static']
+html_css_files = ['custom.css']
 source_suffix = ['.rst', '.md']
-
-# The master toctree document.
 master_doc = "index"
-
-# Language
 language = "en"
-
-# If true, the current module name will be prepended to all description
-# unit titles (such as .. function::).
 add_module_names = False
-
+nbsphinx_execute = 'never'
 
 # -- Options for HTML output ----------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
 html_theme = "sphinx_rtd_theme"
-
-# Output file base name for HTML help builder.
+html_logo = "https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/wlplan.png"
+html_favicon = "https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/favicon.png"
 htmlhelp_basename = "wlplandoc"
-
-# -- Options for LaTeX output ---------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
-    # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
-    # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
-    # Latex figure (float) alignment
-    #'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-# latex_documents = [
-#     (
-#         master_doc,
-#         "wlplan.tex",
-#         "wlplan Documentation",
-#         author,
-#         "manual",
-#     ),
-# ]
-
-# The name of an image file (relative to this directory) to place at the top of
-# the title page.
-# latex_logo = None
-
-# For "manual" documents, if this is true, then toplevel headings are parts,
-# not chapters.
-# latex_use_parts = False
-
-# If true, show page references after internal links.
-# latex_show_pagerefs = False
-
-# If true, show URL addresses after external links.
-# latex_show_urls = False
-
-# Documents to append as an appendix to all manuals.
-# latex_appendices = []
-
-# If false, no module index is generated.
-# latex_domain_indices = True
