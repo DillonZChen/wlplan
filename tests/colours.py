@@ -64,11 +64,13 @@ def colours_test(
         mat.append([desc, n_feat])
     print_mat(mat)
 
-    if pruning != PruningOptions.NONE:
-        ## multiset should always give more features
+    if pruning == PruningOptions.NONE:
+        # pruning may lead to unintuitive results
+        
+        # multiset should always give more features
         assert n_features["static-set"] <= n_features["static-mset"]
         assert n_features["schema-non-static-set"] <= n_features["schema-non-static-mset"]
 
-        ## removing statics by schema analysis should always give fewer features
+        # removing statics by schema analysis should always give fewer features
         assert n_features["schema-non-static-set"] <= n_features["static-set"]
         assert n_features["schema-non-static-mset"] <= n_features["static-mset"]
