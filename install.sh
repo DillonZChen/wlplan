@@ -19,6 +19,6 @@ pybind11-stubgen _wlplan -o .
 # Generate documentation
 pip install sphinx sphinx_rtd_theme
 cd docs
-rm -rf _build/
+rm -rf build/
 make html
 cd ..

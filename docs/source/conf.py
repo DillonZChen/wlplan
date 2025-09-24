@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "wlplan"
-copyright = "2024, Dillon Z. Chen"
+copyright = "2025, Dillon Z. Chen"
 author = "Dillon Z. Chen"
 
 # -- General configuration ------------------------------------------------
@@ -31,6 +31,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -38,18 +39,13 @@ templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-# source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = "index"
 
 # Language
 language = "en"
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns = ["_build"]
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
@@ -81,15 +77,15 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (
-        master_doc,
-        "wlplan.tex",
-        "wlplan Documentation",
-        author,
-        "manual",
-    ),
-]
+# latex_documents = [
+#     (
+#         master_doc,
+#         "wlplan.tex",
+#         "wlplan Documentation",
+#         author,
+#         "manual",
+#     ),
+# ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
