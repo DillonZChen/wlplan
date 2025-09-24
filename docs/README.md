@@ -1,6 +1,7 @@
 To generate the documentation locally for this package with Sphinx, clone the repository and then run the following commands:
 
     cd docs/
+    sudo apt-get install pandoc
     pip install -r docs-requirements.txt
     make html
 

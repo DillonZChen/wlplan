@@ -34,6 +34,7 @@ jobs:
             - name: Build docs
               run: |
                   cd docs
+                  sudo apt-get install pandoc
                   pip install -r docs-requirements.txt
                   make html
             
