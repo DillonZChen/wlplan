@@ -49,7 +49,7 @@ namespace wlplan {
                                  " != 1 for multiset_hash=" + std::to_string(multiset_hash));
       }
 
-      for (size_t i = 0; i < colours.size(); i += inc) {
+      for (int i = 0; i < (int)colours.size() - inc; i += inc) {
         int edge_label = colours.at(i);
         int node_colour = colours.at(i + 1);
         int n_occurrences = colours.at(i + 2);

@@ -140,7 +140,7 @@ namespace wlplan {
         for (size_t graph_i = 0; graph_i < graphs.size(); graph_i++) {
           const auto graph = std::make_shared<graph_generator::Graph>(graphs[graph_i]);
           std::set<int> nodes = graph->get_nodes_set();
-          refine_fast(graph, nodes, graph_colours[graph_i], itr);
+          refine(graph, nodes, graph_colours[graph_i], itr);
         }
 
         // layer pruning
