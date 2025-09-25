@@ -37,15 +37,7 @@ namespace wlplan {
       for (int itr = 1; itr < maxsat_iterations + 1; itr++) {
         // neighbours: std::vector<int>; colour: int
         for (const auto &[neighbours, colour] : colour_hash[itr]) {
-          if (colour < 0 || colour >= n_features) {
-            to_prune.insert(colour);
-            continue;
-          }
           for (const int ancestor : neighbour_container->get_neighbour_colours(neighbours)) {
-            if (ancestor < 0 || ancestor >= n_features) {
-              to_prune.insert(colour);
-              continue;
-            }
             edges_fw.at(ancestor).insert(colour);
             edges_bw.at(colour).insert(ancestor);
           }
