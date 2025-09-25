@@ -11,18 +11,18 @@ namespace wlplan {
 
     void WLNeighbourContainer::insert(const int node_colour, const int edge_label) {
       const auto key = std::make_pair(edge_label, node_colour);
-      auto it = neighbours.lower_bound(key);
 
-      if (it != neighbours.end() && it->first == key) {
-        // Key already exists, update it.
-        if (multiset_hash) {
+      if (multiset_hash) {
+        auto it = neighbours.lower_bound(key);
+        if (it != neighbours.end() && it->first == key) {
+          // Key already exists, update it.
           it->second++;
         } else {
-          it->second = 1;
+          // Key does not exist, insert it with a hint.
+          neighbours.emplace_hint(it, key, 1);
         }
       } else {
-        // Key does not exist, insert it with a hint.
-        neighbours.emplace_hint(it, key, 1);
+        neighbours[key] = 1;
       }
     }
 

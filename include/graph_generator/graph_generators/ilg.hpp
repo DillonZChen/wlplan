@@ -66,9 +66,12 @@ namespace wlplan {
       std::vector<int> neg_goal_changed;
       std::vector<int> pos_goal_changed_pred;
       std::vector<int> neg_goal_changed_pred;
+      std::unordered_map<std::string, int> object_node_indices;
+      std::unordered_map<std::string, int> positive_goal_atom_indices;
+      std::unordered_map<std::string, int> negative_goal_atom_indices;
       std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,
                                                      const std::shared_ptr<Graph> graph,
-                                                     bool store_changes);
+                                                     const bool store_changes);
     };
 
     inline int ILGGenerator::fact_colour(const int predicate_idx,

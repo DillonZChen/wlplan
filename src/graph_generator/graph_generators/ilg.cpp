@@ -81,19 +81,42 @@ namespace wlplan {
 
       /* set pointer */
       base_graph = std::make_shared<Graph>(graph);
+
+      // Pre-compute object node indices
+      object_node_indices.clear();
+      for (const auto &object : problem.get_problem_objects()) {
+        object_node_indices[object] = base_graph->get_node_index(object);
+      }
+      for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
+        std::string node = domain.constant_objects[i];
+        object_node_indices[node] = base_graph->get_node_index(node);
+      }
+
+      // Pre-compute positive goal atom node indices
+      positive_goal_atom_indices.clear();
+      for (const auto &atom : problem.get_positive_goals()) {
+        positive_goal_atom_indices[atom.to_string()] = base_graph->get_node_index(atom.to_string());
+      }
+
+      // Pre-compute negative goal atom node indices
+      negative_goal_atom_indices.clear();
+      for (const auto &atom : problem.get_negative_goals()) {
+        negative_goal_atom_indices[atom.to_string()] = base_graph->get_node_index(atom.to_string());
+      }
+
       n_edges_added = std::vector<int>(base_graph->nodes.size(), 0);
     }
 
     std::shared_ptr<Graph> ILGGenerator::modify_graph_from_state(const planning::State &state,
                                                                  const std::shared_ptr<Graph> graph,
-                                                                 bool store_changes) {
+                                                                 const bool store_changes) {
       if (store_changes) {
         n_nodes_added = 0;
         std::fill(n_edges_added.begin(), n_edges_added.end(), 0);
-        pos_goal_changed = std::vector<int>();
-        neg_goal_changed = std::vector<int>();
-        pos_goal_changed_pred = std::vector<int>();
-        neg_goal_changed_pred = std::vector<int>();
+        pos_goal_changed.clear();
+        neg_goal_changed.clear();
+        pos_goal_changed_pred.clear();
+        neg_goal_changed_pred.clear();
         graph->set_store_node_names(false);
       }
 
@@ -104,7 +127,7 @@ namespace wlplan {
         atom_node_str = atom->to_string();
         pred_idx = domain.predicate_to_colour.at(atom->predicate->name);
         if (positive_goal_names.count(atom_node_str)) {
-          atom_node = graph->get_node_index(atom_node_str);
+          atom_node = positive_goal_atom_indices[atom_node_str];
           graph->change_node_colour(atom_node,
                                     fact_colour(pred_idx, ILGFactDescription::T_POS_GOAL));
           if (store_changes) {
@@ -112,7 +135,7 @@ namespace wlplan {
             pos_goal_changed_pred.push_back(pred_idx);
           }
         } else if (negative_goal_names.count(atom_node_str)) {
-          atom_node = graph->get_node_index(atom_node_str);
+          atom_node = negative_goal_atom_indices[atom_node_str];
           graph->change_node_colour(atom_node,
                                     fact_colour(pred_idx, ILGFactDescription::T_NEG_GOAL));
           if (store_changes) {
@@ -127,8 +150,7 @@ namespace wlplan {
           }
 
           for (size_t r = 0; r < atom->objects.size(); r++) {
-            // object nodes should never be needed to be added
-            object_node = graph->get_node_index(atom->objects[r]);
+            object_node = object_node_indices[atom->objects[r]];
             graph->add_edge(atom_node, r, object_node);
             graph->add_edge(object_node, r, atom_node);
             if (store_changes) {
