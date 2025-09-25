@@ -26,8 +26,7 @@ namespace wlplan {
     }
 
     std::set<int> Features::prune_maxsat(std::vector<Embedding> X, const int maxsat_iterations) {
-      // Same as prune_maxsat but no marking distinct features via dependency graph, and just
-      // letting maxsat deal with this
+      std::set<int> to_prune;
       std::cout << "Minimising equivalent features..." << std::endl;
 
       // 0. construct feature dependency graph
@@ -38,7 +37,15 @@ namespace wlplan {
       for (int itr = 1; itr < maxsat_iterations + 1; itr++) {
         // neighbours: std::vector<int>; colour: int
         for (const auto &[neighbours, colour] : colour_hash[itr]) {
+          if (colour < 0 || colour >= n_features) {
+            to_prune.insert(colour);
+            continue;
+          }
           for (const int ancestor : neighbour_container->get_neighbour_colours(neighbours)) {
+            if (ancestor < 0 || ancestor >= n_features) {
+              to_prune.insert(colour);
+              continue;
+            }
             edges_fw.at(ancestor).insert(colour);
             edges_bw.at(colour).insert(ancestor);
           }
@@ -99,8 +106,6 @@ namespace wlplan {
 
       // time the solver
       std::map<int, int> solution = max_sat_problem.solve();
-
-      std::set<int> to_prune;
 
       for (const auto &[colour, value] : solution) {
         if (value == 1) {
