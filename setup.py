@@ -57,7 +57,7 @@ def main():
         keywords="wlplan, automated planning, machine learning",
         python_requires=">=3.10",
         install_requires=[
-            "networkx>=3.5",
+            "networkx",
             "pddl==0.4.1",
             "python-sat==1.8.dev14",
         ],
