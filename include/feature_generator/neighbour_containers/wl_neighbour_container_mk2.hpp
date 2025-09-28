@@ -1,0 +1,36 @@
+#ifndef FEATURE_GENERATOR_NEIGHBOUR_CONTAINERS_WL_NEIGHBOUR_CONTAINER_MK2_HPP
+#define FEATURE_GENERATOR_NEIGHBOUR_CONTAINERS_WL_NEIGHBOUR_CONTAINER_MK2_HPP
+
+#include "../neighbour_container.hpp"
+
+#include <map>
+#include <set>
+#include <tuple>
+
+namespace wlplan {
+  namespace feature_generator {
+    class WLNeighbourContainerMk2 : public NeighbourContainer {
+     public:
+      WLNeighbourContainerMk2(bool multiset_hash, int n_features, int n_relations);
+
+      void clear() override;
+      void insert(const int node_colour, const int edge_label) override;
+      std::vector<int> to_vector() const override;
+
+      // triples are <node_colour, edge_label, n_occurrence>
+      std::vector<std::tuple<int, int, int>> deconstruct(const std::vector<int> &colours) const;
+      std::vector<int> get_neighbour_colours(const std::vector<int> &colours) const override;
+
+      std::vector<int> remap(const std::vector<int> &input,
+                             const std::map<int, int> &remap) override;
+
+     protected:
+      const int n_features;
+      const int n_relations;
+      std::map<int, int> neighbours_multiset;
+      std::set<int> neighbours_set;
+    };
+  }  // namespace feature_generator
+}  // namespace wlplan
+
+#endif  // FEATURE_GENERATOR_NEIGHBOUR_CONTAINERS_WL_NEIGHBOUR_CONTAINER_MK2_HPP
