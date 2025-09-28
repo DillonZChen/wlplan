@@ -127,7 +127,7 @@ namespace wlplan {
       collected = false;
       iterations = original_iterations;
 
-      std::cout << "Pruning " << to_prune.size() << " features with <1\% frequency count."
+      std::cout << "Pruning " << to_prune.size() << " features with <1% frequency count."
                 << std::endl;
 
       return to_prune;
