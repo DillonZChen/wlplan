@@ -66,9 +66,11 @@ namespace wlplan {
       // We use a factory style method here instead of a virtual function as this is called
       // from a constructor, from which virtual functions are not allowed to be called.
       if (std::set<std::string>({"wl", "ccwl", "ccwl-a", "iwl", "niwl"}).count(feature_name)) {
-        // neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
-        neighbour_container = std::make_shared<WLNeighbourContainerMk2>(
-            multiset_hash, graph_generator->get_n_features(), graph_generator->get_n_relations());
+        if (graph_representation == "custom")
+          neighbour_container = std::make_shared<WLNeighbourContainer>(multiset_hash);
+        else
+          neighbour_container = std::make_shared<WLNeighbourContainerMk2>(
+              multiset_hash, graph_generator->get_n_features(), graph_generator->get_n_relations());
       } else if (feature_name == "2-kwl") {
         neighbour_container = std::make_shared<KWL2NeighbourContainer>(multiset_hash);
       } else if (feature_name == "2-lwl") {
