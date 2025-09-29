@@ -4,7 +4,7 @@ namespace wlplan {
   namespace feature_generator {
     NeighbourContainer::NeighbourContainer(bool multiset_hash) : multiset_hash(multiset_hash) {}
 
-    std::string NeighbourContainer::to_string(const std::vector<int> &colours) const {
+    std::string NeighbourContainer::to_string(const std::vector<int> &colours) {
       std::string str = "";
       for (const int i : colours) {
         str += "." + std::to_string(i);
@@ -12,7 +12,7 @@ namespace wlplan {
       return str;
     }
 
-    std::string NeighbourContainer::to_string() const {
+    std::string NeighbourContainer::to_string() {
       std::vector<int> vec = to_vector();
       return to_string(vec);
     }

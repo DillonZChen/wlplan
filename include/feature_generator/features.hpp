@@ -6,6 +6,7 @@
 #include "../graph_generator/graph_generator.hpp"
 #include "../planning/domain.hpp"
 #include "../planning/state.hpp"
+#include "../utils/hash.hpp"
 #include "neighbour_container.hpp"
 #include "pruning_options.hpp"
 
@@ -47,6 +48,7 @@ namespace wlplan {
   namespace feature_generator {
     using Embedding = std::vector<double>;
     using ColourHash = std::unordered_map<std::vector<int>, int, int_vector_hasher>;
+    // using ColourHash = std::unordered_map<std::vector<int>, int, utils::Hash<std::vector<int>>>;
     using VecColourHash = std::vector<ColourHash>;
     using StrColourHash = std::vector<std::unordered_map<std::string, int>>;
 

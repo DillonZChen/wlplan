@@ -8,6 +8,10 @@ namespace wlplan {
         : NeighbourContainer(multiset_hash) {}
 
     void WLNeighbourContainer::clear() { neighbours.clear(); }
+    void WLNeighbourContainer::clear_init(size_t s) {
+      (void)s;
+      neighbours.clear();
+    }
 
     void WLNeighbourContainer::insert(const int node_colour, const int edge_label) {
       const auto key = std::make_pair(edge_label, node_colour);
@@ -26,7 +30,7 @@ namespace wlplan {
       }
     }
 
-    std::vector<int> WLNeighbourContainer::to_vector() const {
+    std::vector<int> WLNeighbourContainer::to_vector() {
       std::vector<int> vec;
       vec.reserve(neighbours.size() * 3);
       for (const auto &[label_colour, count] : neighbours) {
@@ -38,7 +42,7 @@ namespace wlplan {
     }
 
     std::vector<std::tuple<int, int, int>>
-    WLNeighbourContainer::deconstruct(const std::vector<int> &colours) const {
+    WLNeighbourContainer::deconstruct(const std::vector<int> &colours) {
       std::vector<std::tuple<int, int, int>> output;
 
       int inc = 3;
@@ -59,8 +63,7 @@ namespace wlplan {
       return output;
     }
 
-    std::vector<int>
-    WLNeighbourContainer::get_neighbour_colours(const std::vector<int> &colours) const {
+    std::vector<int> WLNeighbourContainer::get_neighbour_colours(const std::vector<int> &colours) {
       std::vector<int> neighbour_colours;
       for (const auto &[node_colour, edge_label, n_occurrences] : deconstruct(colours)) {
         neighbour_colours.push_back(node_colour);

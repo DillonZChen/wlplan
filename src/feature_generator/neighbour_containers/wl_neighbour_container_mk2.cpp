@@ -1,5 +1,6 @@
 #include "../../../include/feature_generator/neighbour_containers/wl_neighbour_container_mk2.hpp"
 
+#include <algorithm>
 #include <iostream>
 
 namespace wlplan {
@@ -16,33 +17,27 @@ namespace wlplan {
         neighbours_set.clear();
     }
 
+    void WLNeighbourContainerMk2::clear_init(size_t s) {
+      if (multiset_hash)
+        neighbours_multiset.clear(), neighbours_multiset.reserve(s);
+      else
+        neighbours_set.clear();
+    }
+
     void WLNeighbourContainerMk2::insert(const int node_colour, const int edge_label) {
       const int key = n_relations * node_colour + edge_label;
 
       if (multiset_hash) {
-        auto it = neighbours_multiset.lower_bound(key);
-        if (it != neighbours_multiset.end() && it->first == key) {
-          // Key already exists, update it.
-          it->second++;
-        } else {
-          // Key does not exist, insert it with a hint.
-          neighbours_multiset.emplace_hint(it, key, 1);
-        }
+        neighbours_multiset.push_back(key);
       } else {
         neighbours_set.insert(key);
       }
     }
 
-    std::vector<int> WLNeighbourContainerMk2::to_vector() const {
+    std::vector<int> WLNeighbourContainerMk2::to_vector() {
       if (multiset_hash) {
-        std::vector<int> vec;
-        vec.reserve(neighbours_multiset.size() * 2);
-        // neighbours is already sorted by key due to std::map
-        for (const auto &[label_colour, count] : neighbours_multiset) {
-          vec.push_back(label_colour);
-          vec.push_back(count);
-        }
-        return vec;
+        std::sort(neighbours_multiset.begin(), neighbours_multiset.end());
+        return neighbours_multiset;
       } else {
         std::vector<int> vec(neighbours_set.begin(), neighbours_set.end());
         return vec;
@@ -50,23 +45,21 @@ namespace wlplan {
     }
 
     std::vector<std::tuple<int, int, int>>
-    WLNeighbourContainerMk2::deconstruct(const std::vector<int> &colours) const {
+    WLNeighbourContainerMk2::deconstruct(const std::vector<int> &colours) {
       std::vector<std::tuple<int, int, int>> output;
 
       if (multiset_hash) {
-        int inc = 2;
+        std::map<std::pair<int, int>, int> count_map;
 
-        if (colours.size() % inc != 1) {
-          throw std::runtime_error("Key " + to_string(colours) + " has size() % " +
-                                   std::to_string(inc) +
-                                   " != 1 for multiset_hash=" + std::to_string(multiset_hash));
+        for (const int &key : colours) {
+          int edge_label = key % n_relations;
+          int node_colour = key / n_relations;
+          count_map.try_emplace(std::make_pair(node_colour, edge_label), 0);
+          count_map[std::make_pair(node_colour, edge_label)] += 1;
         }
 
-        for (int i = 0; i < (int)colours.size() - inc; i += inc) {
-          int edge_label = colours.at(i) % n_relations;
-          int node_colour = colours.at(i) / n_relations;
-          int n_occurrences = colours.at(i + 1);
-          output.push_back(std::tuple<int, int, int>(node_colour, edge_label, n_occurrences));
+        for (const auto &[key, count] : count_map) {
+          output.push_back(std::tuple<int, int, int>(key.first, key.second, count));
         }
       } else {
         for (const int &key : colours) {
@@ -81,7 +74,7 @@ namespace wlplan {
     }
 
     std::vector<int>
-    WLNeighbourContainerMk2::get_neighbour_colours(const std::vector<int> &colours) const {
+    WLNeighbourContainerMk2::get_neighbour_colours(const std::vector<int> &colours) {
       std::vector<int> neighbour_colours;
       for (const auto &[node_colour, edge_label, n_occurrences] : deconstruct(colours)) {
         neighbour_colours.push_back(node_colour);

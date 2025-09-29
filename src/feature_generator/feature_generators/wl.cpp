@@ -95,7 +95,7 @@ namespace wlplan {
       std::vector<int> new_colours(colours.size(), UNSEEN_COLOUR);
 
       for (size_t u = 0; u < colours.size(); u++) {
-        neighbour_container->clear();
+        neighbour_container->clear_init(graph->edges[u].size());
 
         for (const auto &edge : graph->edges[u]) {
           // add sorted neighbour (colour, edge_label) pair

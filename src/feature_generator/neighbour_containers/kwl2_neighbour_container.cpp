@@ -8,7 +8,7 @@ namespace wlplan {
         : WLNeighbourContainer(multiset_hash) {}
 
     std::vector<int>
-    KWL2NeighbourContainer::get_neighbour_colours(const std::vector<int> &colours) const {
+    KWL2NeighbourContainer::get_neighbour_colours(const std::vector<int> &colours) {
       std::set<int> neighbour_colours_set;
       for (const auto &[col0, col1, n_occurrences] : deconstruct(colours)) {
         neighbour_colours_set.insert(col0);

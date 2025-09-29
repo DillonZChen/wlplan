@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <tuple>
+#include <vector>
 
 namespace wlplan {
   namespace feature_generator {
@@ -14,12 +15,13 @@ namespace wlplan {
       WLNeighbourContainerMk2(bool multiset_hash, int n_features, int n_relations);
 
       void clear() override;
+      void clear_init(size_t s) override;
       void insert(const int node_colour, const int edge_label) override;
-      std::vector<int> to_vector() const override;
+      std::vector<int> to_vector() override;
 
       // triples are <node_colour, edge_label, n_occurrence>
-      std::vector<std::tuple<int, int, int>> deconstruct(const std::vector<int> &colours) const;
-      std::vector<int> get_neighbour_colours(const std::vector<int> &colours) const override;
+      std::vector<std::tuple<int, int, int>> deconstruct(const std::vector<int> &colours);
+      std::vector<int> get_neighbour_colours(const std::vector<int> &colours) override;
 
       std::vector<int> remap(const std::vector<int> &input,
                              const std::map<int, int> &remap) override;
@@ -27,7 +29,7 @@ namespace wlplan {
      protected:
       const int n_features;
       const int n_relations;
-      std::map<int, int> neighbours_multiset;
+      std::vector<int> neighbours_multiset;
       std::set<int> neighbours_set;
     };
   }  // namespace feature_generator
