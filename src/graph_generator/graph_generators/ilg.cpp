@@ -33,6 +33,7 @@ namespace wlplan {
 
       /* add nodes */
       int colour;
+      std::string node;
 
       // add constant object nodes
       for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
@@ -47,21 +48,21 @@ namespace wlplan {
 
       // objects
       for (const auto &object : problem.get_problem_objects()) {
-        std::string node = object;
+        node = object;
         colour = 0;
         graph.add_node(node, colour);
       }
 
       // atoms
       for (const auto &atom : problem.get_positive_goals()) {
-        std::string node = atom.to_string();
+        node = atom.to_string();
         colour = fact_colour(atom, ILGFactDescription::F_POS_GOAL);
         graph.add_node(node, colour);
         positive_goal_names.insert(node);
       }
 
       for (const auto &atom : problem.get_negative_goals()) {
-        std::string node = atom.to_string();
+        node = atom.to_string();
         colour = fact_colour(atom, ILGFactDescription::F_NEG_GOAL);
         graph.add_node(node, colour);
         negative_goal_names.insert(node);
@@ -88,7 +89,7 @@ namespace wlplan {
         object_node_indices[object] = base_graph->get_node_index(object);
       }
       for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
-        std::string node = domain.constant_objects[i];
+        node = domain.constant_objects[i];
         object_node_indices[node] = base_graph->get_node_index(node);
       }
 
