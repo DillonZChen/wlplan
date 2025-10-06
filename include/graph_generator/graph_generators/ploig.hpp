@@ -34,7 +34,6 @@ namespace wlplan {
       std::shared_ptr<Graph> to_graph(const planning::State &state) override;
       std::shared_ptr<Graph> to_graph(const planning::State &state,
                                       const planning::ActionPointers &actions) override;
-      // TODO implement optimised variant
       std::shared_ptr<Graph> to_graph_opt(const planning::State &state) override;
       void reset_graph() const override;
 
@@ -47,6 +46,9 @@ namespace wlplan {
       std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ag_to_e_col;
       std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ug_to_e_col;
       std::unordered_map<std::string, std::map<std::pair<int, int>, int>> ap_to_e_col;
+
+      std::unordered_map<std::string, int> obj_to_colour;
+      std::unordered_map<std::string, int> unary_pred_to_i;
 
       /* For modifying the base graph and redoing its changes */
       std::shared_ptr<Graph> modify_graph_from_state(const planning::State &state,

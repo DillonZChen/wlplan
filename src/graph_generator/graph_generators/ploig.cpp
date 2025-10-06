@@ -5,11 +5,17 @@ namespace wlplan {
     PLOIGGenerator::PLOIGGenerator(const planning::Domain &domain,
                                    const bool differentiate_constant_objects)
         : GraphGenerator(domain, differentiate_constant_objects, "PLOIGGenerator") {
-      // Note that there are edge colours here.
-      // The only node (object) colours are already handled in GraphGenerator.
+      if (differentiate_constant_objects) {
+        throw std::runtime_error("PLOIG does not support differentiating constant objects");
+      }
+
       n_relations = 0;
       std::string desc;
       for (const auto &predicate : domain.predicates) {
+        if (predicate.arity == 1) {
+          unary_pred_to_i[predicate.name] = unary_pred_to_i.size();
+        }
+
         std::map<std::pair<int, int>, int> ag;
         std::map<std::pair<int, int>, int> ug;
         std::map<std::pair<int, int>, int> ap;
@@ -55,36 +61,29 @@ namespace wlplan {
     void PLOIGGenerator::set_problem(const planning::Problem &problem) {
       this->problem = std::make_shared<planning::Problem>(problem);
       if (problem.get_negative_goals().size() > 0) {
-        std::cerr << "PLOIGGenerator does not support negative goals. "
-                  << "Please use ILGGenerator instead." << std::endl;
-        exit(1);
         throw std::runtime_error("PLOIG does not yet support negative goals");
       }
+      obj_to_colour.clear();
+      for (const auto &object : problem.get_constant_objects()) {
+        obj_to_colour[object] = 0;
+      }
+      for (const auto &object : problem.get_problem_objects()) {
+        obj_to_colour[object] = 0;
+      }
+
       for (const auto &atom : problem.get_positive_goals()) {
         positive_goal_names.insert(atom.to_string());
+        if (atom.predicate->arity == 1) {
+          int pred_i = unary_pred_to_i.at(atom.predicate->name);
+          obj_to_colour[atom.objects[0]] = 2 << (pred_i + unary_pred_to_i.size());
+        }
       }
 
       Graph graph = Graph(/*store_node_names=*/true);
 
       /* add nodes */
-      int colour;
-
-      // add constant object nodes
-      for (size_t i = 0; i < problem.get_constant_objects().size(); i++) {
-        std::string node = domain.constant_objects[i];
-        if (differentiate_constant_objects) {
-          colour = -(i + 1);
-        } else {
-          colour = 0;
-        }
-        graph.add_node(node, colour);
-      }
-
-      // objects
-      for (const auto &object : problem.get_problem_objects()) {
-        std::string node = object;
-        colour = 0;
-        graph.add_node(node, colour);
+      for (const auto &pair : obj_to_colour) {
+        graph.add_node(pair.first, pair.second);
       }
 
       /* set pointer */
@@ -94,18 +93,23 @@ namespace wlplan {
     std::shared_ptr<Graph>
     PLOIGGenerator::modify_graph_from_state(const planning::State &state,
                                             const std::shared_ptr<Graph> graph) {
+      std::unordered_map<std::string, int> obj_to_colour_copy = obj_to_colour;
 
       /* add edges */
 
       // compute ug, ag, ap
       std::unordered_set<std::string> unachieved_goals;
-      for (const auto &atom : problem->get_positive_goals()) {
-        unachieved_goals.insert(atom.to_string());
-      }
       std::vector<std::shared_ptr<planning::Atom>> ug;
       std::vector<std::shared_ptr<planning::Atom>> ag;
       std::vector<std::shared_ptr<planning::Atom>> ap;
+      for (const auto &atom : problem->get_positive_goals()) {
+        unachieved_goals.insert(atom.to_string());
+      }
       for (const auto &atom : state.atoms) {
+        if (atom->predicate->arity == 1) {
+          obj_to_colour_copy[atom->objects[0]] = 2 << (unary_pred_to_i[atom->predicate->name]);
+        }
+
         std::string atom_name = atom->to_string();
         if (positive_goal_names.count(atom_name)) {
           unachieved_goals.erase(atom_name);
@@ -119,6 +123,11 @@ namespace wlplan {
         if (unachieved_goals.count(atom_name)) {
           ug.push_back(std::make_shared<planning::Atom>(atom));
         }
+      }
+
+      // update node colours
+      for (const auto &pair : obj_to_colour_copy) {
+        base_graph->change_node_colour(pair.first, pair.second);
       }
 
       // add obj <-> obj edges
@@ -174,6 +183,9 @@ namespace wlplan {
       // Delete all edges, keep nodes
       for (size_t i = 0; i < base_graph->nodes.size(); i++) {
         base_graph->edges[i].clear();
+      }
+      for (const auto &pair : obj_to_colour) {
+        base_graph->change_node_colour(pair.first, pair.second);
       }
     }
 

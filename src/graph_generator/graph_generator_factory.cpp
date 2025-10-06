@@ -15,7 +15,7 @@ namespace wlplan {
       } else if (name == "nilg") {
         graph_generator = std::make_shared<NILGGenerator>(domain, true);
       } else if (name == "ploig") {
-        graph_generator = std::make_shared<PLOIGGenerator>(domain, true);
+        graph_generator = std::make_shared<PLOIGGenerator>(domain, false);
       } else if (name == "aoag") {
         graph_generator = std::make_shared<AOAGGenerator>(domain, true);
       } else if (name == "custom") {
