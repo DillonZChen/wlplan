@@ -1,11 +1,5 @@
-#ifndef GRAPH_GENERATOR_GRAPH_GENERATORS_NILG_HPP
-#define GRAPH_GENERATOR_GRAPH_GENERATORS_NILG_HPP
-
-// Reference:
-// Dillon Z. Chen and Sylvie Thiébaux. Graph Learning for Numeric Planning. In NeurIPS, 2024.
-
-// Link:
-// https://arxiv.org/abs/2410.24080
+#ifndef GRAPH_GENERATOR_GRAPH_GENERATORS_IILG_HPP
+#define GRAPH_GENERATOR_GRAPH_GENERATORS_IILG_HPP
 
 #include "ilg.hpp"
 
@@ -17,9 +11,9 @@
 #include <vector>
 
 namespace wlplan::graph_generator {
-  class NILGGenerator : public ILGGenerator {
+  class IILGGenerator : public ILGGenerator {
    public:
-    NILGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
+    IILGGenerator(const planning::Domain &domain, const bool differentiate_constant_objects);
 
     // Graph generation
     void set_problem(const planning::Problem &problem) override;
@@ -50,4 +44,4 @@ namespace wlplan::graph_generator {
   };
 }  // namespace wlplan::graph_generator
 
-#endif  // GRAPH_GENERATOR_GRAPH_GENERATORS_NILG_HPP
+#endif  // GRAPH_GENERATOR_GRAPH_GENERATORS_IILG_HPP
