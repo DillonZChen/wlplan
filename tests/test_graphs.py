@@ -9,6 +9,7 @@ from neurips24 import get_raw_dataset as get_neurips24_dataset
 
 from wlplan.feature_generator import init_feature_generator
 from wlplan.graph_generator import (
+    IILGGenerator,
     ILGGenerator,
     NILGGenerator,
     PLOIGGenerator,
@@ -100,6 +101,18 @@ def test_ploig():
         for state in states:
             ploig_generator.set_problem(problem)
             graph = ploig_generator.to_graph(state)
+            nx_graph = to_networkx(graph)  # just checks to see no crash
+            assert nx_graph is not None
+
+
+def test_iilg():
+    """Test IILG generator does not crash"""
+    domain, dataset, _ = get_ipc23lt_dataset(domain_name="blocksworld", keep_statics=False)
+    iilg_generator = IILGGenerator(domain)
+    for problem, states in dataset:
+        for state in states:
+            iilg_generator.set_problem(problem)
+            graph = iilg_generator.to_graph(state)
             nx_graph = to_networkx(graph)  # just checks to see no crash
             assert nx_graph is not None
 

@@ -9,6 +9,7 @@
 #include "../include/feature_generator/features.hpp"
 #include "../include/feature_generator/pruning_options.hpp"
 #include "../include/graph_generator/graph_generators/aoag.hpp"
+#include "../include/graph_generator/graph_generators/iilg.hpp"
 #include "../include/graph_generator/graph_generators/ilg.hpp"
 #include "../include/graph_generator/graph_generators/nilg.hpp"
 #include "../include/graph_generator/graph_generators/ploig.hpp"
@@ -589,6 +590,11 @@ Methods
       .def(py::init<wlplan::planning::Domain &, bool>(),
            "domain"_a,
            "differentiate_constant_objects"_a);
+
+  // IILGGenerator
+  py::class_<wlplan::graph_generator::IILGGenerator, wlplan::graph_generator::GraphGenerator>(
+      graph_generator_m, "IILGGenerator")
+      .def(py::init<wlplan::planning::Domain &>(), "domain"_a);
 
   // NILGGenerator
   py::class_<wlplan::graph_generator::NILGGenerator, wlplan::graph_generator::ILGGenerator>(

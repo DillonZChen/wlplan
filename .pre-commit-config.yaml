@@ -7,10 +7,6 @@ repos:
   -   id: check-yaml
   -   id: debug-statements
   -   id: requirements-txt-fixer
-- repo: https://github.com/pocc/pre-commit-hooks
-  rev: master
-  hooks:
-    - id: clang-format
 - repo: https://github.com/kynan/nbstripout
   rev: 0.8.1
   hooks:
@@ -20,8 +16,3 @@ repos:
   hooks:
     - id: black
       language_version: python3
-- repo: https://github.com/pycqa/isort
-  rev: 6.0.1
-  hooks:
-    - id: isort
-      args: ["--profile", "black"]

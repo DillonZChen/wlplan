@@ -1,6 +1,7 @@
 #include "../../include/graph_generator/graph_generator_factory.hpp"
 
 #include "../../include/graph_generator/graph_generators/aoag.hpp"
+#include "../../include/graph_generator/graph_generators/iilg.hpp"
 #include "../../include/graph_generator/graph_generators/ilg.hpp"
 #include "../../include/graph_generator/graph_generators/nilg.hpp"
 #include "../../include/graph_generator/graph_generators/ploig.hpp"
@@ -11,6 +12,8 @@ namespace wlplan::graph_generator {
     std::shared_ptr<GraphGenerator> graph_generator;
     if (name == "ilg") {
       graph_generator = std::make_shared<ILGGenerator>(domain, false);
+    } else if (name == "iilg") {
+      graph_generator = std::make_shared<IILGGenerator>(domain);
     } else if (name == "nilg") {
       graph_generator = std::make_shared<NILGGenerator>(domain, true);
     } else if (name == "ploig") {

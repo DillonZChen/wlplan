@@ -4,6 +4,7 @@ from _wlplan.graph_generator import (
     AOAGGenerator,
     Graph,
     GraphGenerator,
+    IILGGenerator,
     ILGGenerator,
     NILGGenerator,
     PLOIGGenerator,
@@ -23,6 +24,7 @@ _GRAPH_REPRESENTATIONS = {
     "custom": None,
     "aoag": AOAGGenerator,
     "ilg": ILGGenerator,
+    "iilg": IILGGenerator,
     "nilg": NILGGenerator,
     "ploig": PLOIGGenerator,
 }
