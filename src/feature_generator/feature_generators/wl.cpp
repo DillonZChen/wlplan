@@ -88,15 +88,14 @@ namespace wlplan {
     }
 
     void WLFeatures::refine_fast(const std::shared_ptr<graph_generator::Graph> &graph,
-                                 const std::set<int> &nodes,
                                  std::vector<int> &colours,
                                  int iteration) {
       // memory for storing string and hashed int representation of colours
       std::vector<int> new_colour;
       std::vector<int> new_colours(colours.size(), UNSEEN_COLOUR);
 
-      for (const int u : nodes) {
-        neighbour_container->clear();
+      for (size_t u = 0; u < colours.size(); u++) {
+        neighbour_container->clear_init(graph->edges[u].size());
 
         for (const auto &edge : graph->edges[u]) {
           // add sorted neighbour (colour, edge_label) pair
@@ -167,7 +166,7 @@ namespace wlplan {
 
       std::vector<int> colours(n_nodes, 0);
       for (int node_i = 0; node_i < n_nodes; node_i++) {
-        int col = get_colour_hash({graph->nodes[node_i]}, 0);
+        int col = get_colour_hash_fast({graph->nodes[node_i]}, 0);
         colours[node_i] = col;
 
         features.try_emplace(col, 0);
@@ -175,9 +174,8 @@ namespace wlplan {
       }
 
       // main WL loop
-      std::set<int> nodes = graph->get_nodes_set();
       for (int itr = 1; itr < iterations + 1; itr++) {
-        refine_fast(graph, nodes, colours, itr);
+        refine_fast(graph, colours, itr);
 
         for (const int col : colours) {
           features.try_emplace(col, 0);
