@@ -5,7 +5,7 @@ WLPlan Documentation
 
 .. raw:: html
 
-    <p class="flex-wrapper"><img src="_static/favicon.png" style="height:2em; display:inline; padding-right:0.1em;">Plan is a library for generating embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
+    <p class="flex-wrapper"><img src="_static/favicon.png" style="height:2em; display:inline; padding-right:0.1em; padding-bottom:0.2em">Plan is a library for generating embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
 
 .. toctree::
     :caption: Get Started
