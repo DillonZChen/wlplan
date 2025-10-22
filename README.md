@@ -18,6 +18,13 @@ The main pipeline in WLPlan consists of (1) converting planning problems and sta
     <img src="docs/source/_static/pipeline.svg" alt="WLPlan" title="WLPlan"/>
 </p>
 
+The entire pipeline of generating feature embeddings from PDDL planning problems can be performed in a matter of steps with WLPlan:
+```
+feature_generator = init_feature_generator(domain)
+feature_generator.collect(dataset)
+X = feature_generator.embed(dataset)
+```
+
 Detailed documentation for WLPlan can be found in the official website available [here](https://dillonzchen.github.io/wlplan).
 
 ## Installation

@@ -23,6 +23,7 @@ extensions = [
 add_module_names = False
 language = "en"
 master_doc = "index"
+pygments_style = "tango"
 nbsphinx_execute = "never"
 templates_path = ["_templates"]
 html_static_path = ["_static"]
