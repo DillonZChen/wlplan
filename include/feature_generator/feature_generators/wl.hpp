@@ -41,7 +41,6 @@ namespace wlplan {
                   int iteration);
       // for when we know that there are no unseen colours
       void refine_fast(const std::shared_ptr<graph_generator::Graph> &graph,
-                       const std::set<int> &nodes,
                        std::vector<int> &colours,
                        int iteration);
     };

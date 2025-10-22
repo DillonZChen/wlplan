@@ -19,7 +19,7 @@ namespace wlplan {
      public:
       KWL2NeighbourContainer(bool multiset_hash);
 
-      std::vector<int> get_neighbour_colours(const std::vector<int> &colours) const override;
+      std::vector<int> get_neighbour_colours(const std::vector<int> &colours) override;
       std::vector<int> remap(const std::vector<int> &input,
                              const std::map<int, int> &remap) override;
     };
