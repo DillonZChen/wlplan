@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/source/_static/logo.png" alt="WLPlan Logo" style="height:256px; width:auto;">
+    <img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/docs/source/_static/logo.png" alt="WLPlan Logo" style="height:256px; width:auto;">
 </p>
 
 ------
@@ -10,7 +10,7 @@ WLPlan
 [![PyPI version](https://badge.fury.io/py/wlplan.svg)](https://pypi.org/project/wlplan/)
 [![License](https://img.shields.io/pypi/l/wlplan)](https://github.com/DillonZChen/wlplan/LICENSE)
 
-<p class="flex-wrapper"><img src="docs/source/_static/favicon.png" style="height:1em; display:inline; padding-right:0.1em">Plan is a library for generating graph representations and feature embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
+<p class="flex-wrapper"><img src="https://raw.githubusercontent.com/DillonZChen/wlplan/refs/heads/main/docs/source/_static/favicon.png" style="height:1em; display:inline; padding-right:0.1em">Plan is a library for generating graph representations and feature embeddings of PDDL planning problems and states for machine learning tasks. WLPlan currently supports both classical and numeric planning problems.</p>
 
 The main pipeline in WLPlan consists of (1) converting planning problems and states into graphs, and (2) synthesising feature embeddings by running a variant of the Weisfeiler-Leman (WL) algorithm on the resulting graph.
 
