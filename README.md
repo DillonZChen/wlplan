@@ -50,7 +50,7 @@ and adding the following to the root CMakeLists.txt file of your project
 ## References
 ### Academic Publications
 Some academic publications which use WLPlan are listed as follows.
-- Daniel Höller. **Learning Heuristic Functions for HTN Planning**. In Proceedings of the 40th Annual AAAI Conference on Artificial Intelligence, 2025.
+- Daniel Höller. **Learning Heuristic Functions for HTN Planning**. In Proceedings of the 40th Annual AAAI Conference on Artificial Intelligence, 2026.
 - Dillon Z. Chen. **Symmetry-Invariant Novelty Heuristics via Unsupervised Weisfeiler-Leman Features**. In Proceedings of the ICAPS 2025 Workshop on Heuristics and Search for Domain-independent Planning (HSDIP), 2025.
 - Dillon Z. Chen. **Weisfeiler-Leman Features for Planning: A 1,000,000 Sample Size Hyperparameter Study**. In Proceedings of the 28th European Conference on Artificial Intelligence (ECAI), 2025.
 - Mingyu Hao, Dillon Z. Chen, Felipe Trevizan, and Sylvie Thiébaux. **Effective Data Generation and Feature Selection in Learning for Planning**. In Proceedings of the 28th European Conference on Artificial Intelligence (ECAI), 2025.
