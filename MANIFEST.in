@@ -3,4 +3,5 @@ include README.md
 include pyproject.toml
 recursive-include include *.hpp
 recursive-include src *.cpp
-recursive-include _wlplan *
+graft _wlplan
+prune _wlplan/__pycache__
