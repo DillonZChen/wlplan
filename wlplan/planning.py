@@ -202,7 +202,7 @@ def to_wlplan_problem(
             expression = pddl.logic.functions.Minus(rhs, lhs)
         elif isinstance(goal, pddl.logic.functions.LesserEqualThan):
             # lhs <= rhs ---> rhs - lhs >= 0
-            comparator_type = ComparatorType.GreaterEqualThan
+            comparator_type = ComparatorType.GreaterThanOrEqual
             expression = pddl.logic.functions.Minus(rhs, lhs)
         elif isinstance(goal, pddl.logic.functions.GreaterThan):
             # lhs >  rhs ---> lhs - rhs >  0
@@ -210,7 +210,7 @@ def to_wlplan_problem(
             expression = pddl.logic.functions.Minus(lhs, rhs)
         elif isinstance(goal, pddl.logic.functions.GreaterEqualThan):
             # lhs >= rhs ---> lhs - rhs >= 0
-            comparator_type = ComparatorType.GreaterEqualThan
+            comparator_type = ComparatorType.GreaterThanOrEqual
             expression = pddl.logic.functions.Minus(lhs, rhs)
         expression = _convert_pddl_to_wlplan_expression(expression, fluent_to_id)
         numeric_goal = NumericCondition(comparator_type=comparator_type, expression=expression)
